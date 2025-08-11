@@ -1,17 +1,15 @@
 const fr = {
-    app: {
-      header: {
-        title: "Bienvenue sur notre site",
-        subtitle: "Profitez de votre visite !",
-      },
-      footer: {
-        copyright: "© 2025 Mon entreprise",
-      },
+  homePage: {
+    navbar: {
+      home: "Accueil",
+      features: "Nos Solutions",
+      about: "À propos",
+      contactUs: "Contactez-nous",
+      getStarted: "Commencer"
     },
-    homePage: {
-      greeting: "Bonjour",
-    },
-  };
+  },
+};
+
   
   export default fr;
   

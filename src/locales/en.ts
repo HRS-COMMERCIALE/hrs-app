@@ -1,11 +1,13 @@
 const en = {
-  homePage:{
-    navbar:{
-      firstField:"solutions",
-      secondField:"Enterprise",
-      thirdField:"Global",
-      fourthField:"Security",
-    },}
+  homePage: {
+    navbar: {
+      home: "Home",
+      features: "Features",
+      about: "About",
+      contactUs: "Contact Us",
+      getStarted:"Get Started"
+    },
+  },
 };
-  
-  export default en;
+
+export default en;

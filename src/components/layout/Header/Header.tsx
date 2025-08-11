@@ -1,20 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLanguageStore } from '../../../store/languageStore';
+import { useLanguageUtils } from '../../../utils/language/languageUtils';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('EN');
+
+  // Use the language utility hook
+  const { changeLanguage, currentLanguageCode, currentTranslations } = useLanguageUtils();
 
   // Navigation items - easy to modify here
   const navigationItems = [
-    { id: 'home', label: 'Home', href: '#home' },
-    { id: 'features', label: 'Features', href: '#features' },
-    { id: 'about', label: 'About', href: '#about' },
-    { id: 'contact', label: 'Contact Us', href: '#contact' }
+    { id: 'home', label: currentTranslations?.homePage?.navbar?.home || 'Home', href: '#home' },
+    { id: 'features', label: currentTranslations?.homePage?.navbar?.features || 'Features', href: '#features' },
+    { id: 'about', label: currentTranslations?.homePage?.navbar?.about || 'About', href: '#about' },
+    { id: 'contact', label: currentTranslations?.homePage?.navbar?.contactUs || 'Contact Us', href: '#contact' }
   ];
+
+  useEffect(() => {
+    console.log('Current language object from store:', currentTranslations);
+  }, [currentTranslations]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,30 +34,29 @@ export default function Header() {
   }, []);
 
   const languages = [
-    { code: 'EN', name: 'English', flag: '🇺🇸' },
-    { code: 'FR', name: 'Français', flag: '🇫🇷' },
-    { code: 'AR', name: 'العربية', flag: '🇹🇳' }
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'ar', name: 'العربية', flag: '🇸🇦' }
   ];
 
   const handleLanguageChange = (langCode: string) => {
-    setCurrentLanguage(langCode);
+    changeLanguage(langCode as any);
     setLanguageOpen(false);
-    // Here you can add logic to change the app language
   };
 
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-      isScrolled ? 'bg-gradient-to-r from-[#03071a]/95 to-[#172453]/95 backdrop-blur-xl border-b border-[#3c959d]/30 shadow-2xl' : 'bg-transparent'
+      isScrolled ? 'bg-gradient-to-r from-[#03071a]/10 to-[#172453]/10 backdrop-blur-sm border-b border-[#3c959d]/30 shadow-2xl' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-12 lg:h-16">
           {/* Logo Section */}
           <div className="flex-shrink-0 group cursor-pointer">
             <div className="relative">
               <img 
                 src="/logo.png" 
                 alt="Tunisie Business Solutions Logo" 
-                className="h-10 lg:h-14 w-auto object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
+                className="h-8 lg:h-10 w-auto object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[#3c959d]/20 via-transparent to-[#ef7335]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
             </div>
@@ -77,8 +84,8 @@ export default function Header() {
                 onClick={() => setLanguageOpen(!languageOpen)}
                 className="flex items-center space-x-2 text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-3 py-2 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-sm"
               >
-                <span className="text-base">{languages.find(lang => lang.code === currentLanguage)?.flag}</span>
-                <span className="hidden sm:inline">{currentLanguage}</span>
+                <span className="text-base">{languages.find(lang => lang.code === currentLanguageCode)?.flag}</span>
+                <span className="hidden sm:inline">{currentLanguageCode}</span>
                 <svg className={`w-3 h-3 transition-transform duration-200 ${languageOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -91,8 +98,8 @@ export default function Header() {
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
                       className={`w-full flex items-center space-x-3 px-3 py-2.5 text-left hover:bg-[#3c959d]/20 transition-all duration-200 ${
-                        currentLanguage === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
-                      } ${language.code === 'AR' ? 'text-right' : ''}`}
+                        currentLanguageCode === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
+                      } ${language.code === 'ar' ? 'text-right' : ''}`}
                     >
                       <span className="text-base">{language.flag}</span>
                       <span className="font-medium text-sm">{language.name}</span>
@@ -103,7 +110,7 @@ export default function Header() {
             </div>
 
             <button className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-5 py-2.5 rounded-lg text-sm">
-              Get Started
+              {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started'}
             </button>
           </div>
 
@@ -147,7 +154,7 @@ export default function Header() {
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
                       className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                        currentLanguage === language.code 
+                        currentLanguageCode === language.code 
                           ? 'text-[#3c959d] bg-[#3c959d]/10 border border-[#3c959d]/30' 
                           : 'text-slate-200 hover:bg-slate-800/30'
                       }`}
@@ -161,7 +168,7 @@ export default function Header() {
 
               <div className="pt-4">
                 <button className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base">
-                  Get Started Now
+                  {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started Now'}
                 </button>
               </div>
             </nav>

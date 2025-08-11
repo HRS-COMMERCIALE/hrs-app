@@ -1,12 +1,15 @@
 const ar = {
-    homePage:{
-      navbar:{
-        firstField:"solutions",
-        secondField:"Enterprise",
-        thirdField:"الخدمات",
-        fourthField:"اتصل بنا",
-      },}
-  };
+  homePage: {
+    navbar: {
+      home: "الرئيسية",
+      features: "الميزات",
+      about: "من نحن",
+      contactUs: "اتصل بنا",
+      getStarted: "ابدأ الآن"
+    },
+  },
+};
+
   
   export default ar;
   
