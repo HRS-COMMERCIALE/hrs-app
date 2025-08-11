@@ -5,6 +5,16 @@ import { useState, useEffect } from 'react';
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('EN');
+
+  // Navigation items - easy to modify here
+  const navigationItems = [
+    { id: 'home', label: 'Home', href: '#home' },
+    { id: 'features', label: 'Features', href: '#features' },
+    { id: 'about', label: 'About', href: '#about' },
+    { id: 'contact', label: 'Contact Us', href: '#contact' }
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,51 +25,99 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const languages = [
+    { code: 'EN', name: 'English', flag: '🇺🇸' },
+    { code: 'FR', name: 'Français', flag: '🇫🇷' },
+    { code: 'AR', name: 'العربية', flag: '🇹🇳' }
+  ];
+
+  const handleLanguageChange = (langCode: string) => {
+    setCurrentLanguage(langCode);
+    setLanguageOpen(false);
+    // Here you can add logic to change the app language
+  };
+
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-      isScrolled ? 'bg-gradient-to-r from-[#03071a]/80 to-[#172453]/80 backdrop-blur-xl border-b border-[#3c959d]/20 shadow-2xl' : 'bg-transparent'
+      isScrolled ? 'bg-gradient-to-r from-[#03071a]/95 to-[#172453]/95 backdrop-blur-xl border-b border-[#3c959d]/30 shadow-2xl' : 'bg-transparent'
     }`}>
-      <div className="container mx-auto px-8 py-5">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo Section */}
-          <div className="flex items-center space-x-4 group cursor-pointer">
+          <div className="flex-shrink-0 group cursor-pointer">
             <div className="relative">
               <img 
                 src="/logo.png" 
                 alt="Tunisie Business Solutions Logo" 
-                className="w-48 h-16 object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
+                className="h-10 lg:h-14 w-auto object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-lg"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#3c959d]/20 via-transparent to-[#ef7335]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
             </div>
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-10">
-            {['Solutions', 'Enterprise', 'Global', 'Security'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-slate-300 hover:text-[#3c959d] transition-all duration-300 relative group font-semibold text-lg">
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-full transition-all duration-500"></span>
+          <nav className="hidden lg:flex items-center space-x-1">
+            {navigationItems.map((item) => (
+              <a 
+                key={item.id} 
+                href={item.href} 
+                className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 relative group font-medium text-sm px-4 py-2 rounded-lg hover:bg-slate-800/30"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-3/4 transition-all duration-500"></span>
               </a>
             ))}
-            <button className="border border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-[#3c959d] hover:border-[#3c959d]/50 transition-all duration-300 font-semibold px-6 py-2 rounded-lg">
-              Client Portal
-            </button>
-            <button className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 px-8 py-2 rounded-lg">
-            Get Started Now
-            </button>
           </nav>
+
+          {/* Right Side Actions */}
+          <div className="hidden lg:flex items-center space-x-3">
+            {/* Language Selector */}
+            <div className="relative">
+              <button 
+                onClick={() => setLanguageOpen(!languageOpen)}
+                className="flex items-center space-x-2 text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-3 py-2 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-sm"
+              >
+                <span className="text-base">{languages.find(lang => lang.code === currentLanguage)?.flag}</span>
+                <span className="hidden sm:inline">{currentLanguage}</span>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${languageOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {languageOpen && (
+                <div className="absolute top-full right-0 mt-1 bg-gradient-to-br from-[#1a2a4a]/95 to-[#2d7a82]/95 border border-[#3c959d]/30 rounded-lg shadow-2xl backdrop-blur-xl z-50 min-w-[140px]">
+                  {languages.map((language) => (
+                    <button
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2.5 text-left hover:bg-[#3c959d]/20 transition-all duration-200 ${
+                        currentLanguage === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
+                      } ${language.code === 'AR' ? 'text-right' : ''}`}
+                    >
+                      <span className="text-base">{language.flag}</span>
+                      <span className="font-medium text-sm">{language.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-5 py-2.5 rounded-lg text-sm">
+              Get Started
+            </button>
+          </div>
 
           {/* Mobile Menu Button */}
           <button 
-            className="lg:hidden text-[#3c959d]"
+            className="lg:hidden text-[#3c959d] p-2 rounded-lg hover:bg-slate-800/30 transition-all duration-200"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
@@ -68,19 +126,44 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-slate-700">
-            <nav className="flex flex-col space-y-4 pt-4">
-              {['Solutions', 'Enterprise', 'Global', 'Security'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="text-slate-300 hover:text-[#3c959d] transition-all duration-300 font-semibold text-lg">
-                  {item}
+          <div className="lg:hidden border-t border-slate-700/50 bg-gradient-to-b from-[#1a2a4a]/95 to-[#2d7a82]/95 backdrop-blur-xl">
+            <nav className="px-4 py-6 space-y-4">
+              {navigationItems.map((item) => (
+                <a 
+                  key={item.id} 
+                  href={item.href} 
+                  className="block text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium text-base px-3 py-2 rounded-lg hover:bg-slate-800/30"
+                >
+                  {item.label}
                 </a>
               ))}
-              <button className="border border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-[#3c959d] hover:border-[#3c959d]/50 transition-all duration-300 font-semibold px-6 py-2 rounded-lg text-left">
-                Client Portal
-              </button>
-              <button className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 px-8 py-2 rounded-lg text-left">
-                Request Demo
-              </button>
+              
+              {/* Mobile Language Selector */}
+              <div className="pt-4 border-t border-slate-700/50">
+                <div className="text-slate-400 text-sm mb-3 px-3 font-medium">Language</div>
+                <div className="space-y-2">
+                  {languages.map((language) => (
+                    <button
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                        currentLanguage === language.code 
+                          ? 'text-[#3c959d] bg-[#3c959d]/10 border border-[#3c959d]/30' 
+                          : 'text-slate-200 hover:bg-slate-800/30'
+                      }`}
+                    >
+                      <span className="text-lg">{language.flag}</span>
+                      <span className="font-medium">{language.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <button className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base">
+                  Get Started Now
+                </button>
+              </div>
             </nav>
           </div>
         )}
