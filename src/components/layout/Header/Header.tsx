@@ -26,7 +26,8 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      setIsScrolled(scrollPercentage > 60);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -46,7 +47,7 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-      isScrolled ? 'bg-gradient-to-r from-[#03071a]/10 to-[#172453]/10 backdrop-blur-sm border-b border-[#3c959d]/30 shadow-2xl' : 'bg-transparent'
+      isScrolled ? 'bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-sm border-b border-[#3c959d]/50 shadow-2xl' : 'bg-gradient-to-r from-[#03071a]/5 to-[#172453]/5 backdrop-blur-sm'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12 lg:h-16">

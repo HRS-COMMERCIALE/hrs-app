@@ -1,8 +1,7 @@
 import Header from '@/components/layout/Header/Header';
 import HeroSection from '@/components/pages/HomePage/HeroSection';
 import BusinessSolutions from "@/components/pages/HomePage/BusinessSolutions"
-import BusinessPlan from "@/components/pages/HomePage/businessPlan"
-import AboutUs from "@/components/pages/HomePage/AboutUs"
+import Container from "@/components/pages/HomePage/container"
 import Footer from "@/components/pages/HomePage/footer"
 
 export default function Home() {
@@ -12,8 +11,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <BusinessSolutions/>
-        <BusinessPlan/>
-        <AboutUs/>
+        <Container/>
         <Footer/>
       </main>
     </div>

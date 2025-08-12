@@ -144,9 +144,9 @@ const BusinessSolutions = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+    <section ref={sectionRef} className="py-24 bg-gradient-to-bl from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Simple Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-slate-900 via-slate-800 to-slate-900"></div>
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
