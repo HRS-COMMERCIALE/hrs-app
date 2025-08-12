@@ -100,9 +100,9 @@ export default function LanguageSelector() {
               const isHovered = selectedHover === code;
               
               return (
-                <button
+              <button
                   key={code}
-                  onClick={() => handleSelect(code as SupportedLanguageCode)}
+                onClick={() => handleSelect(code as SupportedLanguageCode)}
                   onMouseEnter={() => setSelectedHover(code)}
                   onMouseLeave={() => setSelectedHover(null)}
                   className={`w-full group relative overflow-hidden rounded-xl border transition-all duration-200 transform-gpu ${
@@ -159,7 +159,7 @@ export default function LanguageSelector() {
                     }`}
                     style={{ willChange: 'width' }}
                   />
-                </button>
+              </button>
               );
             })}
           </div>
@@ -170,7 +170,7 @@ export default function LanguageSelector() {
               You can change this later in settings
             </p>
           </div>
-        </div>
+      </div>
       </div>
 
       {/* Optimized CSS Animations */}

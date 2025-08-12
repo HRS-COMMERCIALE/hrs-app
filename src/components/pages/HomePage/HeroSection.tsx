@@ -1,8 +1,42 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { useLanguageStore } from '../../../store/languageStore';
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+
+  // Centralized content object for easy text management
+  const { currentTranslations } = useLanguageStore();
+  const language = currentTranslations.homePage.heroSection;
+  const content = {
+    statusBadge: {
+      text: language.statusBadge.text
+    },
+    hero: {
+      title: {
+        line1: language.hero.title.line1,
+        line2: language.hero.title.line2
+      },
+      description: {
+        main: language.hero.description.main,
+        highlight: language.hero.description.highlight,
+        ending: language.hero.description.ending
+      }
+    },
+    cta: {
+      primaryButton: {
+        text: language.cta.primaryButton.text
+      },
+      secondaryButton: {
+        text: language.cta.secondaryButton.text
+      }
+    },
+    trustIndicators: {
+      setup: language.trustIndicators.setup,
+      cancel: language.trustIndicators.cancel,
+      security: language.trustIndicators.security
+    }
+  };
 
   useEffect(() => {
     setIsVisible(true);
@@ -44,7 +78,7 @@ const HeroSection = () => {
               <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
             </div>
-            <span className="text-slate-200 font-medium">🚀 Trusted by 10,000+ businesses worldwide</span>
+            <span className="text-slate-200 font-medium">{content.statusBadge.text}</span>
           </div>
         </div>
 
@@ -52,18 +86,18 @@ const HeroSection = () => {
         <div className="text-center max-w-6xl mx-auto mb-20">
           <h1 className={`text-6xl md:text-8xl font-black mb-8 leading-tight transform transition-all duration-1000 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <span className="block bg-gradient-to-r from-white via-slate-100 to-white bg-clip-text text-transparent mb-4">
-              Transform Your
+              {content.hero.title.line1}
             </span>
             <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent relative">
-              Business Operations
+              {content.hero.title.line2}
               <div className="absolute -inset-2 bg-gradient-to-r from-[#3c959d]/20 to-[#ef7335]/20 blur-xl -z-10 animate-pulse"></div>
             </span>
           </h1>
           
           <p className={`text-xl md:text-2xl text-slate-300 max-w-4xl mx-auto mb-16 leading-relaxed transform transition-all duration-1000 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            The only business management platform you'll ever need. 
-            <span className="text-[#4ba5ad] font-semibold"> Streamline invoices, suppliers, clients, and analytics</span> 
-            with our intelligent, all-in-one solution.
+            {content.hero.description.main}
+            <span className="text-[#4ba5ad] font-semibold">{content.hero.description.highlight}</span> 
+            {content.hero.description.ending}
           </p>
 
           {/* Enhanced CTA Section */}
@@ -71,7 +105,7 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <button className="group relative bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white font-bold px-12 py-6 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-[#3c959d]/30 min-w-[220px] overflow-hidden">
                 <span className="relative z-10 flex items-center justify-center gap-3">
-                  Start Free Trial
+                  {content.cta.primaryButton.text}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
                   </svg>
@@ -84,7 +118,7 @@ const HeroSection = () => {
                   <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a2.5 2.5 0 010 5H9V10z" />
                   </svg>
-                  Watch Demo
+                  {content.cta.secondaryButton.text}
                 </span>
               </button>
             </div>
@@ -95,21 +129,21 @@ const HeroSection = () => {
                 <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                 </svg>
-                Setup in 5 minutes
+                {content.trustIndicators.setup}
               </span>
               <div className="w-1 h-1 bg-slate-600 rounded-full"></div>
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                 </svg>
-                Cancel anytime
+                {content.trustIndicators.cancel}
               </span>
               <div className="w-1 h-1 bg-slate-600 rounded-full"></div>
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" />
                 </svg>
-                Bank-level security
+                {content.trustIndicators.security}
               </span>
             </div>
           </div>

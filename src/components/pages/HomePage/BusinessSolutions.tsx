@@ -1,10 +1,43 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-
+import { useLanguageStore } from '../../../store/languageStore';
 const BusinessSolutions = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const { currentTranslations } = useLanguageStore();
+  const language = currentTranslations.homePage.BusinessSolutions;
+
+  // Content object with all text
+  const content = {
+    badge: language.badge,
+    title1: language.title1,
+    title2: language.title2,
+    description: language.description,
+    descriptionHighlight: language.descriptionHighlight,
+    salesTitle: language.salesTitle,
+    salesSubtitle: language.salesSubtitle,
+    salesDescription: language.salesDescription,
+    salesFeatures: language.salesFeatures,
+    inventoryTitle: language.inventoryTitle,
+    inventorySubtitle: language.inventorySubtitle,
+    inventoryDescription: language.inventoryDescription,
+    inventoryFeatures: language.inventoryFeatures,
+    financialTitle: language.financialTitle,
+    financialSubtitle: language.financialSubtitle,
+    financialDescription: language.financialDescription,
+    financialFeatures: language.financialFeatures,
+    customerTitle: language.customerTitle,
+    customerSubtitle: language.customerSubtitle,
+    customerDescription: language.customerDescription,
+    customerFeatures: language.customerFeatures,
+    featuresTitle: language.featuresTitle,
+    learnMore: language.learnMore,
+    ctaTitle: language.ctaTitle,
+    ctaDescription: language.ctaDescription,
+    startFreeTrial: language.startFreeTrial,
+    watchDemo: language.watchDemo
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -37,70 +70,74 @@ const BusinessSolutions = () => {
 
   const solutions = [
     {
-      title: "Sales & Invoicing",
-      subtitle: "Get Paid Faster",
-      description: "Create professional invoices in seconds. Track payments automatically. Never chase money again.",
-      features: [
-        "Invoice in 30 seconds",
-        "Auto-payment reminders",
-        "Real-time payment tracking",
-        "Professional templates",
-        "Multi-currency support"
-      ],
+      title: content.salesTitle,
+      subtitle: content.salesSubtitle,
+      description: content.salesDescription,
+      features: content.salesFeatures,
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="salesGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3c959d" />
+              <stop offset="50%" stopColor="#4ba5ad" />
+              <stop offset="100%" stopColor="#ef7335" />
+            </linearGradient>
+          </defs>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="url(#salesGradient)" />
         </svg>
       )
     },
     {
-      title: "Inventory Control",
-      subtitle: "Stop Losing Money",
-      description: "Know exactly what you have, where it is, and when to reorder. Eliminate stockouts and overstock.",
-      features: [
-        "Real-time stock levels",
-        "Auto-reorder alerts",
-        "Multi-warehouse tracking",
-        "Barcode scanning",
-        "Stock value reports"
-      ],
+      title: content.inventoryTitle,
+      subtitle: content.inventorySubtitle,
+      description: content.inventoryDescription,
+      features: content.inventoryFeatures,
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="inventoryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3c959d" />
+              <stop offset="50%" stopColor="#4ba5ad" />
+              <stop offset="100%" stopColor="#ef7335" />
+            </linearGradient>
+          </defs>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke="url(#inventoryGradient)" />
         </svg>
       )
     },
     {
-      title: "Financial Dashboard",
-      subtitle: "See Your Money",
-      description: "Know your cash flow instantly. Make decisions based on real numbers, not guesses.",
-      features: [
-        "Live cash flow view",
-        "Profit & loss tracking",
-        "Expense categorization",
-        "Tax-ready reports",
-        "Bank reconciliation"
-      ],
+      title: content.financialTitle,
+      subtitle: content.financialSubtitle,
+      description: content.financialDescription,
+      features: content.financialFeatures,
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="financialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3c959d" />
+              <stop offset="50%" stopColor="#4ba5ad" />
+              <stop offset="100%" stopColor="#ef7335" />
+            </linearGradient>
+          </defs>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke="url(#financialGradient)" />
         </svg>
       )
     },
     {
-      title: "Customer Management",
-      subtitle: "Grow Your Business",
-      description: "Keep customers happy and coming back. Track every interaction and never miss an opportunity.",
-      features: [
-        "Customer database",
-        "Sales history tracking",
-        "Follow-up reminders",
-        "Customer insights",
-        "Mobile CRM access"
-      ],
+      title: content.customerTitle,
+      subtitle: content.customerSubtitle,
+      description: content.customerDescription,
+      features: content.customerFeatures,
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="customerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3c959d" />
+              <stop offset="50%" stopColor="#4ba5ad" />
+              <stop offset="100%" stopColor="#ef7335" />
+            </linearGradient>
+          </defs>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke="url(#customerGradient)" />
         </svg>
       )
     }
@@ -119,20 +156,19 @@ const BusinessSolutions = () => {
               <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
             </div>
-            <span className="text-slate-200 font-medium">Core Business Solutions</span>
+            <span className="text-slate-200 font-medium">{content.badge}</span>
           </div>
           
           <h2 className="text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
-            Stop Losing Money,
+            {content.title1}
             <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">
-              Start Growing !
+              {content.title2}
             </span>
           </h2>
           
           <p className="text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed">
-            Most businesses waste 20% of their revenue on inefficiencies. Our platform eliminates waste, 
-            automates tedious tasks, and gives you the insights to make more money. 
-            <span className="text-[#4ba5ad] font-semibold"> Start seeing results in 30 days.</span>
+            {content.description} 
+            <span className="text-[#4ba5ad] font-semibold">{content.descriptionHighlight}</span>
           </p>
         </div>
 
@@ -165,27 +201,27 @@ const BusinessSolutions = () => {
         {/* Solutions Carousel */}
         <div className={`mb-20 transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="max-w-6xl mx-auto relative">
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700/80 hover:border-[#3c959d]/50 transition-all duration-300 hover:scale-110"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700/80 hover:border-[#3c959d]/50 transition-all duration-300 hover:scale-110"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
             {/* Active Solution Display */}
-            <div className="bg-gradient-to-r from-[#3c959d]/10 via-slate-800/50 to-[#ef7335]/10 backdrop-blur-lg border border-[#3c959d]/30 rounded-3xl p-8 md:p-12 shadow-2xl">
+            <div className="bg-gradient-to-r from-[#3c959d]/10 via-slate-800/50 to-[#ef7335]/10 backdrop-blur-lg border border-[#3c959d]/30 rounded-3xl p-8 md:p-12 shadow-2xl relative">
+              {/* Navigation Arrows - positioned relative to content */}
+              <button
+                onClick={prevSlide}
+                className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700/90 hover:border-[#3c959d]/50 transition-all duration-300 hover:scale-110 shadow-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                onClick={nextSlide}
+                className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700/90 hover:border-[#3c959d]/50 transition-all duration-300 hover:scale-110 shadow-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
               <div className="grid md:grid-cols-2 gap-12 items-center">
                 {/* Content */}
                 <div>
@@ -206,7 +242,7 @@ const BusinessSolutions = () => {
                   </p>
 
                   <button className="group bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white font-bold px-10 py-5 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-[#3c959d]/25 hover:scale-105 flex items-center gap-3">
-                    Learn More
+                    {content.learnMore}
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
                     </svg>
@@ -215,7 +251,7 @@ const BusinessSolutions = () => {
 
                 {/* Features List */}
                 <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-slate-700/30">
-                  <h4 className="text-xl font-bold text-white mb-6">Key Features</h4>
+                  <h4 className="text-xl font-bold text-white mb-6">{content.featuresTitle}</h4>
                   <ul className="space-y-4">
                     {solutions[activeTab].features.map((feature, index) => (
                       <li key={index} className="flex items-center gap-3 text-slate-300">
@@ -249,16 +285,16 @@ const BusinessSolutions = () => {
         <div className={`text-center transform transition-all duration-1000 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="bg-gradient-to-r from-slate-800/80 via-slate-900/80 to-slate-800/80 backdrop-blur-lg border border-[#3c959d]/20 rounded-3xl p-12 text-center shadow-2xl">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to Stop Losing Money?
+              {content.ctaTitle}
             </h3>
             <p className="text-slate-300 text-lg mb-10 max-w-3xl mx-auto">
-              Join 10,000+ businesses that have increased their profits by an average of 35% in the first year.
+              {content.ctaDescription}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <button className="group bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white font-bold px-12 py-6 rounded-2xl text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-[#3c959d]/25 min-w-[220px]">
                 <span className="flex items-center justify-center gap-3">
-                  Start Free Trial
+                  {content.startFreeTrial}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
                   </svg>
@@ -269,7 +305,7 @@ const BusinessSolutions = () => {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a2.5 2.5 0 010 5H9V10z" />
                   </svg>
-                  Watch Demo
+                  {content.watchDemo}
                 </span>
               </button>
             </div>
