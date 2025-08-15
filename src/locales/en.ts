@@ -65,6 +65,141 @@ const en = {
       startFreeTrial: "Start Free Trial",
       watchDemo: "Watch Demo"
     },
+    BusinessPlan:{
+      header: {
+        badge: {
+          icon: "💎",
+          text: "Choose Your Path"
+        },
+        title: "Choose Your Business Plan",
+        subtitle: "Solutions tailored for all business types, from startups to large organizations"
+      },
+      pricingTiers: [
+        {
+          name: 'Premium',
+          price: '59.99',
+          currency: 'HT',
+          features: [
+            '1 Company Account',
+            '5 User Accounts',
+            '1 Mobile Sales Rep (Free)',
+            'Sales & Purchase Modules',
+            'Finance & HR (Standard)',
+            'Unlimited Products & Stock',
+            'Customer & Supplier Management',
+            'Customer-Specific Pricing',
+          ],
+          buttonText: 'Subscribe'
+        },
+        {
+          name: 'Platinum',
+          price: '129.00',
+          currency: 'HT',
+          features: [
+            '1 Company Account',
+            '5 User Accounts',
+            '1 Mobile Sales Rep (Free)',
+            'Sales & Purchase Modules',
+            'Finance & HR (Standard)',
+            'Leave & Expense Management',
+            'CRM Mobile (Offline & Online)',
+            'Meeting Planning & Reports',
+            'Revenue Dashboard & Surveys',
+            'Recovery & Call Management',
+          ],
+          buttonText: 'Subscribe',
+          popular: true
+        },
+        {
+          name: 'Diamond',
+          price: '270.00',
+          currency: 'HT',
+          features: [
+            '3 Company Accounts',
+            '15 User Accounts',
+            '5 Mobile Sales Reps (Free)',
+            'Sales Cycles & Project Management',
+            'Advanced HR & Fleet Management',
+            'Periodic Invoice Planning',
+            'CRM Mobile (Offline & Online)',
+            'Meeting Planning & Reports',
+            'Revenue Dashboard & Surveys',
+            'Recovery & Call Management',
+          ],
+          buttonText: 'Subscribe'
+        }
+      ],
+      customPlan: {
+        name: 'Custom Plan',
+        price: 'Tailored',
+        description: 'Solution adapted to your specific needs',
+        features: [
+          'All modules available',
+          'Unlimited users',
+          '24/7 dedicated support',
+          'Training & custom integrations'
+        ],
+        buttonText: 'Contact Us'
+      },
+      footer: {
+        maintenance: 'All our plans include maintenance, updates and technical support',
+        pricing: '* HT prices - Monthly or annual billing available',
+        innovation: 'Ready to innovate?'
+      }
+    },
+    footer:{
+      company: {
+        name: "Tunisie Business",
+        tagline: "Solutions",
+        description: "Empowering Tunisian businesses with innovative software solutions for growth and success in the digital age.",
+        logoAlt: "Tunisie Business Solutions Logo"
+      },
+      quickMenu: {
+        title: "Quick Menu",
+        items: [
+          { label: "Home", href: "#home", icon: "home" },
+          { label: "Features", href: "#features", icon: "features" },
+          { label: "About Us", href: "#about", icon: "about" },
+          { label: "Contact Us", href: "#contact", icon: "contact" },
+          { label: "Pricing Plans", href: "#pricing", icon: "pricing" }
+        ]
+      },
+      contactInfo: {
+        title: "Contact Info",
+        email: {
+          label: "Email",
+          value: "contact@tunisiebusiness.tn"
+        },
+        phone: {
+          label: "Phone Numbers",
+          numbers: [
+            "+216 71 234 567",
+            "+216 98 765 432"
+          ]
+        },
+        address: {
+          label: "Address",
+          lines: [
+            "123 Avenue Habib Bourguiba",
+            "Tunis 1000, Tunisia"
+          ]
+        }
+      },
+      location: {
+        title: "Our Location",
+        city: "Tunis, Tunisia",
+        subtitle: "Capital City",
+        mapPlaceholder: "Interactive map coming soon"
+      },
+      footer: {
+        links: [
+          "Privacy Policy",
+          "Terms of Service",
+          "Cookie Policy"
+        ]
+      }
+    }
+  
   },
 
 };

@@ -1,9 +1,66 @@
 'use client';
 
 import React from 'react';
+import { useLanguageStore } from '../../../store/languageStore';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { currentTranslations } = useLanguageStore();
+  const language = currentTranslations.homePage.footer;
+
+  const content = {
+    company: {
+      name: language.company.name,
+      tagline: "Solutions",
+      description: "Empowering Tunisian businesses with innovative software solutions for growth and success in the digital age.",
+      logoAlt: "Tunisie Business Solutions Logo"
+    },
+    quickMenu: {
+      title: "Quick Menu",
+      items: [
+        { label: "Home", href: "#home", icon: "home" },
+        { label: "Features", href: "#features", icon: "features" },
+        { label: "About Us", href: "#about", icon: "about" },
+        { label: "Contact Us", href: "#contact", icon: "contact" },
+        { label: "Pricing Plans", href: "#pricing", icon: "pricing" }
+      ]
+    },
+    contactInfo: {
+      title: "Contact Info",
+      email: {
+        label: "Email",
+        value: "contact@tunisiebusiness.tn"
+      },
+      phone: {
+        label: "Phone Numbers",
+        numbers: [
+          "+216 71 234 567",
+          "+216 98 765 432"
+        ]
+      },
+      address: {
+        label: "Address",
+        lines: [
+          "123 Avenue Habib Bourguiba",
+          "Tunis 1000, Tunisia"
+        ]
+      }
+    },
+    location: {
+      title: "Our Location",
+      city: "Tunis, Tunisia",
+      subtitle: "Capital City",
+      mapPlaceholder: "Interactive map coming soon"
+    },
+    footer: {
+      copyright: `© ${currentYear} Tunisie Business Solutions. All rights reserved.`,
+      links: [
+        "Privacy Policy",
+        "Terms of Service",
+        "Cookie Policy"
+      ]
+    }
+  };
 
   return (
     <footer className="bg-gradient-to-bl from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
@@ -23,17 +80,17 @@ const Footer: React.FC = () => {
               <div className="flex items-center mb-6">
                 <img 
                   src="/logo.png" 
-                  alt="Tunisie Business Solutions Logo" 
+                  alt={content.company.logoAlt}
                   className="h-10 w-auto object-contain mr-3"
                 />
                 <div>
-                  <h3 className="text-xl font-bold text-white">Tunisie Business</h3>
-                  <p className="text-sm text-slate-300">Solutions</p>
+                  <h3 className="text-xl font-bold text-white">{content.company.name}</h3>
+                  <p className="text-sm text-slate-300">{content.company.tagline}</p>
                 </div>
               </div>
               
               <p className="text-slate-300 mb-6 leading-relaxed">
-                Empowering Tunisian businesses with innovative software solutions for growth and success in the digital age.
+                {content.company.description}
               </p>
               
               {/* Social Media */}
@@ -58,63 +115,33 @@ const Footer: React.FC = () => {
 
             {/* Quick Menu */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-6">Quick Menu</h4>
+              <h4 className="text-lg font-semibold text-white mb-6">{content.quickMenu.title}</h4>
               <ul className="space-y-3">
-                <li>
-                  <a href="#home" className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#features" className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#about" className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#pricing" className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                    Pricing Plans
-                  </a>
-                </li>
+                {content.quickMenu.items.map((item, index) => (
+                  <li key={index}>
+                    <a href={item.href} className="text-slate-300 hover:text-[#3c959d] transition-colors duration-300 flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* Contact Information */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-6">Contact Info</h4>
+              <h4 className="text-lg font-semibold text-white mb-6">{content.contactInfo.title}</h4>
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <svg className="w-5 h-5 text-[#3c959d] mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <div>
-                    <p className="text-slate-300 text-sm">Email</p>
-                    <a href="mailto:contact@tunisiebusiness.tn" className="text-white hover:text-[#3c959d] transition-colors duration-300">
-                      contact@tunisiebusiness.tn
+                    <p className="text-slate-300 text-sm">{content.contactInfo.email.label}</p>
+                    <a href={`mailto:${content.contactInfo.email.value}`} className="text-white hover:text-[#3c959d] transition-colors duration-300">
+                      {content.contactInfo.email.value}
                     </a>
                   </div>
                 </li>
@@ -123,14 +150,13 @@ const Footer: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <div>
-                    <p className="text-slate-300 text-sm">Phone Numbers</p>
+                    <p className="text-slate-300 text-sm">{content.contactInfo.phone.label}</p>
                     <div className="space-y-1">
-                      <a href="tel:+21671234567" className="text-white hover:text-[#3c959d] transition-colors duration-300 block">
-                        +216 71 234 567
-                      </a>
-                      <a href="tel:+21698765432" className="text-white hover:text-[#3c959d] transition-colors duration-300 block">
-                        +216 98 765 432
-                      </a>
+                      {content.contactInfo.phone.numbers.map((number, index) => (
+                        <a key={index} href={`tel:${number.replace(/\s/g, '')}`} className="text-white hover:text-[#3c959d] transition-colors duration-300 block">
+                          {number}
+                        </a>
+                      ))}
                     </div>
                   </div>
                 </li>
@@ -140,10 +166,14 @@ const Footer: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div>
-                    <p className="text-slate-300 text-sm">Address</p>
+                    <p className="text-slate-300 text-sm">{content.contactInfo.address.label}</p>
                     <p className="text-white">
-                      123 Avenue Habib Bourguiba<br />
-                      Tunis 1000, Tunisia
+                      {content.contactInfo.address.lines.map((line, index) => (
+                        <span key={index}>
+                          {line}
+                          {index < content.contactInfo.address.lines.length - 1 && <br />}
+                        </span>
+                      ))}
                     </p>
                   </div>
                 </li>
@@ -152,7 +182,7 @@ const Footer: React.FC = () => {
 
             {/* Map */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-6">Our Location</h4>
+              <h4 className="text-lg font-semibold text-white mb-6">{content.location.title}</h4>
               <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
                 <div className="w-full h-48 bg-gradient-to-br from-slate-700 to-slate-600 rounded-lg flex items-center justify-center relative overflow-hidden">
                   {/* Map Placeholder with Tunisian Location */}
@@ -161,8 +191,8 @@ const Footer: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p className="text-sm font-medium">Tunis, Tunisia</p>
-                    <p className="text-xs text-slate-400">Capital City</p>
+                    <p className="text-sm font-medium">{content.location.city}</p>
+                    <p className="text-xs text-slate-400">{content.location.subtitle}</p>
                   </div>
                   
                   {/* Location Pin */}
@@ -172,7 +202,7 @@ const Footer: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-xs text-slate-400 mt-2 text-center">
-                  Interactive map coming soon
+                  {content.location.mapPlaceholder}
                 </p>
               </div>
             </div>
@@ -183,19 +213,15 @@ const Footer: React.FC = () => {
         <div className="border-t border-slate-700/50 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-slate-400 text-sm mb-4 md:mb-0">
-              © {currentYear} Tunisie Business Solutions. All rights reserved.
+              {content.footer.copyright}
             </div>
             
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-slate-400 hover:text-[#3c959d] transition-colors duration-300">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-slate-400 hover:text-[#3c959d] transition-colors duration-300">
-                Terms of Service
-              </a>
-              <a href="#" className="text-slate-400 hover:text-[#3c959d] transition-colors duration-300">
-                Cookie Policy
-              </a>
+              {content.footer.links.map((link, index) => (
+                <a key={index} href="#" className="text-slate-400 hover:text-[#3c959d] transition-colors duration-300">
+                  {link}
+                </a>
+              ))}
             </div>
           </div>
         </div>

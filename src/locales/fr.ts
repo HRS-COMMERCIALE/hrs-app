@@ -65,6 +65,140 @@ const fr = {
       startFreeTrial: "Essai Gratuit",
       watchDemo: "Voir la Démo"
     },
+    BusinessPlan:{
+      header: {
+        badge: {
+          icon: "💎",
+          text: "Choisissez Votre Voie"
+        },
+        title: "Choisissez Votre Plan d'Affaires",
+        subtitle: "Solutions adaptées à tous types d'entreprises, des startups aux grandes organisations"
+      },
+      pricingTiers: [
+        {
+          name: 'Premium',
+          price: '59.99',
+          currency: 'HT',
+          features: [
+            '1 Compte Entreprise',
+            '5 Comptes Utilisateurs',
+            '1 Représentant Commercial Mobile (Gratuit)',
+            'Modules Ventes et Achats',
+            'Finance et RH (Standard)',
+            'Produits et Stocks Illimités',
+            'Gestion Clients et Fournisseurs',
+            'Prix Spécifiques par Client',
+          ],
+          buttonText: 'S\'abonner'
+        },
+        {
+          name: 'Platinum',
+          price: '129.00',
+          currency: 'HT',
+          features: [
+            '1 Compte Entreprise',
+            '5 Comptes Utilisateurs',
+            '1 Représentant Commercial Mobile (Gratuit)',
+            'Modules Ventes et Achats',
+            'Finance et RH (Standard)',
+            'Gestion Congés et Dépenses',
+            'CRM Mobile (Hors ligne et En ligne)',
+            'Planification Réunions et Rapports',
+            'Tableau de Bord Revenus et Enquêtes',
+            'Gestion Recouvrement et Appels',
+          ],
+          buttonText: 'S\'abonner',
+          popular: true
+        },
+        {
+          name: 'Diamond',
+          price: '270.00',
+          currency: 'HT',
+          features: [
+            '3 Comptes Entreprise',
+            '15 Comptes Utilisateurs',
+            '5 Représentants Commerciaux Mobile (Gratuits)',
+            'Cycles de Vente et Gestion de Projets',
+            'RH Avancé et Gestion de Flotte',
+            'Planification Facturation Périodique',
+            'CRM Mobile (Hors ligne et En ligne)',
+            'Planification Réunions et Rapports',
+            'Tableau de Bord Revenus et Enquêtes',
+            'Gestion Recouvrement et Appels',
+          ],
+          buttonText: 'S\'abonner'
+        }
+      ],
+      customPlan: {
+        name: 'Plan Sur Mesure',
+        price: 'Personnalisé',
+        description: 'Solution adaptée à vos besoins spécifiques',
+        features: [
+          'Tous les modules disponibles',
+          'Utilisateurs illimités',
+          'Support dédié 24/7',
+          'Formation et intégrations personnalisées'
+        ],
+        buttonText: 'Contactez-nous'
+      },
+      footer: {
+        maintenance: 'Tous nos plans incluent maintenance, mises à jour et support technique',
+        pricing: '* Prix HT - Facturation mensuelle ou annuelle disponible',
+        innovation: 'Prêt à innover ?'
+      }
+    },
+    footer:{
+      company: {
+        name: "Tunisie Business",
+        tagline: "Solutions",
+        description: "Donner aux entreprises tunisiennes les moyens de réussir avec des solutions logicielles innovantes pour la croissance et le succès à l'ère numérique.",
+        logoAlt: "Logo Tunisie Business Solutions"
+      },
+      quickMenu: {
+        title: "Menu Rapide",
+        items: [
+          { label: "Accueil", href: "#home", icon: "home" },
+          { label: "Fonctionnalités", href: "#features", icon: "features" },
+          { label: "À Propos", href: "#about", icon: "about" },
+          { label: "Contactez-nous", href: "#contact", icon: "contact" },
+          { label: "Plans Tarifaires", href: "#pricing", icon: "pricing" }
+        ]
+      },
+      contactInfo: {
+        title: "Informations de Contact",
+        email: {
+          label: "E-mail",
+          value: "contact@tunisiebusiness.tn"
+        },
+        phone: {
+          label: "Numéros de Téléphone",
+          numbers: [
+            "+216 71 234 567",
+            "+216 98 765 432"
+          ]
+        },
+        address: {
+          label: "Adresse",
+          lines: [
+            "123 Avenue Habib Bourguiba",
+            "Tunis 1000, Tunisie"
+          ]
+        }
+      },
+      location: {
+        title: "Notre Localisation",
+        city: "Tunis, Tunisie",
+        subtitle: "Capitale",
+        mapPlaceholder: "Carte interactive bientôt disponible"
+      },
+      footer: {
+        links: [
+          "Politique de Confidentialité",
+          "Conditions d'Utilisation",
+          "Politique des Cookies"
+        ]
+      }
+    }
   },
 };
 

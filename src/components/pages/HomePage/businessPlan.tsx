@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useLanguageStore } from '../../../store/languageStore';
+
 
 interface PricingFeature {
   text: string;
@@ -17,61 +19,60 @@ interface PricingTier {
 }
 
 const BusinessPlan: React.FC = () => {
-  const pricingTiers: PricingTier[] = [
-    {
-      name: 'Premium',
-      price: '59.99',
-      currency: 'HT',
-      features: [
-        { text: '1 Company Account', included: true },
-        { text: '5 User Accounts', included: true },
-        { text: '1 Mobile Sales Rep (Free)', included: true },
-        { text: 'Sales & Purchase Modules', included: true },
-        { text: 'Finance & HR (Standard)', included: true },
-        { text: 'Unlimited Products & Stock', included: true },
-        { text: 'Customer & Supplier Management', included: true },
-        { text: 'Customer-Specific Pricing', included: true },
-      ],
-      buttonText: 'Subscribe'
+  const { currentTranslations } = useLanguageStore();
+  const language = currentTranslations.homePage.BusinessPlan;
+
+  const content = {
+    header: {
+      badge: {
+        icon: language.header.badge.icon,
+        text: language.header.badge.text
+      },
+      title: language.header.title,
+      subtitle: language.header.subtitle
     },
-    {
-      name: 'Platinum',
-      price: '129.00',
-      currency: 'HT',
-      features: [
-        { text: '1 Company Account', included: true },
-        { text: '5 User Accounts', included: true },
-        { text: '1 Mobile Sales Rep (Free)', included: true },
-        { text: 'Sales & Purchase Modules', included: true },
-        { text: 'Finance & HR (Standard)', included: true },
-        { text: 'Leave & Expense Management', included: true },
-        { text: 'CRM Mobile (Offline & Online)', included: true },
-        { text: 'Meeting Planning & Reports', included: true },
-        { text: 'Revenue Dashboard & Surveys', included: true },
-        { text: 'Recovery & Call Management', included: true },
-      ],
-      buttonText: 'Subscribe',
-      popular: true
+    pricingTiers: [
+      {
+        name: language.pricingTiers[0].name,
+        price: '59.99',
+        currency: 'HT',
+        features: language.pricingTiers[0].features,
+        buttonText: language.pricingTiers[0].buttonText
+      },
+      {
+        name: language.pricingTiers[1].name,
+        price: '129.00',
+        currency: 'HT',
+        features: language.pricingTiers[1].features,
+        buttonText: language.pricingTiers[1].buttonText,
+        popular: true
+      },
+      {
+        name: language.pricingTiers[2].name,
+        price: '270.00',
+        currency: 'HT',
+        features: language.pricingTiers[2].features,
+        buttonText: language.pricingTiers[2].buttonText
+      }
+    ],
+    customPlan: {
+      name: language.customPlan.name,
+      price: language.customPlan.price,
+      description: language.customPlan.description,
+      features: language.customPlan.features,
+      buttonText: language.customPlan.buttonText
     },
-    {
-      name: 'Diamond',
-      price: '270.00',
-      currency: 'HT',
-      features: [
-        { text: '3 Company Accounts', included: true },
-        { text: '15 User Accounts', included: true },
-        { text: '5 Mobile Sales Reps (Free)', included: true },
-        { text: 'Sales Cycles & Project Management', included: true },
-        { text: 'Advanced HR & Fleet Management', included: true },
-        { text: 'Periodic Invoice Planning', included: true },
-        { text: 'CRM Mobile (Offline & Online)', included: true },
-        { text: 'Meeting Planning & Reports', included: true },
-        { text: 'Revenue Dashboard & Surveys', included: true },
-        { text: 'Recovery & Call Management', included: true },
-      ],
-      buttonText: 'Subscribe'
+    footer: {
+      maintenance: language.footer.maintenance,
+      pricing: language.footer.pricing,
+      innovation: language.footer.innovation
     }
-  ];
+  };
+
+  const pricingTiers: PricingTier[] = content.pricingTiers.map(tier => ({
+    ...tier,
+    features: tier.features.map(feature => ({ text: feature, included: true }))
+  }));
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
@@ -90,14 +91,14 @@ const BusinessPlan: React.FC = () => {
               <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
             </div>
-            <span className="text-gray-700 font-medium">💎 Choose Your Path</span>
+            <span className="text-gray-700 font-medium">{content.header.badge.icon} {content.header.badge.text}</span>
           </div>
           
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Choose Your Business Plan
+            {content.header.title}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Solutions tailored for all business types, from startups to large organizations
+            {content.header.subtitle}
           </p>
         </div>
 
@@ -191,87 +192,41 @@ const BusinessPlan: React.FC = () => {
             
             <div className="text-center mb-6 relative z-10">
               <h3 className="text-xl font-bold text-white mb-2">
-                Custom Plan
+                {content.customPlan.name}
               </h3>
               <div className="flex items-baseline justify-center">
                 <span className="text-3xl font-bold text-white">
-                  Tailored
+                  {content.customPlan.price}
                 </span>
               </div>
               <p className="text-purple-100 mt-1 text-sm">
-                Solution adapted to your specific needs
+                {content.customPlan.description}
               </p>
             </div>
 
             <ul className="space-y-2 mb-6 flex-grow relative z-10">
-              <li className="flex items-start">
-                <svg
-                  className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-xs text-purple-100">
-                  All modules available
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-xs text-purple-100">
-                  Unlimited users
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-xs text-purple-100">
-                  24/7 dedicated support
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-xs text-purple-100">
-                  Training & custom integrations
-                </span>
-              </li>
+              {content.customPlan.features.map((feature, index) => (
+                <li key={index} className="flex items-start">
+                  <svg
+                    className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="text-xs text-purple-100">
+                    {feature}
+                  </span>
+                </li>
+              ))}
             </ul>
 
             <button className="w-full py-2.5 px-4 rounded-lg font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200 mt-auto text-sm relative z-10 hover:shadow-lg hover:shadow-purple-500/25">
-              Contact Us
+              {content.customPlan.buttonText}
             </button>
           </div>
         </div>
@@ -279,10 +234,10 @@ const BusinessPlan: React.FC = () => {
         {/* Additional Info */}
         <div className="text-center">
           <p className="text-gray-600 mb-3 text-sm">
-            All our plans include maintenance, updates and technical support
+            {content.footer.maintenance}
           </p>
           <p className="text-xs text-gray-500">
-            * HT prices - Monthly or annual billing available
+            {content.footer.pricing}
           </p>
         </div>
 
@@ -290,7 +245,7 @@ const BusinessPlan: React.FC = () => {
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-4 text-gray-500">
             <div className="w-16 h-px bg-gradient-to-r from-transparent to-[#3c959d]"></div>
-            <span className="text-xs font-medium">Ready to innovate?</span>
+            <span className="text-xs font-medium">{content.footer.innovation}</span>
             <div className="w-16 h-px bg-gradient-to-l from-transparent to-[#ef7335]"></div>
           </div>
         </div>
