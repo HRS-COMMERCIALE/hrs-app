@@ -1,9 +1,15 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 
+export enum UserRole {
+  USER = 'user',
+  MANAGER = 'manager',
+  ADMIN = 'admin',
+  SUPER_ADMIN = 'super_admin'
+}
+
 export function defineRoleModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
   class Role extends ModelClass {
-    public id!: number;
-    public name!: string; // 'user' or 'admin'
+    // Removed public class fields to avoid shadowing Sequelize's built-in getters/setters
   }
 
   Role.init(
@@ -14,7 +20,7 @@ export function defineRoleModel(sequelize: Sequelize, ModelClass: typeof Model, 
         primaryKey: true,
       },
       name: {
-        type: DataTypesLib.STRING,
+        type: DataTypesLib.ENUM(...Object.values(UserRole)),
         allowNull: false,
         unique: true,
       },

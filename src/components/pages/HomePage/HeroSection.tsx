@@ -1,8 +1,10 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '../../../store/languageStore';
 
 const HeroSection = () => {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
 
   // Centralized content object for easy text management
@@ -103,7 +105,10 @@ const HeroSection = () => {
           {/* Enhanced CTA Section */}
           <div className={`transform transition-all duration-1000 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-              <button className="group relative bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white font-bold px-12 py-6 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-[#3c959d]/30 min-w-[220px] overflow-hidden">
+              <button 
+                onClick={() => router.push('/login')}
+                className="group relative bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white font-bold px-12 py-6 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-[#3c959d]/30 min-w-[220px] overflow-hidden"
+              >
                 <span className="relative z-10 flex items-center justify-center gap-3">
                   {content.cta.primaryButton.text}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

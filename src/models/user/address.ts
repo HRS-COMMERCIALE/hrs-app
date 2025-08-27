@@ -1,49 +1,57 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 
-export function defineLoginAttemptModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
-  class LoginAttempt extends ModelClass {
+export function defineAddressModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
+  class Address extends ModelClass {
     // Removed public class fields to avoid shadowing Sequelize's built-in getters/setters
   }
 
-  LoginAttempt.init(
+  Address.init(
     {
       id: {
         type: DataTypesLib.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      ipAddress: {
+      businessId: {
+        type: DataTypesLib.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'businesses',
+          key: 'id',
+        },
+      },
+      country: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      userAgent: {
+      governorate: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      successful: {
-        type: DataTypesLib.BOOLEAN,
-        allowNull: false,
-      },
-      failureReason: {
+      postalCode: {
         type: DataTypesLib.STRING,
-        allowNull: true,
-      },
-      attemptAt: {
-        type: DataTypesLib.DATE,
         allowNull: false,
       },
-      location: {
+      address: {
+        type: DataTypesLib.STRING,
+        allowNull: false,
+      },
+      phone: {
+        type: DataTypesLib.STRING,
+        allowNull: false,
+      },
+      fax: {
         type: DataTypesLib.STRING,
         allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: 'LoginAttempt',
-      tableName: 'login_attempts',
+      modelName: 'Address',
+      tableName: 'addresses',
       timestamps: false,
     }
   );
 
-  return LoginAttempt;
+  return Address;
 }

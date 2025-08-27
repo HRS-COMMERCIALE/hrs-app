@@ -1,58 +1,65 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 
-export function defineUserModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
-  class User extends ModelClass {
+export function defineBusinessModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
+  class Business extends ModelClass {
     // Removed public class fields to avoid shadowing Sequelize's built-in getters/setters
   }
 
-  User.init(
+  Business.init(
     {
       id: {
         type: DataTypesLib.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      status: {
+      userId: {
+        type: DataTypesLib.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+      },
+      currency: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      title: {
+      size: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      firstName: {
+      industry: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      lastName: {
+      businessName: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      email: {
-        type: DataTypesLib.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      mobile: {
+      taxId: {
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      landline: {
+      cnssCode: {
+        type: DataTypesLib.STRING,
+        allowNull: false,
+      },
+      website: {
+        type: DataTypesLib.STRING,
+        allowNull: false,
+      },
+      logoFile: {
         type: DataTypesLib.STRING,
         allowNull: true,
-      },
-      password: {
-        type: DataTypesLib.STRING,
-        allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: 'User',
-      tableName: 'users',
+      modelName: 'Business',
+      tableName: 'businesses',
       timestamps: false,
     }
   );
 
-  return User;
+  return Business;
 }

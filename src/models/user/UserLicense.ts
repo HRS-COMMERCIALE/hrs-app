@@ -2,15 +2,7 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 
 export function defineUserLicenseModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
   class UserLicense extends ModelClass {
-    public id!: number;
-    public licenseType!: string;
-    public startDate!: Date;
-    public endDate!: Date;
-    public isActive!: boolean;
-    public price!: number;
-    public currency!: string;
-    public createdAt!: Date;
-    public updatedAt!: Date;
+    // Removed public class fields to avoid shadowing Sequelize's built-in getters/setters
   }
 
   UserLicense.init(

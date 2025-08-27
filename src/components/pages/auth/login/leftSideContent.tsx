@@ -1,8 +1,12 @@
 "use client"
 import { useState, useEffect } from 'react';
+import { useLanguageStore } from '../../../../store/languageStore';
 
 export default function LeftSideContent() {
+    const { currentTranslations } = useLanguageStore();
+
     const [mounted, setMounted] = useState(false);
+    
 
     useEffect(() => {
         setMounted(true);
@@ -19,21 +23,23 @@ export default function LeftSideContent() {
                 <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(60,149,157,0.03)_26%,rgba(60,149,157,0.08)_27%,transparent_28%,transparent_100%)] animate-pulse"></div>
                 <div className="absolute inset-0 bg-[linear-gradient(-45deg,transparent_70%,rgba(239,115,53,0.04)_71%,rgba(239,115,53,0.06)_72%,transparent_73%,transparent_100%)]" style={{ animationDelay: '1s' }}></div>
                 
-                {/* Floating particles effect */}
-                <div className="absolute inset-0 opacity-20">
-                    {[...Array(8)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="absolute w-1 h-1 bg-[#3c959d] rounded-full animate-ping"
-                            style={{
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                                animationDelay: `${Math.random() * 3}s`,
-                                animationDuration: `${2 + Math.random() * 2}s`
-                            }}
-                        />
-                    ))}
-                </div>
+                {/* Floating particles effect (render after mount to avoid hydration mismatch) */}
+                {mounted && (
+                    <div className="absolute inset-0 opacity-20">
+                        {[...Array(8)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 bg-[#3c959d] rounded-full animate-ping"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 3}s`,
+                                    animationDuration: `${2 + Math.random() * 2}s`
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Enhanced Floating Geometric Elements */}
@@ -77,19 +83,19 @@ export default function LeftSideContent() {
                                 <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
                                 <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-50"></div>
                             </div>
-                            <span className="text-slate-200 font-semibold tracking-wide">Enterprise Ready Platform</span>
+                            <span className="text-slate-200 font-semibold tracking-wide">{currentTranslations.auth.leftSide.badge}</span>
                         </div>
                     </div>
                     
                     <h1 className="text-6xl font-bold mb-8 leading-tight">
-                        <span className="block text-white drop-shadow-lg mb-2">Transform Your</span>
+                        <span className="block text-white drop-shadow-lg mb-2">{currentTranslations.auth.leftSide.title.line1}</span>
                         <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">
-                            Business Journey
+                            {currentTranslations.auth.leftSide.title.line2}
                         </span>
                     </h1>
                     
                     <p className="text-xl text-slate-300 leading-relaxed max-w-lg mx-auto font-light">
-                        Unlock powerful analytics, seamless collaboration, and intelligent automation in one unified platform
+                        {currentTranslations.auth.leftSide.subtitle}
                     </p>
                 </div>
 
@@ -98,22 +104,22 @@ export default function LeftSideContent() {
                     {[
                         {
                             icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                            title: "Real-time Analytics",
-                            subtitle: "Live Business Insights",
+                            title: currentTranslations.auth.leftSide.features[0].title,
+                            subtitle: currentTranslations.auth.leftSide.features[0].subtitle,
                             color: "#3c959d",
                             gradient: "from-[#3c959d]/20 to-[#4ba5ad]/20"
                         },
                         {
                             icon: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4",
-                            title: "Smart Automation",
-                            subtitle: "Intelligent Workflows",
+                            title: currentTranslations.auth.leftSide.features[1].title,
+                            subtitle: currentTranslations.auth.leftSide.features[1].subtitle,
                             color: "#4ba5ad",
                             gradient: "from-[#4ba5ad]/20 to-[#ef7335]/20"
                         },
                         {
                             icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-                            title: "Enterprise Security",
-                            subtitle: "Military-grade Protection",
+                            title: currentTranslations.auth.leftSide.features[2].title,
+                            subtitle: currentTranslations.auth.leftSide.features[2].subtitle,
                             color: "#ef7335",
                             gradient: "from-[#ef7335]/20 to-[#3c959d]/20"
                         }
@@ -143,7 +149,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-emerald-400/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">SOC 2 Certified</span>
+                        <span className="font-semibold">{currentTranslations.auth.leftSide.security.soc2}</span>
                     </div>
                     
                     <div className="w-px h-6 bg-slate-600"></div>
@@ -155,7 +161,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-[#3c959d]/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">GDPR Compliant</span>
+                        <span className="font-semibold">{currentTranslations.auth.leftSide.security.gdpr}</span>
                     </div>
                 </div>
             </div>

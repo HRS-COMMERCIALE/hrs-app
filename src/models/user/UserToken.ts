@@ -2,12 +2,7 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 
 export function defineUserTokenModel(sequelize: Sequelize, ModelClass: typeof Model, DataTypesLib: typeof DataTypes) {
   class UserToken extends ModelClass {
-    public id!: number;
-    public refresh_token!: string;
-    public expiresAt!: Date;
-    public createdAt!: Date;
-    public isRevoked!: boolean;
-    public ipAddress!: string;
+    // Removed public class fields to avoid shadowing Sequelize's built-in getters/setters
   }
 
   UserToken.init(

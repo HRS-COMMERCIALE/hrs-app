@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '../../../store/languageStore';
 import { useLanguageUtils } from '../../../utils/language/languageUtils';
 
 export default function Header() {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -110,7 +112,10 @@ export default function Header() {
               )}
             </div>
 
-            <button className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-5 py-2.5 rounded-lg text-sm">
+            <button 
+              onClick={() => router.push('/login')}
+              className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-5 py-2.5 rounded-lg text-sm"
+            >
               {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started'}
             </button>
           </div>
@@ -168,7 +173,10 @@ export default function Header() {
               </div>
 
               <div className="pt-4">
-                <button className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base">
+                <button 
+                  onClick={() => router.push('/login')}
+                  className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base"
+                >
                   {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started Now'}
                 </button>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '../../../store/languageStore';
 
 
@@ -19,6 +20,7 @@ interface PricingTier {
 }
 
 const BusinessPlan: React.FC = () => {
+  const router = useRouter();
   const { currentTranslations } = useLanguageStore();
   const language = currentTranslations.homePage.BusinessPlan;
 
@@ -107,7 +109,7 @@ const BusinessPlan: React.FC = () => {
           {pricingTiers.map((tier, index) => (
             <div
               key={index}
-              className={`relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group ${
+              className={`relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group flex flex-col ${
                 tier.popular
                   ? 'border-blue-500 ring-4 ring-blue-100'
                   : 'border-gray-200 hover:border-[#3c959d]/50'
@@ -142,7 +144,7 @@ const BusinessPlan: React.FC = () => {
                 </div>
               </div>
 
-              <ul className="space-y-2 mb-6 flex-grow relative z-10">
+              <ul className="space-y-2 mb-6 flex-1 relative z-10">
                 {tier.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start">
                     <svg
@@ -174,7 +176,8 @@ const BusinessPlan: React.FC = () => {
               </ul>
 
               <button
-                className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 mt-auto text-sm relative z-10 ${
+                onClick={() => router.push('/register')}
+                className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 text-sm relative z-10 ${
                   tier.popular
                     ? 'bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white hover:shadow-lg hover:shadow-blue-500/25'
                     : 'bg-gray-100 text-gray-900 hover:bg-[#3c959d]/10 hover:border-[#3c959d]/50'
@@ -204,7 +207,7 @@ const BusinessPlan: React.FC = () => {
               </p>
             </div>
 
-            <ul className="space-y-2 mb-6 flex-grow relative z-10">
+            <ul className="space-y-2 mb-6 flex-1 relative z-10">
               {content.customPlan.features.map((feature, index) => (
                 <li key={index} className="flex items-start">
                   <svg
@@ -225,7 +228,10 @@ const BusinessPlan: React.FC = () => {
               ))}
             </ul>
 
-            <button className="w-full py-2.5 px-4 rounded-lg font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200 mt-auto text-sm relative z-10 hover:shadow-lg hover:shadow-purple-500/25">
+            <button 
+              onClick={() => router.push('/register')}
+              className="w-full py-2.5 px-4 rounded-lg font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200 text-sm relative z-10 hover:shadow-lg hover:shadow-purple-500/25"
+            >
               {content.customPlan.buttonText}
             </button>
           </div>
