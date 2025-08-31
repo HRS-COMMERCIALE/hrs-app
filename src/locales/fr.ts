@@ -5,7 +5,10 @@ const fr = {
       features: "Nos Solutions",
       about: "À propos",
       contactUs: "Contactez-nous",
-      getStarted: "Commencer"
+      getStarted: "Commencer",
+      dashboard: "Tableau de Bord",
+      login: "Connexion",
+      signUp: "S'inscrire"
     }, 
     heroSection:{
       statusBadge: {

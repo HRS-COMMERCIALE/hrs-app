@@ -1,7 +1,6 @@
 import type { RegisterSchema } from '@/validations/auth/register';
 import { User, Business, Address } from '@/models/associationt.ts/association';
 import { hashPassword, checkPasswordStrength } from '@/utils/bycript/password';
-import { assignRole } from './AssignRole';
 import { createBusiness } from './createBuissness';
 import { createAddress } from './createAddress';
 
@@ -55,9 +54,6 @@ export async function RegisterUser(payload: RegisterSchema) {
   // Hash the password
   const hashedPassword = await hashPassword(payload.user.password);
 
-  // Assign manager role
-  const role = await assignRole();
-
   // Create user, business, and address in a transaction
   const result = await User.sequelize!.transaction(async (transaction) => {
     // Create user
@@ -70,7 +66,9 @@ export async function RegisterUser(payload: RegisterSchema) {
       mobile: payload.user.mobile,
       landline: payload.user?.landline,
       password: hashedPassword,
+      role: 'manager',
     }, { transaction });
+
 
     // Create business
     const newBusiness = await createBusiness(payload, newUser.dataValues.id, transaction);
@@ -78,7 +76,7 @@ export async function RegisterUser(payload: RegisterSchema) {
     // Create address
     const newAddress = await createAddress(payload, newBusiness.dataValues.id, transaction);
 
-    return { newUser, newBusiness, newAddress, role };
+    return { newUser, newBusiness, newAddress };
   });
 
   return result;

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '../../../store/languageStore';
 import { useLanguageUtils } from '../../../utils/language/languageUtils';
+import { useAuth } from '../../../store/authProvider';
 
 export default function Header() {
   const router = useRouter();
@@ -13,6 +14,9 @@ export default function Header() {
 
   // Use the language utility hook
   const { changeLanguage, currentLanguageCode, currentTranslations } = useLanguageUtils();
+  
+  // Use auth hook to check authentication status
+  const { authState, user } = useAuth();
 
   // Navigation items - easy to modify here
   const navigationItems = [
@@ -23,7 +27,6 @@ export default function Header() {
   ];
 
   useEffect(() => {
-    console.log('Current language object from store:', currentTranslations);
   }, [currentTranslations]);
 
   useEffect(() => {
@@ -47,45 +50,123 @@ export default function Header() {
     setLanguageOpen(false);
   };
 
+  // Render different buttons based on auth state
+  const renderAuthButtons = () => {
+    if (authState === 'loading') {
+      return (
+        <div className="animate-pulse bg-slate-700 h-10 w-24 rounded-lg"></div>
+      );
+    }
+
+    if (authState === 'authenticated') {
+      return (
+        <button 
+          onClick={() => router.push('/dashboard')}
+          className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-2.5 rounded-lg text-sm whitespace-nowrap"
+        >
+          {currentTranslations?.homePage?.navbar?.dashboard || 'Dashboard'}
+        </button>
+      );
+    }
+
+    // Not authenticated - show login and signup buttons
+    return (
+      <div className="flex items-center space-x-3">
+        <button 
+          onClick={() => router.push('/login')}
+          className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-4 py-2.5 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-sm whitespace-nowrap"
+        >
+          {currentTranslations?.homePage?.navbar?.login || 'Login'}
+        </button>
+        <button 
+          onClick={() => router.push('/register')}
+          className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-2.5 rounded-lg text-sm whitespace-nowrap"
+        >
+          {currentTranslations?.homePage?.navbar?.signUp || 'Sign Up'}
+        </button>
+      </div>
+    );
+  };
+
+  // Render mobile auth buttons
+  const renderMobileAuthButtons = () => {
+    if (authState === 'loading') {
+      return (
+        <div className="animate-pulse bg-slate-700 h-12 w-full rounded-lg"></div>
+      );
+    }
+
+    if (authState === 'authenticated') {
+      return (
+        <button 
+          onClick={() => router.push('/dashboard')}
+          className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base"
+        >
+          {currentTranslations?.homePage?.navbar?.dashboard || 'Dashboard'}
+        </button>
+      );
+    }
+
+    // Not authenticated - show login and signup buttons
+    return (
+      <div className="space-y-3">
+        <button 
+          onClick={() => router.push('/login')}
+          className="w-full text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-6 py-3 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-base"
+        >
+          {currentTranslations?.homePage?.navbar?.login || 'Login'}
+        </button>
+        <button 
+          onClick={() => router.push('/register')}
+          className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base"
+        >
+          {currentTranslations?.homePage?.navbar?.signUp || 'Sign Up'}
+        </button>
+      </div>
+    );
+  };
+
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${
       isScrolled ? 'bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-sm border-b border-[#3c959d]/50 shadow-2xl' : 'bg-gradient-to-r from-[#03071a]/5 to-[#172453]/5 backdrop-blur-sm'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-12 lg:h-16">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo Section */}
           <div className="flex-shrink-0 group cursor-pointer">
             <div className="relative">
               <img 
                 src="/logo.png" 
                 alt="Tunisie Business Solutions Logo" 
-                className="h-8 lg:h-10 w-auto object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
+                className="h-8 lg:h-12 w-auto object-contain transform group-hover:scale-105 transition-all duration-300 filter drop-shadow-lg"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[#3c959d]/20 via-transparent to-[#ef7335]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
             </div>
           </div>
           
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navigationItems.map((item) => (
-              <a 
-                key={item.id} 
-                href={item.href} 
-                className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 relative group font-medium text-sm px-4 py-2 rounded-lg hover:bg-slate-800/30"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-3/4 transition-all duration-500"></span>
-              </a>
-            ))}
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
+            <div className="flex items-center space-x-1">
+              {navigationItems.map((item) => (
+                <a 
+                  key={item.id} 
+                  href={item.href} 
+                  className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 relative group font-medium text-sm px-4 py-2 rounded-lg hover:bg-slate-800/30 whitespace-nowrap"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-3/4 transition-all duration-500"></span>
+                </a>
+              ))}
+            </div>
           </nav>
 
-          {/* Right Side Actions */}
-          <div className="hidden lg:flex items-center space-x-3">
+          {/* Right Side Actions - Fixed Width Container */}
+          <div className="hidden lg:flex items-center justify-end space-x-3 min-w-[280px]">
             {/* Language Selector */}
             <div className="relative">
               <button 
                 onClick={() => setLanguageOpen(!languageOpen)}
-                className="flex items-center space-x-2 text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-3 py-2 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-sm"
+                className="flex items-center space-x-2 text-slate-200 hover:text-[#3c959d] transition-all duration-300 font-medium px-3 py-2.5 rounded-lg border border-slate-600/50 hover:border-[#3c959d]/50 hover:bg-slate-800/30 text-sm whitespace-nowrap"
               >
                 <span className="text-base">{languages.find(lang => lang.code === currentLanguageCode)?.flag}</span>
                 <span className="hidden sm:inline">{currentLanguageCode}</span>
@@ -112,12 +193,8 @@ export default function Header() {
               )}
             </div>
 
-            <button 
-              onClick={() => router.push('/login')}
-              className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-5 py-2.5 rounded-lg text-sm"
-            >
-              {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started'}
-            </button>
+            {/* Auth Buttons */}
+            {renderAuthButtons()}
           </div>
 
           {/* Mobile Menu Button */}
@@ -172,13 +249,9 @@ export default function Header() {
                 </div>
               </div>
 
+              {/* Mobile Auth Buttons */}
               <div className="pt-4">
-                <button 
-                  onClick={() => router.push('/login')}
-                  className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-6 py-3 rounded-lg text-base"
-                >
-                  {currentTranslations?.homePage?.navbar?.getStarted || 'Get Started Now'}
-                </button>
+                {renderMobileAuthButtons()}
               </div>
             </nav>
           </div>

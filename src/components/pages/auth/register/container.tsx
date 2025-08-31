@@ -6,7 +6,7 @@ import BusinessForm, { BusinessData } from './Business';
 import OrderForm, { OrderData } from './Order';
 import SubscriptionForm, { SubscriptionData } from './Subscription';
 import UserForm, { UserData } from './User';
-import { Building2, MapPin, User as UserIcon, CreditCard, ShoppingCart } from 'lucide-react';
+import { Building2, MapPin, User as UserIcon, CreditCard, ShoppingCart, AlertCircle } from 'lucide-react';
 
 type CollectedData = {
     user?: Partial<UserData>;
@@ -27,18 +27,18 @@ export default function RegisterContainer() {
     const [data, setData] = useState<CollectedData>({});
     const [isPending, startTransition] = useTransition();
     const lastLoggedRef = useRef<string>('');
+    const [validationError, setValidationError] = useState<string | null>(null);
+    
     const logCollectedData = useCallback((snapshot: CollectedData) => {
         try {
             const str = JSON.stringify(snapshot);
             if (lastLoggedRef.current !== str) {
                 // eslint-disable-next-line no-console
-                console.log('CollectedData changed:', snapshot);
                 lastLoggedRef.current = str;
             }
         } catch {
             // fallback without blocking UI
             // eslint-disable-next-line no-console
-            console.log('CollectedData changed:', snapshot);
         }
     }, []);
 
@@ -67,9 +67,18 @@ export default function RegisterContainer() {
         { label: 'Order', icon: ShoppingCart },
     ] as const;
 
-    const goNext = () => setStep(s => Math.min(s + 1, totalSteps - 1));
-    const goBack = () => setStep(s => Math.max(s - 1, 0));
+    const goNext = () => {
+        setValidationError(null); // Clear validation errors when moving forward
+        setStep(s => Math.min(s + 1, totalSteps - 1));
+    };
+    
+    const goBack = () => {
+        setValidationError(null); // Clear validation errors when going back
+        setStep(s => Math.max(s - 1, 0));
+    };
+    
     const [canSubmitOrder, setCanSubmitOrder] = useState(false);
+    
     // Listen to order terms changes
     useEffect(() => {
         const handler = (e: any) => {
@@ -78,6 +87,29 @@ export default function RegisterContainer() {
         };
         window.addEventListener('order-terms-changed', handler as any);
         return () => window.removeEventListener('order-terms-changed', handler as any);
+    }, []);
+
+    // Listen to validation errors from OrderForm
+    useEffect(() => {
+        const handler = (e: any) => {
+            if (!e || !e.detail) return;
+            if (e.detail.type === 'validation_error') {
+                setValidationError(e.detail.message);
+                // Automatically go back to the relevant step based on the error
+                const field = e.detail.field;
+                if (field?.startsWith('user.')) {
+                    setStep(3); // User step
+                } else if (field?.startsWith('business.')) {
+                    setStep(1); // Business step
+                } else if (field?.startsWith('address.')) {
+                    setStep(2); // Address step
+                } else if (field?.startsWith('subscription.')) {
+                    setStep(0); // Subscription step
+                }
+            }
+        };
+        window.addEventListener('validation-error', handler as any);
+        return () => window.removeEventListener('validation-error', handler as any);
     }, []);
 
     const handleUser = (payload: UserData) => {
@@ -110,14 +142,70 @@ export default function RegisterContainer() {
     };
     const handleOrder = (payload: OrderData) => {
         const finalPayload = { ...data, order: payload } as Required<CollectedData>;
+        
+        // Log the complete payload to show what's being sent
+        console.log('🚀 Complete Registration Payload:', finalPayload);
+        console.log('📁 Business Data (including logo):', finalPayload.business);
+        console.log('🖼️ Logo File Details:', {
+            exists: !!finalPayload.business?.logoFile,
+            type: finalPayload.business?.logoFile?.type,
+            size: finalPayload.business?.logoFile?.size,
+            name: finalPayload.business?.logoFile?.name
+        });
+        console.log('👤 User Data:', finalPayload.user);
+        console.log('🏢 Address Data:', finalPayload.address);
+        console.log('💳 Subscription Data:', finalPayload.subscription);
+        console.log('🛒 Order Data:', finalPayload.order);
+        
         // TODO: Replace with API call
         // eslint-disable-next-line no-console
         console.log('Registration payload:', finalPayload);
     };
 
+    // Handle business form changes including logo file
+    const handleBusinessChange = (partial: Partial<BusinessData>) => {
+        startTransition(() => {
+            setData(prev => {
+                const next = { 
+                    ...prev, 
+                    business: { 
+                        ...(prev.business ?? {}), 
+                        ...partial,
+                        // Ensure logoFile is preserved when updating other fields
+                        logoFile: partial.logoFile !== undefined ? partial.logoFile : prev.business?.logoFile
+                    } 
+                };
+                logCollectedData(next);
+                return next;
+            });
+        });
+    };
+
     return (
         <div className={`min-h-screen w-full flex items-start justify-center ${isWideStep ? 'bg-gradient-to-br from-slate-50 to-[#eef8f9]' : 'bg-slate-50'} py-0 px-4`}>
             <div className={`w-full ${isWideStep ? 'max-w-6xl' : 'max-w-2xl'} bg-white/90 backdrop-blur rounded-2xl border border-slate-200 shadow-xl`}>
+                {/* Validation Error Banner */}
+                {validationError && (
+                    <div className="px-6 py-4 border-b border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                        <div className="flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                                <h3 className="text-sm font-semibold text-orange-800 mb-1">Validation Error Detected</h3>
+                                <p className="text-sm text-orange-700 mb-2">{validationError}</p>
+                                <p className="text-xs text-orange-600">
+                                    You've been redirected to the relevant step. Please fix the issue and continue.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setValidationError(null)}
+                                className="text-orange-400 hover:text-orange-600 transition-colors text-sm"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="px-5 py-3 border-b border-slate-200">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -159,15 +247,7 @@ export default function RegisterContainer() {
                         <BusinessForm
                             initialValues={data.business}
                             onSubmit={handleBusiness}
-                            onChange={(partial) => {
-                                startTransition(() => {
-                                    setData(prev => {
-                                        const next = { ...prev, business: { ...(prev.business ?? {}), ...partial } };
-                                        logCollectedData(next);
-                                        return next;
-                                    });
-                                });
-                            }}
+                            onChange={handleBusinessChange}
                         />
                     )}
                     {step === 2 && (

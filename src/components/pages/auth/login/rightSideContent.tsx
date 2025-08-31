@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useLanguageStore } from '../../../../store/languageStore';
+import { apiClient } from '../../../../utils/client/client';
+import { getCurrentIP } from '../../../../utils/help/ipProvider/ipProvider';
 
 export default function RightSideContent() {
     const { currentTranslations } = useLanguageStore();
@@ -13,9 +15,28 @@ export default function RightSideContent() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [currentIP, setCurrentIP] = useState<string>('Detecting...');
+    const [isFetchingIP, setIsFetchingIP] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        
+        // Fetch IP address on component mount
+        const fetchIP = async () => {
+            setIsFetchingIP(true);
+            try {
+                const result = await getCurrentIP();
+                setCurrentIP(result.ip);
+            } catch (error) {
+                console.warn('Failed to fetch IP:', error);
+                setCurrentIP('Unknown');
+            } finally {
+                setIsFetchingIP(false);
+            }
+        };
+        
+        fetchIP();
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,15 +47,61 @@ export default function RightSideContent() {
         }));
     };
 
+    const refreshIP = async () => {
+        setIsFetchingIP(true);
+        try {
+            const result = await getCurrentIP();
+            setCurrentIP(result.ip);
+        } catch (error) {
+            console.warn('Failed to refresh IP:', error);
+            setCurrentIP('Unknown');
+        } finally {
+            setIsFetchingIP(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
         
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Login attempt:', formData);
+        // Prevent multiple submissions
+        if (isLoading || isSubmitted) {
+            return;
+        }
+        
+        setIsLoading(true);
+        setIsSubmitted(true);
+        
+        try {
+            
+            // Use the current IP address (already fetched on mount)
+            const realIP = currentIP === 'Unknown' ? '127.0.0.1' : currentIP;
+            
+            const response = await apiClient
+                .post()
+                .to('/api/auth/login')
+                .withBody({
+                    email: formData.email,
+                    password: formData.password,
+                    ip: realIP,
+                    userAgent: navigator.userAgent
+                })
+                .execute();
+                
+            
+            if (response.success) {
+                // Redirect to dashboard or handle success
+                window.location.href = '/dashboard';
+            } else {
+                console.error('Login failed:', response.error);
+                // Handle error (you can add error state and display it)
+                alert(response.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login');
+        } finally {
             setIsLoading(false);
-        }, 1000);
+        }
     };
 
     return (
@@ -277,6 +344,35 @@ export default function RightSideContent() {
                                         <span className="relative z-10">{currentTranslations.auth.login.forgotPassword}</span>
                                         <div className="absolute -inset-2 bg-gradient-to-r from-[#3c959d]/10 to-[#4ba5ad]/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
                                     </a>
+                                </div>
+                            </div>
+
+                            {/* IP Address Indicator */}
+                            <div className="pt-2 pb-1">
+                                <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                                    {isFetchingIP ? (
+                                        <div className="flex items-center">
+                                            <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            <span>Detecting IP address...</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <span>IP: {currentIP}</span>
+                                            <button
+                                                type="button"
+                                                onClick={refreshIP}
+                                                className="p-1 hover:bg-slate-100 rounded-full transition-colors duration-200"
+                                                title="Refresh IP address"
+                                            >
+                                                <svg className="h-3 w-3 text-slate-400 hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 

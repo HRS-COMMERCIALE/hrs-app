@@ -12,13 +12,14 @@ const JWT_CONFIG = {
 export interface TokenPayload {
   userId: number;
   email: string;
-  roleId: number;
-  roleName: string;
+  role: string;
+  tokenType?: 'access';
 }
 
 // Refresh token payload interface (only userId)
 export interface RefreshTokenPayload {
   userId: number;
+  tokenType?: 'refresh';
 }
 
 // Token response interface
@@ -30,14 +31,22 @@ export interface TokenResponse {
 
 // Generate access token
 export function generateAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_CONFIG.ACCESS_TOKEN_SECRET, {
+  const payloadWithType: TokenPayload = {
+    ...payload,
+    tokenType: 'access',
+  };
+  return jwt.sign(payloadWithType, JWT_CONFIG.ACCESS_TOKEN_SECRET, {
     expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN,
   });
 }
 
 // Generate refresh token
 export function generateRefreshToken(payload: RefreshTokenPayload): string {
-  return jwt.sign(payload, JWT_CONFIG.REFRESH_TOKEN_SECRET, {
+  const payloadWithType: RefreshTokenPayload = {
+    ...payload,
+    tokenType: 'refresh',
+  };
+  return jwt.sign(payloadWithType, JWT_CONFIG.REFRESH_TOKEN_SECRET, {
     expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN,
   });
 }
@@ -45,7 +54,7 @@ export function generateRefreshToken(payload: RefreshTokenPayload): string {
 // Generate both tokens
 export function generateTokens(payload: TokenPayload): TokenResponse {
   const accessToken = generateAccessToken(payload);
-  const refreshToken = generateRefreshToken(payload);
+  const refreshToken = generateRefreshToken({ userId: payload.userId });
   
   // Calculate expiration time in seconds
   const expiresIn = 24 * 60 * 60; // 24 hours in seconds
@@ -60,16 +69,24 @@ export function generateTokens(payload: TokenPayload): TokenResponse {
 // Verify access token
 export function verifyAccessToken(token: string): TokenPayload {
   try {
-    return jwt.verify(token, JWT_CONFIG.ACCESS_TOKEN_SECRET) as TokenPayload;
+    const decoded = jwt.verify(token, JWT_CONFIG.ACCESS_TOKEN_SECRET) as TokenPayload;
+    if ((decoded as any)?.tokenType && (decoded as any).tokenType !== 'access') {
+      throw new Error('Provided a refrsh token');
+    }
+    return decoded;
   } catch (error) {
     throw new Error('Invalid or expired access token');
   }
 }
 
 // Verify refresh token
-export function verifyRefreshToken(token: string): TokenPayload {
+export function verifyRefreshToken(token: string): RefreshTokenPayload {
   try {
-    return jwt.verify(token, JWT_CONFIG.REFRESH_TOKEN_SECRET) as TokenPayload;
+    const decoded = jwt.verify(token, JWT_CONFIG.REFRESH_TOKEN_SECRET) as RefreshTokenPayload & { tokenType?: string };
+    if (decoded?.tokenType && decoded.tokenType !== 'refresh') {
+      throw new Error('Provided token is not a refresh token');
+    }
+    return decoded as RefreshTokenPayload;
   } catch (error) {
     throw new Error('Invalid or expired refresh token');
   }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, CreditCard, CheckCircle } from 'lucide-react';
+import { ShoppingCart, CreditCard, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 export interface OrderData {
     planId: string;
@@ -20,6 +20,69 @@ type OrderFormProps = {
     collectedData?: unknown;
 };
 
+// Helper function to format validation error messages
+const formatValidationError = (details: string): string => {
+    if (!details) return 'Validation failed. Please check your input.';
+    
+    // Handle different error formats
+    if (details.includes(':')) {
+        const [field, message] = details.split(':').map(s => s.trim());
+        
+        // Map field names to user-friendly labels
+        const fieldLabels: Record<string, string> = {
+            'user.firstName': 'First Name',
+            'user.lastName': 'Last Name',
+            'user.email': 'Email',
+            'user.mobile': 'Mobile Number',
+            'user.title': 'Job Title',
+            'business.businessName': 'Business Name',
+            'business.taxId': 'Tax ID',
+            'business.industry': 'Industry',
+            'business.currency': 'Currency',
+            'business.size': 'Business Size',
+            'business.cnssCode': 'CNSS Code',
+            'address.street': 'Street Address',
+            'address.city': 'City',
+            'address.governorate': 'Governorate',
+            'address.postalCode': 'Postal Code',
+            'address.country': 'Country'
+        };
+        
+        const friendlyFieldName = fieldLabels[field] || field.replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return `${friendlyFieldName}: ${message}`;
+    }
+    
+    return details;
+};
+
+// Helper function to get field name from error details
+const getFieldFromError = (details: string): string | null => {
+    if (!details || !details.includes(':')) return null;
+    const field = details.split(':')[0].trim();
+    return field;
+};
+
+// Helper functions for localStorage
+const TERMS_ACCEPTANCE_KEY = 'register_terms_accepted';
+
+const saveTermsAcceptance = (accepted: boolean) => {
+    try {
+        localStorage.setItem(TERMS_ACCEPTANCE_KEY, JSON.stringify(accepted));
+    } catch (error) {
+        console.warn('Failed to save terms acceptance to localStorage:', error);
+    }
+};
+
+const loadTermsAcceptance = (): boolean => {
+    try {
+        const saved = localStorage.getItem(TERMS_ACCEPTANCE_KEY);
+        return saved ? JSON.parse(saved) : false;
+    } catch (error) {
+        console.warn('Failed to load terms acceptance from localStorage:', error);
+        return false;
+    }
+};
+
 export default function OrderForm({ availablePlans, selectedPlan, initialValues, onSubmit, onPlanChange, collectedData }: OrderFormProps) {
     const router = useRouter();
     const [formData, setFormData] = useState<OrderData>({
@@ -33,9 +96,19 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [validationErrors, setValidationErrors] = useState<Array<{ field: string; message: string }>>([]);
     const [scrollProgress, setScrollProgress] = useState(0);
     const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
     const [agreeChecked, setAgreeChecked] = useState(false);
+
+    // Load terms acceptance from localStorage on component mount
+    useEffect(() => {
+        const savedAcceptance = loadTermsAcceptance();
+        setAcceptedTerms(savedAcceptance);
+        if (savedAcceptance) {
+            setAgreeChecked(true);
+        }
+    }, []);
 
     // Notify container about terms acceptance
     useEffect(() => {
@@ -108,6 +181,8 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitError(null);
+        setValidationErrors([]);
+        
         if (!acceptedTerms) {
             setSubmitError('Please accept the terms to continue.');
             return;
@@ -138,30 +213,135 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             return;
         }
 
+        // Log what we're about to send to the backend
+        console.log('📤 Sending to Backend API:', payload);
+        console.log('🖼️ Logo File in Business Data:', {
+            exists: !!payload.business?.logoFile,
+            type: payload.business?.logoFile?.type,
+            size: payload.business?.logoFile?.size,
+            name: payload.business?.logoFile?.name,
+            isFile: payload.business?.logoFile instanceof File
+        });
+        console.log('📊 Complete Business Object:', payload.business);
+
         try {
             setIsSubmitting(true);
+            
+            // Create FormData to properly handle file uploads
+            const formData = new FormData();
+            
+            // Add user data
+            Object.entries(payload.user).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    formData.append(`user[${key}]`, value.toString());
+                }
+            });
+            
+            // Add business data (including logo file)
+            Object.entries(payload.business).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    if (key === 'logoFile' && value instanceof File) {
+                        // Handle logo file separately
+                        formData.append('business[logoFile]', value);
+                        console.log('✅ Logo file added to FormData:', value.name, value.size, value.type);
+                    } else {
+                        formData.append(`business[${key}]`, value.toString());
+                    }
+                }
+            });
+            
+            // Add address data
+            Object.entries(payload.address).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    formData.append(`address[${key}]`, value.toString());
+                }
+            });
+            
+            // Add subscription data
+            Object.entries(payload.subscription).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    formData.append(`subscription[${key}]`, value.toString());
+                }
+            });
+            
+            // Log FormData contents
+            console.log('📋 FormData entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}:`, value instanceof File ? `File(${value.name}, ${value.size} bytes)` : value);
+            }
+            console.log('🚀 FormData:', formData);
+            console.log('🚀 FormData entries:', formData.entries());
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: formData, // Use FormData instead of JSON for file uploads
             });
 
             if (res.ok) {
+                console.log('✅ Registration successful! Redirecting to dashboard...');
                 router.push('/dashboard');
                 return;
             }
 
             // Try to extract server error message
             try {
-                const err = await res.json();
-                setSubmitError(err?.message || 'Registration failed. Please try again.');
+                const errorData = await res.json();
+                console.error('❌ Registration failed:', errorData);
+                
+                // Handle validation errors specifically
+                if (errorData.type === 'validation_error' && errorData.details) {
+                    const formattedMessage = formatValidationError(errorData.details);
+                    const field = getFieldFromError(errorData.details);
+                    
+                    if (field) {
+                        setValidationErrors([{
+                            field,
+                            message: formattedMessage
+                        }]);
+                        
+                        // Dispatch event to notify container about validation error
+                        window.dispatchEvent(new CustomEvent('validation-error', {
+                            detail: {
+                                type: 'validation_error',
+                                field,
+                                message: formattedMessage
+                            }
+                        }));
+                    } else {
+                        setSubmitError(formattedMessage);
+                    }
+                } else {
+                    setSubmitError(errorData?.message || 'Registration failed. Please try again.');
+                }
             } catch {
+                console.error('❌ Registration failed with status:', res.status);
                 setSubmitError('Registration failed. Please try again.');
             }
         } catch (err) {
+            console.error('❌ Network error during registration:', err);
             setSubmitError('Network error. Please check your connection.');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    // Function to clear specific validation error
+    const clearValidationError = (field: string) => {
+        setValidationErrors(prev => prev.filter(error => error.field !== field));
+    };
+
+    // Function to clear all errors
+    const clearAllErrors = () => {
+        setSubmitError(null);
+        setValidationErrors([]);
+    };
+
+    // Function to handle terms acceptance
+    const handleTermsAcceptance = () => {
+        if (agreeChecked) {
+            setAcceptedTerms(true);
+            setShowTerms(false);
+            // Save to localStorage
+            saveTermsAcceptance(true);
         }
     };
 
@@ -178,6 +358,52 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                 </div>
             </div>
 
+            {/* Error Display Section */}
+            {(submitError || validationErrors.length > 0) && (
+                <div className="mb-6 space-y-3">
+                    {/* General Error */}
+                    {submitError && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-semibold text-red-800 mb-1">Registration Error</h3>
+                                    <p className="text-sm text-red-700">{submitError}</p>
+                                </div>
+                                <button
+                                    onClick={clearAllErrors}
+                                    className="text-red-400 hover:text-red-600 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Validation Errors */}
+                    {validationErrors.map((error, index) => (
+                        <div key={index} className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-semibold text-orange-800 mb-1">Validation Error</h3>
+                                    <p className="text-sm text-orange-700">{error.message}</p>
+                                    <p className="text-xs text-orange-600 mt-1">
+                                        Please go back and fix this field in the previous step.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => clearValidationError(error.field)}
+                                    className="text-orange-400 hover:text-orange-600 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             <form id="order-form" onSubmit={handleSubmit} className="space-y-6" data-terms-accepted={acceptedTerms ? 'true' : 'false'}>
                 {/* Order Configuration */}
                 <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
@@ -190,7 +416,7 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                         <div>
                             <label htmlFor="planId" className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-1.5">
                                 Plan
-                                <span className="ml-1 inline-flex items-center rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600 border border-red-200">
+                                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600 border border-red-200">
                                     Required
                                 </span>
                             </label>
@@ -292,23 +518,24 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                 <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div className="text-sm text-slate-700">
-                            {acceptedTerms ? 'Terms accepted' : 'You must accept the terms to continue'}
+                            {acceptedTerms ? (
+                                <span className="flex items-center gap-2 text-green-700">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Terms accepted
+                                </span>
+                            ) : (
+                                'You must accept the terms to continue'
+                            )}
                         </div>
                         <button
                             type="button"
-                            onClick={() => { setShowTerms(true); setAgreeChecked(false); setHasScrolledToEnd(false); setScrollProgress(0); }}
+                            onClick={() => { setShowTerms(true); setAgreeChecked(acceptedTerms); setHasScrolledToEnd(false); setScrollProgress(0); }}
                             className="rounded-lg border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-50"
                         >
-                            View Terms
+                            {acceptedTerms ? 'View Terms Again' : 'View Terms'}
                         </button>
                     </div>
                 </div>
-
-                {submitError && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm p-3">
-                        {submitError}
-                    </div>
-                )}
 
                 {/* Confirmation Message */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
@@ -415,13 +642,13 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                                     <button
                                         type="button"
                                         onClick={() => setShowTerms(false)}
-                                        className="rounded-lg border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50"
+                                        className="rounded-lg border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-100"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => { if (agreeChecked) { setAcceptedTerms(true); setShowTerms(false); } }}
+                                        onClick={handleTermsAcceptance}
                                         disabled={!agreeChecked}
                                         className={`rounded-lg px-4 py-2 text-white ${
                                             !agreeChecked

@@ -23,7 +23,7 @@ export const registerSchema = z.object({
     tableHeaderBackgroundColor: z.string().optional(),
     tableHeaderTitleColor: z.string().optional(),
     referralCode: z.string().optional(),
-    logoFile: z.unknown().optional()
+    logoFile: z.any().optional()
   }),
   address: z.object({
     country: z.string().min(2, 'Country must be at least 2 characters').max(100, 'Country must not exceed 100 characters'),

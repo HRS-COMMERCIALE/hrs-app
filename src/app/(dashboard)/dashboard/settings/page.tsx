@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
+import CompanyInformation from '../../../../components/pages/dashboard/CompanyInformation';
 
 type NavItem = {
   id: string;
@@ -314,19 +315,23 @@ export default function SettingsPage() {
         {/* Enhanced Right Content */}
         <section className="lg:col-span-8 xl:col-span-9 bg-white/40 backdrop-blur-sm">
           <div className="p-8 h-full">
-            <div className="max-w-2xl">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center mx-auto mb-4">
-                  <Icon icon={activeItem?.icon || DEFAULT_ICON} className="text-[#3c959d]" width={32} height={32} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{activeItem?.name}</h3>
-                <p className="text-gray-600 mb-6">{activeItem?.description || 'This settings panel is coming soon.'}</p>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
-                  <Icon icon="solar:settings-linear" width={16} height={16} />
-                  Configuration panel coming soon
+            {activeId === 'company-info' ? (
+              <CompanyInformation />
+            ) : (
+              <div className="max-w-2xl">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center mx-auto mb-4">
+                    <Icon icon={activeItem?.icon || DEFAULT_ICON} className="text-[#3c959d]" width={32} height={32} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{activeItem?.name}</h3>
+                  <p className="text-gray-600 mb-6">{activeItem?.description || 'This settings panel is coming soon.'}</p>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
+                    <Icon icon="solar:settings-linear" width={16} height={16} />
+                    Configuration panel coming soon
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
       </div>

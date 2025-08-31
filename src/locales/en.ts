@@ -5,7 +5,10 @@ const en = {
       features: "Features",
       about: "About",
       contactUs: "Contact Us",
-      getStarted:"Get Started"
+      getStarted:"Get Started",
+      dashboard: "Dashboard",
+      login: "Login",
+      signUp: "Sign Up"
     },
     heroSection:{
       statusBadge: {

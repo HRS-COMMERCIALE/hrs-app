@@ -6,7 +6,54 @@ import { generateAccessToken, generateRefreshToken } from "@/utils/jwt/jwtUtils"
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Handle FormData instead of JSON
+    const formData = await request.formData();
+    
+    // Convert FormData to structured object
+    const body: any = {};
+    
+    // Process user data
+    const userData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('user[') && key.endsWith(']')) {
+        const fieldName = key.slice(5, -1); // Remove 'user[' and ']' (5 chars)
+        userData[fieldName] = value;
+      }
+    }
+    body.user = userData;
+    
+    // Process business data
+    const businessData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('business[') && key.endsWith(']')) {
+        const fieldName = key.slice(9, -1); // Remove 'business[' and ']' (9 chars)
+        businessData[fieldName] = value;
+      }
+    }
+    body.business = businessData;
+    
+    // Process address data
+    const addressData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('address[') && key.endsWith(']')) {
+        const fieldName = key.slice(8, -1); // Remove 'address[' and ']' (8 chars)
+        addressData[fieldName] = value;
+      }
+    }
+    body.address = addressData;
+    
+    // Process subscription data
+    const subscriptionData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('subscription[') && key.endsWith(']')) {
+        const fieldName = key.slice(13, -1); // Remove 'subscription[' and ']' (13 chars)
+        subscriptionData[fieldName] = value;
+      }
+    }
+    body.subscription = subscriptionData;
+
+    // Log the parsed data for debugging
+    console.log('Parsed FormData:', body);
 
     // Validate payload using Zod schema
     const validationResult = registerSchema.safeParse(body);
@@ -27,8 +74,7 @@ export async function POST(request: NextRequest) {
     const accessToken = generateAccessToken({
       userId: result.newUser.get('id') as number,
       email: result.newUser.get('email') as string,
-      roleId: result.role.id,
-      roleName: result.role.name
+      role: result.newUser.get('role') as string,
     });
 
     const refreshToken = generateRefreshToken({

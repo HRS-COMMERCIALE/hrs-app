@@ -102,6 +102,18 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
         formDataRef.current = formData;
     }, [formData]);
 
+    // Update logo preview when initialValues.logoFile changes
+    useEffect(() => {
+        if (initialValues?.logoFile) {
+            // If we have a logoFile in initialValues, create a preview URL
+            if (initialValues.logoFile instanceof File) {
+                const reader = new FileReader();
+                reader.onload = () => setLogoPreviewUrl(reader.result as string);
+                reader.readAsDataURL(initialValues.logoFile);
+            }
+        }
+    }, [initialValues?.logoFile]);
+
     // Ensure defaults like currency and size are reflected in parent state on mount
     useEffect(() => {
         if (!onChange) return;
@@ -109,6 +121,7 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
             currency: formData.currency,
             size: formData.size,
             industry: formData.industry,
+            logoFile: formData.logoFile, // Include logoFile in initial change
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -119,7 +132,6 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
         if (!onChange) return;
         if (debounceTimer.current) clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-            console.log('📤 Business Form emitting change:', partial);
             onChange(partial);
         }, 200);
     }, [onChange]);
@@ -169,33 +181,6 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
 
     // Debug logging for form validation
     useEffect(() => {
-        console.log('🔍 Business Form Debug:', {
-            formData,
-            requiredFields: {
-                businessName: formData.businessName.trim(),
-                taxId: formData.taxId.trim(),
-                industry: formData.industry.trim(),
-                currency: formData.currency.trim(),
-                size: formData.size.trim(),
-                cnssCode: (formData.cnssCode ?? '').trim(),
-            },
-            allRequiredFilled: [
-                formData.businessName.trim(),
-                formData.taxId.trim(),
-                formData.industry.trim(),
-                formData.currency.trim(),
-                formData.size.trim(),
-                (formData.cnssCode ?? '').trim(),
-            ].every(v => v),
-            missingFields: [
-                { field: 'businessName', value: formData.businessName.trim(), filled: !!formData.businessName.trim() },
-                { field: 'taxId', value: formData.taxId.trim(), filled: !!formData.taxId.trim() },
-                { field: 'industry', value: formData.industry.trim(), filled: !!formData.industry.trim() },
-                { field: 'currency', value: formData.currency.trim(), filled: !!formData.currency.trim() },
-                { field: 'size', value: formData.size.trim(), filled: !!formData.size.trim() },
-                { field: 'cnssCode', value: (formData.cnssCode ?? '').trim(), filled: !!(formData.cnssCode ?? '').trim() },
-            ].filter(f => !f.filled)
-        });
     }, [formData]);
 
     // Debounced change propagation to container

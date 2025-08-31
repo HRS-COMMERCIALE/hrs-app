@@ -16,7 +16,7 @@ export type BusinessPayload = {
   tableHeaderBackgroundColor?: string;
   tableHeaderTitleColor?: string;
   referralCode?: string;
-  logoFile?: unknown;
+  logoFile?: File;
 };
 
 export type AddressPayload = {

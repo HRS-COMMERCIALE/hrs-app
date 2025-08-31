@@ -45,6 +45,11 @@ export function defineUserModel(sequelize: Sequelize, ModelClass: typeof Model, 
         type: DataTypesLib.STRING,
         allowNull: false,
       },
+      role: {
+        type: DataTypesLib.ENUM('user', 'manager', 'admin', 'super_admin'),
+        allowNull: false,
+        defaultValue: 'user',
+      },
     },
     {
       sequelize,

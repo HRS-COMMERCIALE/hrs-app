@@ -5,7 +5,10 @@ const ar = {
       features: "الميزات",
       about: "من نحن",
       contactUs: "اتصل بنا",
-      getStarted: "ابدأ الآن"
+      getStarted: "ابدأ الآن",
+      dashboard: "لوحة التحكم",
+      login: "تسجيل الدخول",
+      signUp: "إنشاء حساب"
     },
     heroSection:{
       statusBadge: {

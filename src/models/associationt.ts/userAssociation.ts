@@ -1,7 +1,6 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
 import { defineUserModel } from "../user/User";
 import { defineBusinessModel } from "../user/business";
-import { defineRoleModel } from "../user/Role";
 import { defineUserLicenseModel } from "../user/UserLicense";
 import { defineLoginAttemptModel } from "../user/LoginAttempt";
 import { defineUserTokenModel } from "../user/UserToken";
@@ -11,7 +10,6 @@ export function setupUserAssociations(
   ModelClass: typeof Model,
   DataTypesLib: typeof DataTypes
 ) {
-  const Role = defineRoleModel(sequelize, ModelClass, DataTypesLib);
   const User = defineUserModel(sequelize, ModelClass, DataTypesLib);
   const Business = defineBusinessModel(sequelize, ModelClass, DataTypesLib);
   const UserLicense = defineUserLicenseModel(
@@ -27,6 +25,7 @@ export function setupUserAssociations(
   const UserToken = defineUserTokenModel(sequelize, ModelClass, DataTypesLib);
 
   // Associations
+ 
 
   // User has many businesses
   User.hasMany(Business, { foreignKey: "userId", as: "businesses" });
@@ -41,5 +40,5 @@ export function setupUserAssociations(
   User.hasMany(UserToken, { foreignKey: "userId", as: "tokens" });
   UserToken.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-  return { User, Role, Business, UserLicense, LoginAttempt, UserToken };
+  return { User, Business, UserLicense, LoginAttempt, UserToken };
 }
