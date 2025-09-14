@@ -90,7 +90,7 @@ export default function RightSideContent() {
             
             if (response.success) {
                 // Redirect to dashboard or handle success
-                window.location.href = '/dashboard';
+                window.location.href = '/';
             } else {
                 console.error('Login failed:', response.error);
                 // Handle error (you can add error state and display it)
@@ -105,7 +105,7 @@ export default function RightSideContent() {
     };
 
     return (
-        <div className="flex-1 flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-[#3c959d] via-[#4ba5ad] to-[#ef7335] relative overflow-hidden">
+        <div className="flex-1 flex items-center justify-center h-full w-full bg-gradient-to-br from-[#3c959d] via-[#4ba5ad] to-[#ef7335] relative overflow-hidden">
             {/* Enhanced Background Elements - Full Screen Coverage */}
             <div className="absolute inset-0 w-full h-full">
                 {/* Primary gradient overlays */}
@@ -347,34 +347,6 @@ export default function RightSideContent() {
                                 </div>
                             </div>
 
-                            {/* IP Address Indicator */}
-                            <div className="pt-2 pb-1">
-                                <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-                                    {isFetchingIP ? (
-                                        <div className="flex items-center">
-                                            <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            <span>Detecting IP address...</span>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <span>IP: {currentIP}</span>
-                                            <button
-                                                type="button"
-                                                onClick={refreshIP}
-                                                className="p-1 hover:bg-slate-100 rounded-full transition-colors duration-200"
-                                                title="Refresh IP address"
-                                            >
-                                                <svg className="h-3 w-3 text-slate-400 hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                </svg>
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
 
                             {/* Enhanced Submit Button */}
                             <div className="pt-4">

@@ -13,6 +13,7 @@ export const registerSchema = z.object({
   }),
   business: z.object({
     businessName: z.string().min(2, 'Company name must be at least 2 characters').max(100, 'Company name must not exceed 100 characters'),
+    registrationNumber: z.string().max(100, 'Registration Number must not exceed 100 characters'),
     taxId: z.string().min(3, 'Tax ID must be at least 3 characters').max(50, 'Tax ID must not exceed 50 characters'),
     cnssCode: z.string().min(3, 'CNSS Code must be at least 3 characters').max(50, 'CNSS Code must not exceed 50 characters'),
     industry: z.string().min(2, 'Industry sector must be at least 2 characters').max(100, 'Industry sector must not exceed 100 characters'),

@@ -143,23 +143,6 @@ export default function RegisterContainer() {
     const handleOrder = (payload: OrderData) => {
         const finalPayload = { ...data, order: payload } as Required<CollectedData>;
         
-        // Log the complete payload to show what's being sent
-        console.log('🚀 Complete Registration Payload:', finalPayload);
-        console.log('📁 Business Data (including logo):', finalPayload.business);
-        console.log('🖼️ Logo File Details:', {
-            exists: !!finalPayload.business?.logoFile,
-            type: finalPayload.business?.logoFile?.type,
-            size: finalPayload.business?.logoFile?.size,
-            name: finalPayload.business?.logoFile?.name
-        });
-        console.log('👤 User Data:', finalPayload.user);
-        console.log('🏢 Address Data:', finalPayload.address);
-        console.log('💳 Subscription Data:', finalPayload.subscription);
-        console.log('🛒 Order Data:', finalPayload.order);
-        
-        // TODO: Replace with API call
-        // eslint-disable-next-line no-console
-        console.log('Registration payload:', finalPayload);
     };
 
     // Handle business form changes including logo file

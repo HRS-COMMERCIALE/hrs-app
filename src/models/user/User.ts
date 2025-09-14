@@ -45,10 +45,35 @@ export function defineUserModel(sequelize: Sequelize, ModelClass: typeof Model, 
         type: DataTypesLib.STRING,
         allowNull: false,
       },
-      role: {
-        type: DataTypesLib.ENUM('user', 'manager', 'admin', 'super_admin'),
+      emailVerified:{
+        type: DataTypesLib.BOOLEAN,
         allowNull: false,
-        defaultValue: 'user',
+        defaultValue: false,
+      },
+      plan:{
+        type: DataTypesLib.STRING,
+        allowNull: true,
+      },
+      buinessCount:{
+        type: DataTypesLib.STRING,
+        allowNull: true,
+      },
+      isBanned:{
+        type: DataTypesLib.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      bannedReason:{
+        type: DataTypesLib.STRING,
+        allowNull: true,
+      },
+      bannedAt:{
+        type: DataTypesLib.DATE,
+        allowNull: true,
+      },
+      bannedBy:{
+        type: DataTypesLib.STRING,
+        allowNull: true,
       },
     },
     {

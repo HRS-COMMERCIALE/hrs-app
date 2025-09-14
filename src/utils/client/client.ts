@@ -130,7 +130,10 @@ class ApiClient {
         return {
           success: false,
           error: errorData.error || `HTTP ${response.status}: ${response.statusText}`,
-          code: errorData.code || 'REQUEST_ERROR'
+          code: errorData.code || 'REQUEST_ERROR',
+          message: errorData.message,
+          errors: errorData.errors,
+          data: errorData
         };
       }
 

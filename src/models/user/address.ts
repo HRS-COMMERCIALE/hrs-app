@@ -22,7 +22,7 @@ export function defineAddressModel(sequelize: Sequelize, ModelClass: typeof Mode
       },
       country: {
         type: DataTypesLib.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       governorate: {
         type: DataTypesLib.STRING,

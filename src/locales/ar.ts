@@ -221,7 +221,6 @@ const ar = {
       createAccount: "أنشئ حسابك"
     },
     leftSide: {
-      badge: "منصة جاهزة للمؤسسات",
       title: {
         line1: "حوّل",
         line2: "رحلة عملك"

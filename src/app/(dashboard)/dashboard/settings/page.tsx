@@ -2,7 +2,9 @@
 
 import React, { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
-import CompanyInformation from '../../../../components/pages/dashboard/CompanyInformation';
+import CompanyInformation from '../../../../components/pages/dashboard/settings/CompanyInformation';
+import PostalCodes from '../../../../components/pages/dashboard/settings/PostalCodes';
+import PointOfSale from '../../../../components/pages/dashboard/settings/PointOfSale';
 
 type NavItem = {
   id: string;
@@ -317,6 +319,10 @@ export default function SettingsPage() {
           <div className="p-8 h-full">
             {activeId === 'company-info' ? (
               <CompanyInformation />
+            ) : activeId === 'postal-codes' ? (
+              <PostalCodes />
+            ) : activeId === 'pos-settings' ? (
+              <PointOfSale />
             ) : (
               <div className="max-w-2xl">
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">

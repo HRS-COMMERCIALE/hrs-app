@@ -69,12 +69,6 @@ export async function uploadToCloudinary(
       );
     });
     
-    console.log('✅ File uploaded to Cloudinary:', {
-      filename: file.name,
-      size: file.size,
-      url: result.url,
-      public_id: result.public_id
-    });
     
     return result;
     
@@ -101,7 +95,6 @@ export async function deleteFromCloudinary(publicId: string): Promise<boolean> {
       });
     });
     
-    console.log('✅ File deleted from Cloudinary:', publicId, result);
     return true;
     
   } catch (error) {

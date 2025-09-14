@@ -221,7 +221,6 @@ const fr = {
       createAccount: "Créez votre compte"
     },
     leftSide: {
-      badge: "Plateforme Prête pour l'Entreprise",
       title: {
         line1: "Transformez Votre",
         line2: "Parcours Commercial"

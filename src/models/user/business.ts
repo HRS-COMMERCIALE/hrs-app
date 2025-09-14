@@ -36,6 +36,10 @@ export function defineBusinessModel(sequelize: Sequelize, ModelClass: typeof Mod
         type: DataTypesLib.STRING,
         allowNull: false,
       },
+      registrationNumber: {
+        type: DataTypesLib.STRING,
+        allowNull: true,
+      },
       taxId: {
         type: DataTypesLib.STRING,
         allowNull: false,

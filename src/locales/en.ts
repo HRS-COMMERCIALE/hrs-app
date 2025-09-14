@@ -222,7 +222,6 @@ const en = {
       createAccount: "Create your account"
     },
     leftSide: {
-      badge: "Enterprise Ready Platform",
       title: {
         line1: "Transform Your",
         line2: "Business Journey"

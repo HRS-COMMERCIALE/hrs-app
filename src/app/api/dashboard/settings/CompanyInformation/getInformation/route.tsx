@@ -19,6 +19,7 @@ export async function GET(req: Request) {
         'size',
         'industry',
         'businessName',
+        'registrationNumber',
         'taxId',
         'cnssCode',
         'website',

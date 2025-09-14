@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
+import { useAuth } from '@/store/authProvider';
 
 type LeafItem = {
   name: string;
@@ -21,6 +22,7 @@ type SectionItem = {
 
 const DashboardSidebar = () => {
   const pathname = usePathname();
+  const { user, business } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     Operations: true,
@@ -28,6 +30,11 @@ const DashboardSidebar = () => {
     'Finance & Accounting': false,
     'Analytics & Insights': false,
   });
+
+  // Debug logging
+  console.log('DashboardSidebar - User:', user);
+  console.log('DashboardSidebar - Business:', business);
+  console.log('DashboardSidebar - Logo URL:', business?.logoFile);
 
   const sections: SectionItem[] = useMemo(
     () => [
@@ -231,25 +238,53 @@ const DashboardSidebar = () => {
 
       <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200/70 bg-white/80 backdrop-blur">
         <div className="flex items-center justify-between">
-        <div className="flex items-center">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 rounded-full flex items-center justify-center">
-              <Icon icon="solar:user-bold-duotone" className="text-gray-700" width={16} height={16} />
-          </div>
+          <div className="flex items-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 rounded-full flex items-center justify-center overflow-hidden">
+              {business?.logoFile ? (
+                <Image 
+                  src={business.logoFile} 
+                  alt={business.businessName || "Business Logo"} 
+                  width={36} 
+                  height={36} 
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    console.error('Failed to load business logo:', business.logoFile);
+                    // Fallback to user initials on error
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                  unoptimized={true}
+                />
+              ) : null}
+              {(!business?.logoFile || !business.logoFile) && user?.firstName && user?.lastName ? (
+                <span className="text-sm font-semibold text-gray-700">
+                  {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                </span>
+              ) : null}
+              {(!business?.logoFile || !business.logoFile) && (!user?.firstName || !user?.lastName) ? (
+                <Icon icon="solar:user-bold-duotone" className="text-gray-700" width={16} height={16} />
+              ) : null}
+            </div>
             {!isCollapsed && (
-          <div className="ml-3">
-                <p className="text-sm font-medium text-gray-800">User</p>
-            <p className="text-xs text-gray-500">user@example.com</p>
-          </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-800">
+                  {business?.businessName || (user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user?.title || 'User'
+                  )}
+                </p>
+                <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
+              </div>
             )}
-        </div>
+          </div>
           {!isCollapsed && (
             <Link href="/logout" className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
               <Icon icon="solar:logout-3-bold-duotone" width={14} height={14} />
               Logout
             </Link>
           )}
+        </div>
       </div>
-    </div>
     </aside>
   );
 };

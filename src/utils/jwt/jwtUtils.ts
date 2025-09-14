@@ -12,7 +12,6 @@ const JWT_CONFIG = {
 export interface TokenPayload {
   userId: number;
   email: string;
-  role: string;
   tokenType?: 'access';
 }
 

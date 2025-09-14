@@ -1,5 +1,5 @@
-import RegisterContainer from '@/components/pages/auth/register/container';
+import SignupContainer from "@/components/pages/auth/signup/container";
 
-export default function RegisterPage() {
-    return <RegisterContainer />;
+export default function SignupPage() {
+    return <SignupContainer />;
 }

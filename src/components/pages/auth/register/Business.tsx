@@ -60,6 +60,7 @@ const INDUSTRY_OPTIONS: string[] = [
 
 export interface BusinessData {
     businessName: string;
+    registrationNumber?: string;
     taxId: string;
     industry: string;
     currency: string;
@@ -83,6 +84,7 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
     const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
     const [formData, setFormData] = useState<BusinessData>({
         businessName: initialValues?.businessName ?? '',
+        registrationNumber: (initialValues as any)?.registrationNumber ?? '',
         taxId: (initialValues as any)?.taxId ?? '',
         industry: initialValues?.industry ?? '',
         currency: (initialValues as any)?.currency ?? 'TND',
@@ -139,7 +141,7 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
     // Sync values that the browser may autofill so they count towards validation
     useEffect(() => {
         const syncFromDom = () => {
-            const ids = ['businessName', 'taxId', 'cnssCode', 'website', 'size', 'currency'] as const;
+            const ids = ['businessName', 'registrationNumber', 'taxId', 'cnssCode', 'website', 'size', 'currency'] as const;
             const partial: Partial<BusinessData> = {};
             ids.forEach((fieldId) => {
                 const el = document.getElementById(fieldId) as HTMLInputElement | HTMLSelectElement | null;
@@ -293,6 +295,16 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
                                     />
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <InputField
+                                            icon={Hash}
+                                            label="Registration Number"
+                                            id="registrationNumber"
+                                            name="registrationNumber"
+                                            placeholder="TN-123456"
+                                            value={formData.registrationNumber ?? ''}
+                                            onChange={handleChange}
+                                            autoComplete="off"
+                                        />
                                         <InputField
                                             icon={Hash}
                                             label="Tax ID"

@@ -16,7 +16,6 @@ export async function createBusiness(payload: RegisterSchema, userId: number, tr
           'hrs-app/business-logos'
         );
         logoFilePath = uploadResult.secure_url;
-        console.log('✅ Logo uploaded to Cloudinary:', logoFilePath);
       } catch (fileError) {
         console.error('❌ Error uploading logo file:', fileError);
         throw new Error('Failed to upload logo file to Cloudinary');
@@ -26,6 +25,7 @@ export async function createBusiness(payload: RegisterSchema, userId: number, tr
     const newBusiness = await Business.create({
       userId: userId,
       businessName: payload.business.businessName,
+      registrationNumber: (payload as any).business?.registrationNumber || '',
       taxId: payload.business.taxId,
       cnssCode: payload.business.cnssCode,
       industry: payload.business.industry,

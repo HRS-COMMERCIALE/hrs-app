@@ -25,6 +25,7 @@ interface User {
   title: string;
   status: string;
   mobile: string;
+  emailVerified: boolean;
 }
 
 // Auth context interface
@@ -33,6 +34,7 @@ interface AuthContextType {
   user: User | null;
   business: Business | null;
   checkAuth: () => Promise<void>;
+  updateEmailVerification: (verified: boolean) => void;
 }
 
 // Create auth context
@@ -69,6 +71,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Update email verification status
+  const updateEmailVerification = (verified: boolean) => {
+    if (user) {
+      setUser({
+        ...user,
+        emailVerified: verified
+      });
+    }
+  };
+
   // Check auth on mount
   useEffect(() => {
     checkAuth();
@@ -79,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     business,
     checkAuth,
+    updateEmailVerification,
   };
 
   return (

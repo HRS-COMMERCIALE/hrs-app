@@ -13,7 +13,7 @@ export default function LeftSideContent() {
     }, []);
 
     return (
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
             {/* Enhanced Animated Background */}
             <div className="absolute inset-0">
                 {/* Primary gradient overlay */}
@@ -77,16 +77,6 @@ export default function LeftSideContent() {
                 
                 {/* Enhanced Hero Section */}
                 <div className="text-center mb-12 max-w-xl">
-                    <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#3c959d]/20 to-[#ef7335]/20 backdrop-blur-md border border-[#3c959d]/40 rounded-full px-6 py-3 text-sm mb-10 group hover:border-[#3c959d]/60 transition-all duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                                <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-50"></div>
-                            </div>
-                            <span className="text-slate-200 font-semibold tracking-wide">{currentTranslations.auth.leftSide.badge}</span>
-                        </div>
-                    </div>
-                    
                     <h1 className="text-6xl font-bold mb-8 leading-tight">
                         <span className="block text-white drop-shadow-lg mb-2">{currentTranslations.auth.leftSide.title.line1}</span>
                         <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">

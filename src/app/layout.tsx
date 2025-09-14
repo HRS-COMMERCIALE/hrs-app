@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LanguageSelector from "@/components/LanguageSelector/LanguageSelector";
 import { AuthProvider } from '@/store/authProvider';
+import { ToastProvider } from '@/components/ui/alerts';
+import { VerificationBanner } from '@/components/shared';
+import QueryProvider from '@/components/providers/QueryProvider';
 
 
 const geistSans = Geist({
@@ -28,11 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased pb-32 sm:pb-28`}
       >
         <AuthProvider>
-          <LanguageSelector />
-          {children}
+          <QueryProvider>
+            <ToastProvider>
+              <LanguageSelector />
+              {children}
+              <VerificationBanner />
+            </ToastProvider>
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>

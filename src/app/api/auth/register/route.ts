@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
     body.subscription = subscriptionData;
 
     // Log the parsed data for debugging
-    console.log('Parsed FormData:', body);
 
     // Validate payload using Zod schema
     const validationResult = registerSchema.safeParse(body);

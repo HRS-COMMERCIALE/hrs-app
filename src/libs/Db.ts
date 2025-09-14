@@ -13,7 +13,7 @@ export function getSequelize(): Sequelize {
       port: Number(DB_PORT),
       dialect: 'postgres',
       models: [], // Add your models here later
-      logging: console.log, // Set to true for SQL query logging
+      logging: (sql) => console.log(`[SQL] ${sql}`), // Clean SQL logging
       pool: {
         max: 5,
         min: 0,

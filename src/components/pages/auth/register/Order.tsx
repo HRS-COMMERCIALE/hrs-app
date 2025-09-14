@@ -173,7 +173,6 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                 planId: value,
             };
             // eslint-disable-next-line no-console
-            console.log('OrderForm plan changed. Updated order data:', updatedFormData);
             onPlanChange(value);
         }
     };
@@ -213,16 +212,6 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             return;
         }
 
-        // Log what we're about to send to the backend
-        console.log('📤 Sending to Backend API:', payload);
-        console.log('🖼️ Logo File in Business Data:', {
-            exists: !!payload.business?.logoFile,
-            type: payload.business?.logoFile?.type,
-            size: payload.business?.logoFile?.size,
-            name: payload.business?.logoFile?.name,
-            isFile: payload.business?.logoFile instanceof File
-        });
-        console.log('📊 Complete Business Object:', payload.business);
 
         try {
             setIsSubmitting(true);
@@ -243,7 +232,6 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                     if (key === 'logoFile' && value instanceof File) {
                         // Handle logo file separately
                         formData.append('business[logoFile]', value);
-                        console.log('✅ Logo file added to FormData:', value.name, value.size, value.type);
                     } else {
                         formData.append(`business[${key}]`, value.toString());
                     }
@@ -265,20 +253,16 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             });
             
             // Log FormData contents
-            console.log('📋 FormData entries:');
             for (let [key, value] of formData.entries()) {
                 console.log(`  ${key}:`, value instanceof File ? `File(${value.name}, ${value.size} bytes)` : value);
             }
-            console.log('🚀 FormData:', formData);
-            console.log('🚀 FormData entries:', formData.entries());
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 body: formData, // Use FormData instead of JSON for file uploads
             });
 
             if (res.ok) {
-                console.log('✅ Registration successful! Redirecting to dashboard...');
-                router.push('/dashboard');
+                router.push('/verify-email');
                 return;
             }
 
