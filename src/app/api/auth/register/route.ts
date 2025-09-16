@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     const accessToken = generateAccessToken({
       userId: result.newUser.get('id') as number,
       email: result.newUser.get('email') as string,
-      role: result.newUser.get('role') as string,
+      plan: result.newUser.get('plan') as string,
     });
 
     const refreshToken = generateRefreshToken({
@@ -154,11 +154,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (error.message.includes("Failed to assign role")) {
-        return ApiResponseHandler.internalError(
-          "Failed to assign user role"
-        );
-      }
+    
 
       if (error.message.includes("Failed to create business")) {
         return ApiResponseHandler.internalError(

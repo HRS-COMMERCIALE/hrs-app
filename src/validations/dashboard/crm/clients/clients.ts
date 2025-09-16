@@ -22,7 +22,7 @@ const priceTypes = ['Daily', 'Monthly', 'Yearly'] as const;
 
 export const createClientSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255).trim(),
-  type: z.enum(clientTypes, { required_error: 'Type is required' }),
+  type: z.enum(clientTypes, { message: 'Type is required' }),
   address: z.string().min(1, 'Address is required').max(255).trim(),
   governorate: z.enum(tunisianGovernorates).nullable().optional(),
   city: z.string().max(255).nullable().optional(),

@@ -41,7 +41,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // If articleId is being updated, verify the new article exists and belongs to the business
-    if (validatedData.articleId && validatedData.articleId !== existingOrder.articleId) {
+    if (validatedData.articleId && validatedData.articleId !== (existingOrder as any).articleId) {
       const article = await Article.findOne({
         where: {
           id: validatedData.articleId,

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import PaymentContainer from '../../../components/pages/payment/PaymentContainer';
 import { getPlanById, isValidPlanId, PaymentPlan } from '../../api/stripe-config/PaymentPlanceConfig';
 
-export default function PaymentPage() {
+function PaymentPageContent() {
     const [mounted, setMounted] = useState(false);
     const [planData, setPlanData] = useState<PaymentPlan | null>(null);
     const searchParams = useSearchParams();
@@ -52,5 +52,13 @@ export default function PaymentPage() {
                 planCurrency={planData.currency}
             />
         </div>
+    );
+}
+
+export default function PaymentPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <PaymentPageContent />
+        </Suspense>
     );
 }

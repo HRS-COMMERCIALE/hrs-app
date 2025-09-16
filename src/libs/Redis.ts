@@ -28,7 +28,7 @@ const redisConfig = {
   socket: {
     connectTimeout: 10000,
     lazyConnect: true,
-    keepAlive: 5000,
+    keepAlive: true,
     family: 4,
     noDelay: true,
   },
@@ -191,7 +191,7 @@ export async function setKeyExpiration(key: string, seconds: number): Promise<bo
   try {
     const client = await getRedisClient();
     const result = await client.expire(key, seconds);
-    return result;
+    return result === 1;
   } catch (error) {
     console.error(`❌ Error setting expiration for key ${key}:`, error);
     throw error;

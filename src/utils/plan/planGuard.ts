@@ -41,7 +41,7 @@ export async function requireValidPlan(
     }
 
     // Check if specific plan is required
-    if (requiredPlan && user.plan !== requiredPlan) {
+    if (requiredPlan && (user as any).plan !== requiredPlan) {
       return NextResponse.json({
         success: false,
         error: `${requiredPlan} plan required for this feature`,

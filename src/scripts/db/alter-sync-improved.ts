@@ -41,20 +41,20 @@ async function alterSyncImproved() {
         console.log(`✅ Successfully synced: ${model.name}`);
         
       } catch (modelError) {
-        console.warn(`⚠️  Warning syncing ${model.name}:`, modelError.message);
-        syncResults.push({ model: model.name, table: modelName, status: 'warning', error: modelError.message });
+        console.warn(`⚠️  Warning syncing ${model.name}:`, (modelError as any).message);
+        syncResults.push({ model: model.name, table: modelName, status: 'warning', error: (modelError as any).message });
         
         // Try to create the table if it doesn't exist
-        if (modelError.message.includes('relation') && modelError.message.includes('does not exist')) {
+        if ((modelError as any).message.includes('relation') && (modelError as any).message.includes('does not exist')) {
           try {
             console.log(`🔄 Attempting to create table for ${model.name}...`);
             await model.sync({ force: false });
             syncResults[syncResults.length - 1].status = 'created';
             console.log(`✅ Created table for: ${model.name}`);
           } catch (createError) {
-            console.error(`❌ Failed to create table for ${model.name}:`, createError.message);
+            console.error(`❌ Failed to create table for ${model.name}:`, (createError as any).message);
             syncResults[syncResults.length - 1].status = 'failed';
-            syncResults[syncResults.length - 1].error = createError.message;
+            syncResults[syncResults.length - 1].error = (createError as any).message;
           }
         }
       }

@@ -140,7 +140,7 @@ export default function RightSideContent() {
                 setIsSubmitted(false);
                 
                 // Handle API response errors - check multiple possible locations
-                const errors = response?.errors || response?.data?.errors;
+                const errors = (response as any)?.errors || (response as any)?.data?.errors;
                 const message = response?.message || response?.data?.message || response?.error;
                 
                 if (errors && Array.isArray(errors)) {

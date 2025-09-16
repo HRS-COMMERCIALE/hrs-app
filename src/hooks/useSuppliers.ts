@@ -30,7 +30,7 @@ export interface CreateSupplierData {
 
 export interface UpdateSupplierData extends Partial<CreateSupplierData> {
   id: number;
-  codesPostauxId?: number | null;
+  codesPostauxId?: number;
 }
 
 // API functions

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/store/authProvider';
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Header from '@/components/layout/Header/Header';
 import HeroSection from '@/components/pages/HomePage/HeroSection';
 import BusinessSolutions from "@/components/pages/HomePage/BusinessSolutions"
@@ -11,7 +11,7 @@ import Container from "@/components/pages/HomePage/container"
 import Footer from "@/components/pages/HomePage/footer"
 import PaymentSuccessPopup from '@/components/ui/PaymentSuccessPopup';
 
-export default function Home() {
+function HomeContent() {
   const { authState, user } = useAuth();
   const searchParams = useSearchParams();
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -67,5 +67,13 @@ export default function Home() {
         />
       )}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
