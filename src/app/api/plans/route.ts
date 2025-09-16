@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getPlansForDisplay } from '../../stripe-config/PaymentPlanceConfig';
+import { getPlansForDisplay } from '../stripe-config/PaymentPlanceConfig';
 
 export async function GET() {
   try {
