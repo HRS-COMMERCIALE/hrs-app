@@ -12,6 +12,7 @@ const JWT_CONFIG = {
 export interface TokenPayload {
   userId: number;
   email: string;
+  plan: string;
   tokenType?: 'access';
 }
 

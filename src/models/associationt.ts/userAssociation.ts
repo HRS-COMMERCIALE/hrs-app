@@ -4,6 +4,7 @@ import { defineBusinessModel } from "../user/business";
 import { defineUserLicenseModel } from "../user/UserLicense";
 import { defineLoginAttemptModel } from "../user/LoginAttempt";
 import { defineUserTokenModel } from "../user/UserToken";
+import { definePaymentTransactionModel } from "../user/PaymentTransaction";
 
 export function setupUserAssociations(
   sequelize: Sequelize,
@@ -23,6 +24,7 @@ export function setupUserAssociations(
     DataTypesLib
   );
   const UserToken = defineUserTokenModel(sequelize, ModelClass, DataTypesLib);
+  const PaymentTransaction = definePaymentTransactionModel(sequelize, ModelClass, DataTypesLib);
 
   // Associations
  
@@ -40,5 +42,8 @@ export function setupUserAssociations(
   User.hasMany(UserToken, { foreignKey: "userId", as: "tokens" });
   UserToken.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-  return { User, Business, UserLicense, LoginAttempt, UserToken };
+  User.hasMany(PaymentTransaction, { foreignKey: "userId", as: "paymentTransactions" });
+  PaymentTransaction.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+  return { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction };
 }

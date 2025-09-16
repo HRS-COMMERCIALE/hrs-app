@@ -352,10 +352,17 @@ export default function ContactUsPage() {
                                                     required
                                                     value={formData.email}
                                                     onChange={handleInputChange}
-                                                    className="relative block w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad] transition-all duration-200 text-slate-800 text-lg"
+                                                    className={`relative block w-full px-6 py-4 bg-white border rounded-2xl shadow-sm placeholder-slate-500 focus:outline-none transition-all duration-200 text-slate-800 text-lg ${
+                                                        fieldErrors.email 
+                                                            ? 'border-red-300 focus:ring-2 focus:ring-red-200 focus:border-red-500' 
+                                                            : 'border-slate-200 focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad]'
+                                                    }`}
                                                     placeholder="Enter your email address"
                                                 />
                                             </div>
+                                            {fieldErrors.email && (
+                                                <p className="text-red-600 text-sm mt-1">{fieldErrors.email}</p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -372,7 +379,11 @@ export default function ContactUsPage() {
                                                 required
                                                 value={formData.subject}
                                                 onChange={handleInputChange}
-                                                className="relative block w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3c959d]/20 focus:border-[#3c959d] transition-all duration-200 text-slate-800 text-lg"
+                                                className={`relative block w-full px-6 py-4 bg-white border rounded-2xl shadow-sm focus:outline-none transition-all duration-200 text-slate-800 text-lg ${
+                                                    fieldErrors.subject 
+                                                        ? 'border-red-300 focus:ring-2 focus:ring-red-200 focus:border-red-500' 
+                                                        : 'border-slate-200 focus:ring-2 focus:ring-[#3c959d]/20 focus:border-[#3c959d]'
+                                                }`}
                                             >
                                                 <option value="">Select a subject</option>
                                                 <option value="general">General Inquiry</option>
@@ -382,6 +393,9 @@ export default function ContactUsPage() {
                                                 <option value="other">Other</option>
                                             </select>
                                         </div>
+                                        {fieldErrors.subject && (
+                                            <p className="text-red-600 text-sm mt-1">{fieldErrors.subject}</p>
+                                        )}
                                     </div>
 
                                     {/* Message Field */}
@@ -398,10 +412,17 @@ export default function ContactUsPage() {
                                                 required
                                                 value={formData.message}
                                                 onChange={handleInputChange}
-                                                className="relative block w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad] transition-all duration-200 text-slate-800 text-lg resize-none"
+                                                className={`relative block w-full px-6 py-4 bg-white border rounded-2xl shadow-sm placeholder-slate-500 focus:outline-none transition-all duration-200 text-slate-800 text-lg resize-none ${
+                                                    fieldErrors.message 
+                                                        ? 'border-red-300 focus:ring-2 focus:ring-red-200 focus:border-red-500' 
+                                                        : 'border-slate-200 focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad]'
+                                                }`}
                                                 placeholder="Tell us about your project or inquiry..."
                                             />
                                         </div>
+                                        {fieldErrors.message && (
+                                            <p className="text-red-600 text-sm mt-1">{fieldErrors.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Submit Button */}

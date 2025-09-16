@@ -136,6 +136,9 @@ export default function RightSideContent() {
                 // Redirect to email verification page
                 window.location.href = '/verify-email';
             } else {
+                // Reset isSubmitted to allow retry
+                setIsSubmitted(false);
+                
                 // Handle API response errors - check multiple possible locations
                 const errors = response?.errors || response?.data?.errors;
                 const message = response?.message || response?.data?.message || response?.error;
@@ -153,6 +156,9 @@ export default function RightSideContent() {
                 }
             }
         } catch (error: any) {
+            // Reset isSubmitted to allow retry
+            setIsSubmitted(false);
+            
             // Handle different types of errors
             if (error?.response?.status === 400) {
                 const errorData = error.response.data;
@@ -341,7 +347,46 @@ export default function RightSideContent() {
 
                         {/* Enhanced Form */}
                         <form onSubmit={handleSubmit} className="space-y-2">
-                            {/* Name Row - First */}
+                            {/* Email - First Priority */}
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="block text-xs font-bold text-slate-700 tracking-wide uppercase">
+                                    Email Address *
+                                </label>
+                                <div className="relative group">
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg className="h-4 w-4 text-slate-400 group-hover:text-[#3c959d] group-focus-within:text-[#3c959d] transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            autoComplete="email"
+                                            required
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            className={`relative block w-full pl-10 pr-3 py-2.5 bg-white border rounded-lg shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 transition-all duration-200 text-slate-800 text-sm ${
+                                                errors.email || apiErrors.email
+                                                    ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500' 
+                                                    : 'border-slate-200 focus:ring-[#3c959d]/20 focus:border-[#3c959d]'
+                                            }`}
+                                            placeholder="Enter email address"
+                                        />
+                                    </div>
+                                    {(errors.email || apiErrors.email) && (
+                                        <p className="text-xs text-red-500 mt-1 flex items-center">
+                                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                            </svg>
+                                            {apiErrors.email || errors.email}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Name Row - Second Priority */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
                                     <label htmlFor="firstName" className="block text-xs font-bold text-slate-700 tracking-wide uppercase">
@@ -418,7 +463,7 @@ export default function RightSideContent() {
                                 </div>
                             </div>
 
-                            {/* Title and Status Row */}
+                            {/* Title Row - Third Priority */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
                                     <label htmlFor="title" className="block text-xs font-bold text-slate-700 tracking-wide uppercase">
@@ -447,70 +492,6 @@ export default function RightSideContent() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-1">
-                                    <label htmlFor="status" className="block text-xs font-bold text-slate-700 tracking-wide uppercase">
-                                        Status
-                                    </label>
-                                    <div className="relative group">
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <svg className="h-4 w-4 text-slate-400 group-hover:text-[#4ba5ad] group-focus-within:text-[#4ba5ad] transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <select
-                                                id="status"
-                                                name="status"
-                                                value={formData.status}
-                                                onChange={handleInputChange}
-                                                className="relative block w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad] transition-all duration-200 text-slate-800 text-sm"
-                                            >
-                                                <option value="active">Active</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="inactive">Inactive</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Email */}
-                            <div className="space-y-2">
-                                <label htmlFor="email" className="block text-xs font-bold text-slate-700 tracking-wide uppercase">
-                                    Email Address *
-                                </label>
-                                <div className="relative group">
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg className="h-4 w-4 text-slate-400 group-hover:text-[#3c959d] group-focus-within:text-[#3c959d] transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                            </svg>
-                                        </div>
-                                        <input
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            autoComplete="email"
-                                            required
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                            className={`relative block w-full pl-10 pr-3 py-2.5 bg-white border rounded-lg shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 transition-all duration-200 text-slate-800 text-sm ${
-                                                errors.email || apiErrors.email
-                                                    ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500' 
-                                                    : 'border-slate-200 focus:ring-[#3c959d]/20 focus:border-[#3c959d]'
-                                            }`}
-                                            placeholder="Enter email address"
-                                        />
-                                    </div>
-                                    {(errors.email || apiErrors.email) && (
-                                        <p className="text-xs text-red-500 mt-1 flex items-center">
-                                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            {apiErrors.email || errors.email}
-                                        </p>
-                                    )}
-                                </div>
                             </div>
 
                             {/* Mobile and Landline Row */}

@@ -4,11 +4,11 @@ import { setupUserAssociations } from './userAssociation';
 import { setupBusinessAssociations } from './businessAssociation';
 
 // Initialize models and associations without auto-syncing
-const { User, Business, UserLicense, LoginAttempt, UserToken } = setupUserAssociations(sequelize, Model, DataTypes);
+const { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction } = setupUserAssociations(sequelize, Model, DataTypes);
 const { Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order } = setupBusinessAssociations(sequelize, Model, DataTypes);
 
 // Export individual models
-export { User, Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, UserLicense, LoginAttempt, UserToken };
+export { User, Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, UserLicense, LoginAttempt, UserToken, PaymentTransaction };
 
 // Export array of all models for sync operations (ordered by dependencies)
 // Parent tables first, then child tables
@@ -26,6 +26,7 @@ export const models = [
   UserLicense,
   LoginAttempt,
   UserToken,
+  PaymentTransaction,
 ];
 
 // Export model names for logging (in same order as models)
@@ -43,5 +44,6 @@ export const modelNames = [
   'user_licenses',
   'login_attempts',
   'user_tokens',
+  'payment_transactions',
 ];
 

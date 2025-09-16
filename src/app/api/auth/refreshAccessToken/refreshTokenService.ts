@@ -41,7 +41,6 @@ export async function refreshAccessTokenService(cookieStore: ReadonlyRequestCook
       };
     }
 
-    // Load user to reconstruct access token payload (email, role)
     const user = await User.findByPk(userId);
     if (!user) {
       return {
@@ -54,7 +53,7 @@ export async function refreshAccessTokenService(cookieStore: ReadonlyRequestCook
     const accessToken = generateAccessToken({
       userId: user.get("id") as number,
       email: user.get("email") as string,
-      role: user.get("role") as string,
+      plan: user.get("plan") as string,
     });
 
     const response = ApiResponseHandler.success({}, "Access token refreshed");

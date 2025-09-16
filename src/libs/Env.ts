@@ -5,11 +5,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const envSchema = z.object({
-    DB_NAME: z.string(),
-    DB_USER: z.string(),
-    DB_PASS: z.string(),
-    DB_HOST: z.string(),
-    DB_PORT: z.string(),
+    // Neon database URL (required)
+    DATABASE_URL: z.string(),
+    // Local DB config (commented out - using Neon only)
+    // DB_NAME: z.string().optional(),
+    // DB_USER: z.string().optional(),
+    // DB_PASS: z.string().optional(),
+    // DB_HOST: z.string().optional(),
+    // DB_PORT: z.string().optional(),
     // Redis configuration
     REDIS_HOST: z.string().optional(),
     REDIS_PORT: z.string().optional(),
@@ -24,16 +27,25 @@ function validateEnv() {
         console.error("❌ Invalid environment variables:", parsed.error.format());
         process.exit(1);
     }
+    
+    // Ensure we have DATABASE_URL (Neon only)
+    if (!process.env.DATABASE_URL) {
+        console.error("❌ DATABASE_URL is required for Neon database connection");
+        process.exit(1);
+    }
 }
 
 validateEnv();
 
 export const env = {
-    DB_NAME: process.env.DB_NAME,
-    DB_USER: process.env.DB_USER,
-    DB_PASS: process.env.DB_PASS,
-    DB_HOST: process.env.DB_HOST,
-    DB_PORT: process.env.DB_PORT,
+    // Neon database URL (required)
+    DATABASE_URL: process.env.DATABASE_URL,
+    // Local DB config (commented out - using Neon only)
+    // DB_NAME: process.env.DB_NAME,
+    // DB_USER: process.env.DB_USER,
+    // DB_PASS: process.env.DB_PASS,
+    // DB_HOST: process.env.DB_HOST,
+    // DB_PORT: process.env.DB_PORT,
     // Redis configuration
     REDIS_HOST: process.env.REDIS_HOST || 'localhost',
     REDIS_PORT: process.env.REDIS_PORT || '6379',

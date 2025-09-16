@@ -19,7 +19,7 @@ interface Business {
 interface User {
   id: number;
   email: string;
-  role: string;
+  plan: string;
   firstName: string;
   lastName: string;
   title: string;

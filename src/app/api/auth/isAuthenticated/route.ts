@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
           user: {
             id: user.get("id") as number,
             email: user.get("email") as string,
-            role: user.get("role") as string,
+            plan: user.get("plan") as string,
+            planValidUntil: user.get("planValidUntil") as string | null,
             firstName: user.get("firstName") as string,
             lastName: user.get("lastName") as string,
             title: user.get("title") as string,
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
         const newAccessToken = generateAccessToken({
           userId: user.get("id") as number,
           email: user.get("email") as string,
-          role: user.get("role") as string,
+          plan: user.get("plan") as string,
         });
 
         const response = NextResponse.json({
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
           user: {
             id: user.get("id") as number,
             email: user.get("email") as string,
-            role: user.get("role") as string,
+            plan: user.get("plan") as string,
             firstName: user.get("firstName") as string,
             lastName: user.get("lastName") as string,
             title: user.get("title") as string,

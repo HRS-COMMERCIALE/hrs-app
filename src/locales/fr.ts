@@ -80,8 +80,8 @@ const fr = {
       pricingTiers: [
         {
           name: 'Premium',
-          price: '59.99',
-          currency: 'HT',
+          price: '99.99',
+          currency: 'USD',
           features: [
             '1 Compte Entreprise',
             '5 Comptes Utilisateurs',
@@ -96,8 +96,8 @@ const fr = {
         },
         {
           name: 'Platinum',
-          price: '129.00',
-          currency: 'HT',
+          price: '190.99',
+          currency: 'USD',
           features: [
             '1 Compte Entreprise',
             '5 Comptes Utilisateurs',
@@ -116,7 +116,7 @@ const fr = {
         {
           name: 'Diamond',
           price: '270.00',
-          currency: 'HT',
+          currency: 'USD',
           features: [
             '3 Comptes Entreprise',
             '15 Comptes Utilisateurs',

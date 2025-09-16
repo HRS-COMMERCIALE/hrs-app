@@ -80,8 +80,8 @@ const en = {
       pricingTiers: [
         {
           name: 'Premium',
-          price: '59.99',
-          currency: 'HT',
+          price: '99.99',
+          currency: 'USD',
           features: [
             '1 Company Account',
             '5 User Accounts',
@@ -96,8 +96,8 @@ const en = {
         },
         {
           name: 'Platinum',
-          price: '129.00',
-          currency: 'HT',
+          price: '190.99',
+          currency: 'USD',
           features: [
             '1 Company Account',
             '5 User Accounts',
@@ -116,7 +116,7 @@ const en = {
         {
           name: 'Diamond',
           price: '270.00',
-          currency: 'HT',
+          currency: 'USD',
           features: [
             '3 Company Accounts',
             '15 User Accounts',

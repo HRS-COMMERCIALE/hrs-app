@@ -51,7 +51,12 @@ export function defineUserModel(sequelize: Sequelize, ModelClass: typeof Model, 
         defaultValue: false,
       },
       plan:{
-        type: DataTypesLib.STRING,
+        type: DataTypesLib.ENUM('free', 'Premium', 'Platinum',"Diamond", 'custom'),
+        allowNull: false,
+        defaultValue: 'free',
+      },
+      planValidUntil:{
+        type: DataTypesLib.DATE,
         allowNull: true,
       },
       buinessCount:{

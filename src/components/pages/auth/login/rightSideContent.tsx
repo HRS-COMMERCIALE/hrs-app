@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLanguageStore } from '../../../../store/languageStore';
 import { apiClient } from '../../../../utils/client/client';
 import { getCurrentIP } from '../../../../utils/help/ipProvider/ipProvider';
+import { Alert } from '../../../../components/ui/alerts';
 
 export default function RightSideContent() {
     const { currentTranslations } = useLanguageStore();
@@ -18,6 +19,15 @@ export default function RightSideContent() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [currentIP, setCurrentIP] = useState<string>('Detecting...');
     const [isFetchingIP, setIsFetchingIP] = useState(false);
+    const [errorAlert, setErrorAlert] = useState<{
+        show: boolean;
+        title: string;
+        message: string;
+    }>({
+        show: false,
+        title: '',
+        message: ''
+    });
 
     useEffect(() => {
         setMounted(true);
@@ -93,12 +103,23 @@ export default function RightSideContent() {
                 window.location.href = '/';
             } else {
                 console.error('Login failed:', response.error);
-                // Handle error (you can add error state and display it)
-                alert(response.error || 'Login failed');
+                // Show error alert and reset submission state
+                setErrorAlert({
+                    show: true,
+                    title: 'Login Failed',
+                    message: response.error || 'Invalid email or password. Please try again.'
+                });
+                setIsSubmitted(false); // Reset to allow retry
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('An error occurred during login');
+            // Show error alert and reset submission state
+            setErrorAlert({
+                show: true,
+                title: 'Connection Error',
+                message: 'Unable to connect to the server. Please check your internet connection and try again.'
+            });
+            setIsSubmitted(false); // Reset to allow retry
         } finally {
             setIsLoading(false);
         }
@@ -202,6 +223,21 @@ export default function RightSideContent() {
 
             {/* Main Form Container - Enhanced */}
             <div className={`relative z-10 w-full h-full flex items-center justify-center px-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                
+                {/* Error Alert */}
+                {errorAlert.show && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-6">
+                        <Alert
+                            type="error"
+                            title={errorAlert.title}
+                            message={errorAlert.message}
+                            onClose={() => setErrorAlert(prev => ({ ...prev, show: false }))}
+                            autoClose={true}
+                            autoCloseDelay={5000}
+                            className="shadow-2xl border-red-300 bg-red-50/95 backdrop-blur-sm"
+                        />
+                    </div>
+                )}
                 
                 {/* Form Card - Enhanced Design */}
                 <div className="relative max-w-md w-full">

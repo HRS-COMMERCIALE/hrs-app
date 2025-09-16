@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
       const accessToken = generateAccessToken({
         userId: newUser.get('id') as number,
         email: newUser.get('email') as string,
+        plan: newUser.get('plan') as string,
       });
 
       const refreshToken = generateRefreshToken({

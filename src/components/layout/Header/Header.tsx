@@ -188,23 +188,21 @@ export default function Header() {
             </div>
           </div>
           
-          {/* Desktop Navigation - Absolutely Centered - Only show for non-authenticated users */}
-          {authState !== 'authenticated' && (
-            <nav className="hidden lg:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-              <div className="flex items-center space-x-1">
-                {navigationItems.map((item) => (
-                  <Link 
-                    key={item.id} 
-                    href={item.href} 
-                    className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 relative group font-medium text-sm px-4 py-2 rounded-lg hover:bg-slate-800/30 whitespace-nowrap"
-                  >
-                    {item.label}
-                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-3/4 transition-all duration-500"></span>
-                  </Link>
-                ))}
-              </div>
-            </nav>
-          )}
+          {/* Desktop Navigation - Absolutely Centered - Show for all users */}
+          <nav className="hidden lg:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+            <div className="flex items-center space-x-1">
+              {navigationItems.map((item) => (
+                <Link 
+                  key={item.id} 
+                  href={item.href} 
+                  className="text-slate-200 hover:text-[#3c959d] transition-all duration-300 relative group font-medium text-sm px-4 py-2 rounded-lg hover:bg-slate-800/30 whitespace-nowrap"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#3c959d] to-[#ef7335] group-hover:w-3/4 transition-all duration-500"></span>
+                </Link>
+              ))}
+            </div>
+          </nav>
 
           {/* Right Side Actions - User Profile Dropdown & Auth - Far Right */}
           <div className="hidden lg:flex items-center justify-end ml-auto">
@@ -261,6 +259,24 @@ export default function Header() {
                   >
                     <User className="w-4 h-4 mr-3" />
                     Dashboard
+                  </DropdownMenuItem>
+                  
+                  {/* Current Plan Display */}
+                  <DropdownMenuItem className="text-slate-400 hover:bg-transparent cursor-default">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-xs font-medium">Current Plan:</span>
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs font-semibold px-2 py-1 ${
+                          user.plan === 'free' ? 'bg-slate-600 text-slate-200' :
+                          user.plan === 'Premium' ? 'bg-gradient-to-r from-[#3c959d] to-[#4ba5ad] text-white' :
+                          user.plan === 'Platinum' ? 'bg-gradient-to-r from-[#ef7335] to-[#ff6b35] text-white' :
+                          'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+                        }`}
+                      >
+                        {user.plan}
+                      </Badge>
+                    </div>
                   </DropdownMenuItem>
                   
                   {/* Settings */}
@@ -340,7 +356,7 @@ export default function Header() {
                       className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-slate-800 p-0 rounded-full"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="text-slate-200 font-medium text-base">
                       {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
                     </div>
@@ -349,6 +365,21 @@ export default function Header() {
                         {user.title}
                       </div>
                     )}
+                    {/* Current Plan Display */}
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="text-slate-500 text-xs">Plan:</span>
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs font-semibold px-2 py-0.5 ${
+                          user.plan === 'free' ? 'bg-slate-600 text-slate-200' :
+                          user.plan === 'Premium' ? 'bg-gradient-to-r from-[#3c959d] to-[#4ba5ad] text-white' :
+                          user.plan === 'Platinum' ? 'bg-gradient-to-r from-[#ef7335] to-[#ff6b35] text-white' :
+                          'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+                        }`}
+                      >
+                        {user.plan}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
               )}
@@ -385,8 +416,8 @@ export default function Header() {
                 Settings
               </Button>
 
-              {/* Only show navigation items for non-authenticated users */}
-              {authState !== 'authenticated' && navigationItems.map((item) => (
+              {/* Navigation items for all users */}
+              {navigationItems.map((item) => (
                 <Link 
                   key={item.id} 
                   href={item.href} 

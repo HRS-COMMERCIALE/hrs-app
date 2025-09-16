@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '../../../store/languageStore';
+import { PAYMENT_PLANS } from '../../../app/api/stripe-config/PaymentPlanceConfig';
 
 
 interface PricingFeature {
@@ -36,23 +37,23 @@ const BusinessPlan: React.FC = () => {
     pricingTiers: [
       {
         name: language.pricingTiers[0].name,
-        price: '59.99',
-        currency: 'HT',
+        price: language.pricingTiers[0].price,
+        currency: language.pricingTiers[0].currency,
         features: language.pricingTiers[0].features,
         buttonText: language.pricingTiers[0].buttonText
       },
       {
         name: language.pricingTiers[1].name,
-        price: '129.00',
-        currency: 'HT',
+        price: language.pricingTiers[1].price,
+        currency: language.pricingTiers[1].currency,
         features: language.pricingTiers[1].features,
         buttonText: language.pricingTiers[1].buttonText,
         popular: true
       },
       {
         name: language.pricingTiers[2].name,
-        price: '270.00',
-        currency: 'HT',
+        price: language.pricingTiers[2].price,
+        currency: language.pricingTiers[2].currency,
         features: language.pricingTiers[2].features,
         buttonText: language.pricingTiers[2].buttonText
       }
@@ -176,7 +177,16 @@ const BusinessPlan: React.FC = () => {
               </ul>
 
               <button
-                onClick={() => router.push('/register')}
+                onClick={() => {
+                  const planId = tier.name.toLowerCase().replace(/\s+/g, '');
+                  const plan = PAYMENT_PLANS[planId];
+                  if (plan) {
+                    router.push(`/Payment?planId=${planId}`);
+                  } else {
+                    // Fallback for plans not in our config
+                    router.push(`/Payment?planId=premium`);
+                  }
+                }}
                 className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 text-sm relative z-10 ${
                   tier.popular
                     ? 'bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white hover:shadow-lg hover:shadow-blue-500/25'
@@ -229,7 +239,7 @@ const BusinessPlan: React.FC = () => {
             </ul>
 
             <button 
-              onClick={() => router.push('/register')}
+              onClick={() => router.push(`/Payment?planId=custom`)}
               className="w-full py-2.5 px-4 rounded-lg font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200 text-sm relative z-10 hover:shadow-lg hover:shadow-purple-500/25"
             >
               {content.customPlan.buttonText}

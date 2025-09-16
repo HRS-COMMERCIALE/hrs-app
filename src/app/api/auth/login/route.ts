@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     const accessToken = generateAccessToken({
       userId: loginResult.user.id,
       email: loginResult.user.email,
-      role: loginResult.user.role,
+      plan: loginResult.user.plan,
     });
 
     const refreshToken = generateRefreshToken({
