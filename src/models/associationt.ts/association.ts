@@ -4,8 +4,8 @@ import { setupUserAssociations } from './userAssociation';
 import { setupBusinessAssociations } from './businessAssociation';
 
 // Initialize models and associations without auto-syncing
-const { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction } = setupUserAssociations(sequelize, Model, DataTypes);
-const { Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order } = setupBusinessAssociations(sequelize, Model, DataTypes);
+const { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction } = setupUserAssociations(sequelize(), Model, DataTypes);
+const { Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order } = setupBusinessAssociations(sequelize(), Model, DataTypes);
 
 // Export individual models
 export { User, Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, UserLicense, LoginAttempt, UserToken, PaymentTransaction };
