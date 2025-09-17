@@ -6,7 +6,7 @@ async function forceSync() {
     console.log('🔄 Starting force sync...');
     
     // Force sync each model individually - this will drop all tables and recreate them
-    for (const model of models) {
+    for (const model of models()) {
       await model.sync({ force: true });
       console.log(`✅ Synced: ${model.name}`);
     }

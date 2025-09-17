@@ -14,7 +14,7 @@ async function alterSync() {
     // console.log('🔓 Foreign key constraints temporarily disabled');
     
     // Alter sync each model individually - this will modify existing tables without dropping them
-    for (const model of models) {
+    for (const model of models()) {
       try {
         await model.sync({ alter: true });
         console.log(`✅ Synced: ${model.name}`);

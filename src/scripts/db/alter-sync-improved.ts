@@ -26,10 +26,11 @@ async function alterSyncImproved() {
     console.log('🔓 Foreign key constraints temporarily disabled');
     
     // Sync models with better error handling
-    const syncResults = [];
+    const syncResults: Array<{ model: string; table: string; status: string; error?: string }> = [];
+    const allModels = models();
     
-    for (let i = 0; i < models.length; i++) {
-      const model = models[i];
+    for (let i = 0; i < allModels.length; i++) {
+      const model: any = allModels[i];
       const modelName = modelNames[i];
       
       try {
