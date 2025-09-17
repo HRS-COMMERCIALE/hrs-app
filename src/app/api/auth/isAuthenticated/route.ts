@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     if (accessToken) {
       try {
         const accessPayload = verifyAccessToken(accessToken);
-        const user = await User.findByPk(accessPayload.userId);
+        const user = await User().findByPk(accessPayload.userId);
         if (!user) {
           return NextResponse.json({
             authenticated: false,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
             code: 'USER_NOT_FOUND'
           }, { status: 401 });
         }
-        const business = await Business.findOne({
+        const business = await Business().findOne({
           where: { userId: user.get("id") }
         });
         return NextResponse.json({
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       const refreshResult = await refreshAccessTokenService(cookieStore);
 
       if (refreshResult.success) {
-        const user = await User.findByPk(refreshPayload.userId);
+        const user = await User().findByPk(refreshPayload.userId);
         if (!user) {
           return NextResponse.json({
             authenticated: false,
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
           }, { status: 401 });
         }
 
-        const business = await Business.findOne({
+        const business = await Business().findOne({
           where: { userId: user.get("id") }
         });
 

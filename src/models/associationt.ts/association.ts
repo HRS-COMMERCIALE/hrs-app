@@ -3,30 +3,51 @@ import { Model, DataTypes } from 'sequelize';
 import { setupUserAssociations } from './userAssociation';
 import { setupBusinessAssociations } from './businessAssociation';
 
-// Initialize models and associations without auto-syncing
-const { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction } = setupUserAssociations(sequelize(), Model, DataTypes);
-const { Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order } = setupBusinessAssociations(sequelize(), Model, DataTypes);
+// Lazy initialization of models to prevent build-time database connection
+let userModels: any = null;
+let businessModels: any = null;
 
-// Export individual models
-export { User, Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, UserLicense, LoginAttempt, UserToken, PaymentTransaction };
+function initializeModels() {
+  if (!userModels || !businessModels) {
+    userModels = setupUserAssociations(sequelize(), Model, DataTypes);
+    businessModels = setupBusinessAssociations(sequelize(), Model, DataTypes);
+  }
+  return { ...userModels, ...businessModels };
+}
+
+// Export individual models as getters to prevent immediate initialization
+export const User = () => initializeModels().User;
+export const Business = () => initializeModels().Business;
+export const UserLicense = () => initializeModels().UserLicense;
+export const LoginAttempt = () => initializeModels().LoginAttempt;
+export const UserToken = () => initializeModels().UserToken;
+export const PaymentTransaction = () => initializeModels().PaymentTransaction;
+export const Address = () => initializeModels().Address;
+export const CodesPostaux = () => initializeModels().CodesPostaux;
+export const PointOfSale = () => initializeModels().PointOfSale;
+export const Supplier = () => initializeModels().Supplier;
+export const Clients = () => initializeModels().Clients;
+export const Article = () => initializeModels().Article;
+export const Family = () => initializeModels().Family;
+export const Order = () => initializeModels().Order;
 
 // Export array of all models for sync operations (ordered by dependencies)
 // Parent tables first, then child tables
-export const models = [
-  User,
-  Business,
-  CodesPostaux,
-  Supplier,
-  Clients,
-  Family,
-  Address,
-  PointOfSale,
-  Article,
-  Order,
-  UserLicense,
-  LoginAttempt,
-  UserToken,
-  PaymentTransaction,
+export const models = () => [
+  User(),
+  Business(),
+  CodesPostaux(),
+  Supplier(),
+  Clients(),
+  Family(),
+  Address(),
+  PointOfSale(),
+  Article(),
+  Order(),
+  UserLicense(),
+  LoginAttempt(),
+  UserToken(),
+  PaymentTransaction(),
 ];
 
 // Export model names for logging (in same order as models)
