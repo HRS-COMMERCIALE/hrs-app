@@ -10,7 +10,7 @@ async function createPaymentTransactionsTable() {
     console.log('Creating payment_transactions table...');
     
     // Sync the PaymentTransaction model to create the table
-    await PaymentTransaction.sync({ force: false }); // force: false means don't drop existing table
+    await PaymentTransaction().sync({ force: false }); // force: false means don't drop existing table
     
     console.log('✅ Payment transactions table created successfully!');
     console.log('Table structure:');

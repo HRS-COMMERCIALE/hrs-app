@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 1) Check our DB to see if webhook processed this payment already (source of truth)
-    const tx = await PaymentTransaction.findOne({ where: { stripePaymentIntentId: paymentIntentId } });
+    const tx = await PaymentTransaction().findOne({ where: { stripePaymentIntentId: paymentIntentId } });
 
     // 2) Also check Stripe directly to reflect current state
     let stripeStatus: string | null = null;

@@ -102,7 +102,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
     }
 
     // Check if this payment has already been processed
-    const existingTransaction = await PaymentTransaction.findOne({
+    const existingTransaction = await PaymentTransaction().findOne({
       where: { stripePaymentIntentId: paymentIntent.id }
     });
 
@@ -136,7 +136,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
       paymentTransaction = existingTransaction;
     } else {
       // Create new transaction
-      paymentTransaction = await PaymentTransaction.create(transactionData);
+      paymentTransaction = await PaymentTransaction().create(transactionData);
     }
 
     // Update user's plan and set validity for 1 year
@@ -182,7 +182,7 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
     console.log('Processing failed payment:', paymentIntent.id);
 
     // Find existing transaction
-    const existingTransaction = await PaymentTransaction.findOne({
+    const existingTransaction = await PaymentTransaction().findOne({
       where: { stripePaymentIntentId: paymentIntent.id }
     });
 
@@ -208,7 +208,7 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
         }
         
         if (user) {
-          await PaymentTransaction.create({
+          await PaymentTransaction().create({
             userId: (user as any).id,
             stripePaymentIntentId: paymentIntent.id,
             stripeCustomerId: paymentIntent.customer as string || null,
@@ -241,7 +241,7 @@ async function handlePaymentIntentCanceled(paymentIntent: Stripe.PaymentIntent) 
   try {
     console.log('Processing canceled payment:', paymentIntent.id);
 
-    const existingTransaction = await PaymentTransaction.findOne({
+    const existingTransaction = await PaymentTransaction().findOne({
       where: { stripePaymentIntentId: paymentIntent.id }
     });
 
@@ -266,7 +266,7 @@ async function handlePaymentIntentRequiresAction(paymentIntent: Stripe.PaymentIn
   try {
     console.log('Processing payment requiring action:', paymentIntent.id);
 
-    const existingTransaction = await PaymentTransaction.findOne({
+    const existingTransaction = await PaymentTransaction().findOne({
       where: { stripePaymentIntentId: paymentIntent.id }
     });
 
