@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       codesPostauxId,
     } = parsed.data;
 
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }

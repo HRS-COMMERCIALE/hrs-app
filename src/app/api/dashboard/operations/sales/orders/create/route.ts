@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return authResult.response;
     }
     const userId = authResult.payload.userId;
-    const business = await Business.findOne({ where: { userId } });
+    const business = await Business().findOne({ where: { userId } });
     if (!business) {
       return NextResponse.json(
         { error: 'Business not found for this user' },
