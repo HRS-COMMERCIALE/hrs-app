@@ -22,7 +22,7 @@ export async function createBusiness(payload: RegisterSchema, userId: number, tr
       }
     }
 
-    const newBusiness = await Business.create({
+    const newBusiness = await Business().create({
       userId: userId,
       businessName: payload.business.businessName,
       registrationNumber: (payload as any).business?.registrationNumber || '',

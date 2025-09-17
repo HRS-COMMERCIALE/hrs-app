@@ -4,7 +4,7 @@ import type { Transaction } from 'sequelize';
 
 export async function createAddress(payload: RegisterSchema, businessId: number, transaction?: Transaction): Promise<any> {
   try {
-    const newAddress = await Address.create({
+    const newAddress = await Address().create({
       businessId: businessId,
       country: payload.address.country,
       governorate: payload.address.governorate,

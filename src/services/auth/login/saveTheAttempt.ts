@@ -67,7 +67,7 @@ export async function saveTheAttempt(data: SaveAttemptData): Promise<SaveAttempt
     
     // Save to database
     try {
-      const savedAttempt = await LoginAttempt.create({
+      const savedAttempt = await LoginAttempt().create({
         userId: data.userId,
         ipAddress: data.ip,
         userAgent: data.userAgent,

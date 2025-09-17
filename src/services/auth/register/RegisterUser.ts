@@ -1,5 +1,6 @@
 import type { RegisterSchema } from '@/validations/auth/register';
 import { User, Business, Address } from '@/models/associationt.ts/association';
+import type { Transaction } from 'sequelize';
 import { hashPassword, checkPasswordStrength } from '@/utils/bycript/password';
 import { createBusiness } from './createBuissness';
 import { createAddress } from './createAddress';
@@ -55,7 +56,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   const hashedPassword = await hashPassword(payload.user.password);
 
   // Create user, business, and address in a transaction
-  const result = await User.sequelize!.transaction(async (transaction) => {
+  const result = await User().sequelize!.transaction(async (transaction: Transaction) => {
     // Create user
     const newUser = await User().create({
       status: payload.user?.status || 'active',
