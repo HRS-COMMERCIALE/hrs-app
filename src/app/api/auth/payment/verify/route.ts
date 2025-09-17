@@ -4,6 +4,10 @@ import { PaymentTransaction } from '../../../../../models/associationt.ts/associ
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+// Force this route to be server-side only
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Verifies a payment by PaymentIntent ID using both Stripe and DB (webhook result)
 // GET /api/auth/payment/verify?payment_intent=pi_...
 export async function GET(request: NextRequest) {

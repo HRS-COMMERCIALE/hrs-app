@@ -3,6 +3,10 @@ import { User } from '../../../../models/associationt.ts/association';
 import { getPlanStatus, isPlanValid, getDaysRemaining, needsRenewalWarning } from '../../../../utils/plan/planValidation';
 import { requireAuth } from '../../_lib/auth';
 
+// Force this route to be server-side only
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   try {
     // Require authentication

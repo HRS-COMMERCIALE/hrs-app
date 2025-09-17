@@ -5,6 +5,10 @@ import { refreshAccessTokenService } from '../refreshAccessToken/refreshTokenSer
 import { generateAccessToken } from '../../../../utils/jwt/jwtUtils';
 import { User, Business } from '../../../../models/associationt.ts/association';
 
+// Force this route to be server-side only
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
