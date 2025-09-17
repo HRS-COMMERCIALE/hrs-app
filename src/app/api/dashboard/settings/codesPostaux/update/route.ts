@@ -21,7 +21,7 @@ export async function PUT(req: Request) {
     const businessId = business.get('id');
 
     // Check if the postal code belongs to this business
-    const existingPostalCode = await CodesPostaux.findOne({
+    const existingPostalCode = await CodesPostaux().findOne({
       where: { id, businessId }
     });
 

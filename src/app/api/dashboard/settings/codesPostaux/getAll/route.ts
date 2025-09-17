@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     const businessId = business.get('id');
 
     // Get all postal codes for this business
-    const postalCodes = await CodesPostaux.findAll({
+    const postalCodes = await CodesPostaux().findAll({
       where: { businessId },
       order: [['createdAt', 'DESC']], // Most recent first
       attributes: ['id', 'governorate', 'code', 'city', 'location', 'createdAt']

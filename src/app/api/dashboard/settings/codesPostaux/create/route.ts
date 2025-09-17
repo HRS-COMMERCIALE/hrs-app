@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
     const businessId = business.get('id');
 
-    const created = await CodesPostaux.create({ businessId, governorate, code, city, location });
+    const created = await CodesPostaux().create({ businessId, governorate, code, city, location });
     return NextResponse.json({ data: created }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: 'Failed to create postal code', details: error?.message }, { status: 500 });

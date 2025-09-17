@@ -21,7 +21,7 @@ export async function DELETE(req: Request) {
     const businessId = business.get('id');
 
     // Check if all postal codes belong to this business
-    const existingPostalCodes = await CodesPostaux.findAll({
+    const existingPostalCodes = await CodesPostaux().findAll({
       where: { 
         id: ids,
         businessId 
@@ -33,7 +33,7 @@ export async function DELETE(req: Request) {
     }
 
     // Delete all specified postal codes
-    await CodesPostaux.destroy({
+    await CodesPostaux().destroy({
       where: { 
         id: ids,
         businessId 

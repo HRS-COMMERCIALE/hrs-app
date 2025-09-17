@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
 
     // Validate codesPostauxId if provided
     if (updateData.codesPostauxId) {
-      const postalCode = await CodesPostaux.findOne({ 
+      const postalCode = await CodesPostaux().findOne({ 
         where: { 
           id: updateData.codesPostauxId, 
           businessId 

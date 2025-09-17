@@ -41,7 +41,7 @@ export async function PUT(req: Request) {
       if (codesPostauxId === null) {
         validatedCodesPostauxId = null;
       } else {
-        const cp = await CodesPostaux.findOne({ where: { id: codesPostauxId, businessId } });
+        const cp = await CodesPostaux().findOne({ where: { id: codesPostauxId, businessId } });
         if (!cp) {
           return NextResponse.json({ error: 'Invalid codesPostauxId for this business' }, { status: 400 });
         }
