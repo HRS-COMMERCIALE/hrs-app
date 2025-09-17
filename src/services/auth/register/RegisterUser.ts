@@ -12,7 +12,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   }
 
   // Check if email already exists
-  const existingUserByEmail = await User.findOne({
+  const existingUserByEmail = await User().findOne({
     where: { email: payload.user.email }
   });
   if (existingUserByEmail) {
@@ -20,7 +20,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   }
 
   // Check if mobile already exists
-  const existingUserByMobile = await User.findOne({
+  const existingUserByMobile = await User().findOne({
     where: { mobile: payload.user.mobile }
   });
   if (existingUserByMobile) {
@@ -28,7 +28,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   }
 
   // Check if business name already exists
-  const existingBusinessByName = await Business.findOne({
+  const existingBusinessByName = await Business().findOne({
     where: { businessName: payload.business.businessName }
   });
   if (existingBusinessByName) {
@@ -36,7 +36,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   }
 
   // Check if tax ID already exists
-  const existingBusinessByTaxId = await Business.findOne({
+  const existingBusinessByTaxId = await Business().findOne({
     where: { taxId: payload.business.taxId }
   });
   if (existingBusinessByTaxId) {
@@ -44,7 +44,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   }
 
   // Check if CNSS code already exists
-  const existingBusinessByCnssCode = await Business.findOne({
+  const existingBusinessByCnssCode = await Business().findOne({
     where: { cnssCode: payload.business.cnssCode }
   });
   if (existingBusinessByCnssCode) {
@@ -57,7 +57,7 @@ export async function RegisterUser(payload: RegisterSchema) {
   // Create user, business, and address in a transaction
   const result = await User.sequelize!.transaction(async (transaction) => {
     // Create user
-    const newUser = await User.create({
+    const newUser = await User().create({
       status: payload.user?.status || 'active',
       title: payload.user.title,
       firstName: payload.user.firstName,

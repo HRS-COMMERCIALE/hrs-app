@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user details from database
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return NextResponse.json({
         success: false,

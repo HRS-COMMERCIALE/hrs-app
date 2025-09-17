@@ -14,7 +14,7 @@ type LoginAttemptFailure = {
 export type LoginAttemptResult = LoginAttemptSuccess | LoginAttemptFailure;
 
 export async function loginAttempt(email: string, password: string): Promise<LoginAttemptResult> {
-  const userInstance = await User.findOne({ where: { email } });
+  const userInstance = await User().findOne({ where: { email } });
   if (!userInstance) {
     return { success: false, error: 'User not found with this email address' };
   }

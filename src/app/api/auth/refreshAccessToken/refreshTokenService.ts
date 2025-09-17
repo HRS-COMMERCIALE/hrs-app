@@ -41,7 +41,7 @@ export async function refreshAccessTokenService(cookieStore: ReadonlyRequestCook
       };
     }
 
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return {
         success: false,

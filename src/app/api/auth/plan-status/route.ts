@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const userId = authResult.userId;
     
     // Get user with plan information
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return NextResponse.json({
         success: false,

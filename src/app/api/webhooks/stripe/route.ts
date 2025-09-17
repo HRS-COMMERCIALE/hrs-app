@@ -88,12 +88,12 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
     // Find user by ID first (from authenticated user), then fallback to email
     let user = null;
     if (userId) {
-      user = await User.findByPk(userId);
+      user = await User().findByPk(userId);
     }
     
     // Fallback to email lookup if user not found by ID
     if (!user) {
-      user = await User.findOne({ where: { email: customerEmail } });
+      user = await User().findOne({ where: { email: customerEmail } });
     }
     
     if (!user) {
@@ -201,10 +201,10 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
         // Find user by ID first, then fallback to email
         let user = null;
         if (userId) {
-          user = await User.findByPk(userId);
+          user = await User().findByPk(userId);
         }
         if (!user) {
-          user = await User.findOne({ where: { email: customerEmail } });
+          user = await User().findOne({ where: { email: customerEmail } });
         }
         
         if (user) {

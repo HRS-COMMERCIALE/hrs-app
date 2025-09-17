@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const amountInCents = Math.round(plan.price * 100);
 
     // Get authenticated user data
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },

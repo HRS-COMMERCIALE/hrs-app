@@ -13,7 +13,7 @@ export async function requireValidPlan(
   requiredPlan?: string
 ): Promise<NextResponse | null> {
   try {
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return NextResponse.json({
         success: false,

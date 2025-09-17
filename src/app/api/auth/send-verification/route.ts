@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const { userId, email } = authResult.payload;
 
     // Get user details from database
-    const user = await User.findByPk(userId);
+    const user = await User().findByPk(userId);
     if (!user) {
       return NextResponse.json({
         success: false,
