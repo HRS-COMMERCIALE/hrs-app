@@ -29,14 +29,14 @@ export async function GET(req: Request) {
     const { id: clientId } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Find client
-    const client = await Clients.findOne({
+    const client = await Clients().findOne({
       where: { 
         id: clientId,
         businessId 

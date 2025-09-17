@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       validatedCodesPostauxId = codesPostauxId;
     }
 
-    const created = await Clients.create({
+    const created = await Clients().create({
       businessId,
       codesPostauxId: validatedCodesPostauxId,
       name,

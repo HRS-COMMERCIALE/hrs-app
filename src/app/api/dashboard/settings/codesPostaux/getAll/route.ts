@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   if (auth instanceof NextResponse) return auth;
 
   try {
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }

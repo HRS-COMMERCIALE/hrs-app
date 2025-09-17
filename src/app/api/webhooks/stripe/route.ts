@@ -165,7 +165,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
       updatedAt: new Date(),
     };
 
-    await UserLicense.create(licenseData);
+    await UserLicense().create(licenseData);
     console.log(`Created license for user ${(user as any).id}`);
 
     console.log('Successfully processed payment:', paymentIntent.id);

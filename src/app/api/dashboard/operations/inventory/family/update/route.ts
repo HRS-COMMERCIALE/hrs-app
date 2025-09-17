@@ -28,14 +28,14 @@ export async function PUT(req: Request) {
     const { id, name } = validationResult.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Find the family to update
-    const family = await Family.findOne({
+    const family = await Family().findOne({
       where: {
         id,
         businessId,
@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
 
     // Check if another family with the same name exists (excluding current one)
     if (name) {
-      const existingFamily = await Family.findOne({
+      const existingFamily = await Family().findOne({
         where: {
           businessId,
           name,
@@ -73,7 +73,7 @@ export async function PUT(req: Request) {
     await family.update(updateData);
 
     // Fetch the updated family
-    const updatedFamily = await Family.findByPk(id, {
+    const updatedFamily = await Family().findByPk(id, {
       attributes: ['id', 'name', 'businessId'],
     });
 

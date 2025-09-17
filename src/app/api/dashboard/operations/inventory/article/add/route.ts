@@ -57,14 +57,14 @@ export async function POST(req: Request) {
     const validatedData = validationResult.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Check if article name already exists for this business
-    const existingArticle = await Article.findOne({
+    const existingArticle = await Article().findOne({
       where: {
         businessId,
         article: validatedData.article,
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
     // Validate family if provided
     if (validatedData.familyId) {
-      const family = await Family.findOne({
+      const family = await Family().findOne({
         where: { id: validatedData.familyId, businessId },
       });
       if (!family) {
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 
     // Validate supplier if provided
     if (validatedData.supplierId) {
-      const supplier = await Supplier.findOne({
+      const supplier = await Supplier().findOne({
         where: { id: validatedData.supplierId, businessId },
       });
       if (!supplier) {
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
     }
 
     // Create the article
-    const created = await Article.create({
+    const created = await Article().create({
       businessId,
       article: validatedData.article,
       familyId: validatedData.familyId || null,
@@ -171,7 +171,7 @@ export async function POST(req: Request) {
     });
 
     // Fetch the created article with relations
-    const createdArticle = await Article.findByPk(created.get('id') as number, {
+    const createdArticle = await Article().findByPk(created.get('id') as number, {
       include: [
         {
           model: Family,

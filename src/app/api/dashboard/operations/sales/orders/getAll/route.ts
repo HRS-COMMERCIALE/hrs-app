@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
     const userId = authResult.payload.userId;
     // derive businessId from user
-    const business = await  Business.findOne({ where: { userId } });
+    const business = await  Business().findOne({ where: { userId } });
     if (!business) {
       return NextResponse.json(
         { error: 'Business not found for this user' },
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     const offset = (validatedQuery.page - 1) * validatedQuery.limit;
 
     // Fetch orders with pagination
-    const { count, rows: orders } = await Order.findAndCountAll({
+    const { count, rows: orders } = await Order().findAndCountAll({
       where: whereClause,
       include: [
         {

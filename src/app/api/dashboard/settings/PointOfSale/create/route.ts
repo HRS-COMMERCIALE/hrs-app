@@ -25,14 +25,14 @@ export async function POST(req: Request) {
     const { pointOfSale, location } = validationResult.data;
 
     // Get business information
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
     const businessId = business.get('id');
 
     // Check if point of sale already exists for this business
-    const existingPointOfSale = await PointOfSale.findOne({
+    const existingPointOfSale = await PointOfSale().findOne({
       where: {
         businessId,
         pointOfSale,
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Create the point of sale
-    const created = await PointOfSale.create({ 
+    const created = await PointOfSale().create({ 
       businessId, 
       pointOfSale, 
       location 

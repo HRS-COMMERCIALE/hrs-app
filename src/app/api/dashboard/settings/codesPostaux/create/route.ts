@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     if ( !governorate || !code || !city || !location) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }

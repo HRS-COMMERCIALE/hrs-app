@@ -8,14 +8,14 @@ export async function GET(req: Request) {
 
   try {
     // Get business information
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
     const businessId = business.get('id');
 
     // Get all points of sale for this business
-    const pointsOfSale = await PointOfSale.findAll({
+    const pointsOfSale = await PointOfSale().findAll({
       where: { businessId },
       order: [['createdAt', 'DESC']], // Most recent first
       attributes: ['id', 'pointOfSale', 'location', 'createdAt', 'updatedAt']

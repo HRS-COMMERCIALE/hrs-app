@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const { name, type, taxId, registrationNumber, email, address, phone1, phone2, phone3, codesPostauxId } = parsed.data;
 
     // Find the business for the authenticated user
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       validatedCodesPostauxId = codesPostauxId;
     }
 
-    const created = await Supplier.create({
+    const created = await Supplier().create({
       businessId,
       codesPostauxId: validatedCodesPostauxId,
       name,

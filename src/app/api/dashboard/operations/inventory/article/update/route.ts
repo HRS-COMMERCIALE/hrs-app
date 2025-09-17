@@ -54,14 +54,14 @@ export async function PUT(req: Request) {
     const { id, ...validatedData } = validationResult.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Find the article to update
-    const article = await Article.findOne({
+    const article = await Article().findOne({
       where: {
         id,
         businessId,
@@ -74,7 +74,7 @@ export async function PUT(req: Request) {
 
     // Check if article name already exists (excluding current one)
     if (validatedData.article) {
-      const existingArticle = await Article.findOne({
+      const existingArticle = await Article().findOne({
         where: {
           businessId,
           article: validatedData.article,
@@ -94,7 +94,7 @@ export async function PUT(req: Request) {
 
     // Validate family if provided
     if (validatedData.familyId) {
-      const family = await Family.findOne({
+      const family = await Family().findOne({
         where: { id: validatedData.familyId, businessId },
       });
       if (!family) {
@@ -107,7 +107,7 @@ export async function PUT(req: Request) {
 
     // Validate supplier if provided
     if (validatedData.supplierId) {
-      const supplier = await Supplier.findOne({
+      const supplier = await Supplier().findOne({
         where: { id: validatedData.supplierId, businessId },
       });
       if (!supplier) {
@@ -168,7 +168,7 @@ export async function PUT(req: Request) {
     await article.update(updateData);
 
     // Fetch the updated article with relations
-    const updatedArticle = await Article.findByPk(id, {
+    const updatedArticle = await Article().findByPk(id, {
       include: [
         {
           model: Family,

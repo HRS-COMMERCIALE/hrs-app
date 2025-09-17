@@ -30,14 +30,14 @@ export async function DELETE(req: Request) {
     const { id: articleId } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Find the article to delete
-    const article = await Article.findOne({
+    const article = await Article().findOne({
       where: {
         id: articleId,
         businessId,

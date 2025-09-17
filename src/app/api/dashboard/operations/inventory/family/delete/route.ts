@@ -29,14 +29,14 @@ export async function DELETE(req: Request) {
     const { id: familyId } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Find the family to delete
-    const family = await Family.findOne({
+    const family = await Family().findOne({
       where: {
         id: familyId,
         businessId,
@@ -48,7 +48,7 @@ export async function DELETE(req: Request) {
     }
 
     // Check if family has associated articles
-    const articlesCount = await Article.count({
+    const articlesCount = await Article().count({
       where: {
         familyId: familyId,
         businessId,

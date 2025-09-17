@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     const { page, limit, search } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
     const offset = (page - 1) * limit;
 
     // Get families with pagination
-    const { count, rows: families } = await Family.findAndCountAll({
+    const { count, rows: families } = await Family().findAndCountAll({
       where: whereClause,
       limit,
       offset,

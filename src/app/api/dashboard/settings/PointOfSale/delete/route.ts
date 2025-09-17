@@ -25,14 +25,14 @@ export async function DELETE(req: Request) {
     const { ids } = validationResult.data;
 
     // Get business information
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
     const businessId = business.get('id');
 
     // Check if all points of sale belong to this business
-    const existingPointsOfSale = await PointOfSale.findAll({
+    const existingPointsOfSale = await PointOfSale().findAll({
       where: { 
         id: ids,
         businessId 
@@ -46,7 +46,7 @@ export async function DELETE(req: Request) {
     }
 
     // Delete all specified points of sale
-    const deletedCount = await PointOfSale.destroy({
+    const deletedCount = await PointOfSale().destroy({
       where: { 
         id: ids,
         businessId 

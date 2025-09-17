@@ -174,7 +174,7 @@ export async function PUT(req: NextRequest) {
     const sanitizedData = sanitizeInput(body as UpdateCompanyInfoRequest);
 
     // Find the business associated with this user
-    const business = await Business.findOne({
+    const business = await Business().findOne({
       where: { userId: userId }
     });
 
@@ -250,7 +250,7 @@ export async function GET(req: NextRequest) {
     const userId = userPayload.userId;
 
     // Find the business associated with this user
-    const business = await Business.findOne({
+    const business = await Business().findOne({
       where: { userId: userId },
       attributes: ['businessName', 'taxId', 'cnssCode', 'website', 'currency', 'size', 'industry', 'logoFile']
     });

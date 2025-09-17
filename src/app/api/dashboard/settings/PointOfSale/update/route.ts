@@ -25,14 +25,14 @@ export async function PUT(req: Request) {
     const { id, pointOfSale, location } = validationResult.data;
 
     // Get business information
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
     const businessId = business.get('id');
 
     // Check if the point of sale belongs to this business
-    const existingPointOfSale = await PointOfSale.findOne({
+    const existingPointOfSale = await PointOfSale().findOne({
       where: { id, businessId }
     });
 
@@ -42,7 +42,7 @@ export async function PUT(req: Request) {
 
     // Check for duplicate if updating name or location
     if (pointOfSale !== undefined || location !== undefined) {
-      const duplicateCheck = await PointOfSale.findOne({
+      const duplicateCheck = await PointOfSale().findOne({
         where: {
           businessId,
           pointOfSale: pointOfSale || existingPointOfSale.get('pointOfSale'),

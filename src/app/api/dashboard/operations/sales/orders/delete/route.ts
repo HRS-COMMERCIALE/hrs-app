@@ -25,7 +25,7 @@ export async function DELETE(req: NextRequest) {
     const validatedData: DeleteOrderData = deleteOrderSchema.parse(body);
 
     // Find the order and verify ownership
-    const existingOrder = await Order.findOne({
+    const existingOrder = await Order().findOne({
       where: {
         id: validatedData.id,
         businessId: businessId,
@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Delete the order
-    await Order.destroy({
+    await Order().destroy({
       where: {
         id: validatedData.id,
         businessId: businessId,

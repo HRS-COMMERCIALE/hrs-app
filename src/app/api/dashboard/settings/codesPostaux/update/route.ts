@@ -14,7 +14,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 });
     }
 
-    const business = await Business.findByPk(auth.userId);
+    const business = await Business().findByPk(auth.userId);
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }

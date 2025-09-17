@@ -28,14 +28,14 @@ export async function PUT(req: Request) {
     const { id, ...updateData } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Check if client exists and belongs to user's business
-    const existingClient = await Clients.findOne({
+    const existingClient = await Clients().findOne({
       where: { 
         id,
         businessId 
@@ -62,7 +62,7 @@ export async function PUT(req: Request) {
     }
 
     // Update client
-    const [updatedRowsCount] = await Clients.update(updateData, {
+    const [updatedRowsCount] = await Clients().update(updateData, {
       where: { 
         id,
         businessId 
@@ -74,7 +74,7 @@ export async function PUT(req: Request) {
     }
 
     // Fetch updated client with relations
-    const updatedClient = await Clients.findOne({
+    const updatedClient = await Clients().findOne({
       where: { 
         id,
         businessId 

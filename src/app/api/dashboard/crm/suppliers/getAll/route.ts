@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 0, 1), 100) : 50;
     const offset = offsetParam ? Math.max(parseInt(offsetParam, 10) || 0, 0) : 0;
 
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     }
 
     // Order by id desc since createdAt isn't present on this model
-    const results = await Supplier.findAll({ where, limit, offset, order: [['id', 'DESC']] });
+    const results = await Supplier().findAll({ where, limit, offset, order: [['id', 'DESC']] });
 
     return NextResponse.json({ data: results }, { status: 200 });
   } catch (error: any) {

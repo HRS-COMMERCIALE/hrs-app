@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest) {
     const validatedData: UpdateOrderData = updateOrderSchema.parse(body);
 
     // Find the order and verify ownership
-    const existingOrder = await Order.findOne({
+    const existingOrder = await Order().findOne({
       where: {
         id: validatedData.id,
         businessId: businessId,
@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest) {
 
     // If articleId is being updated, verify the new article exists and belongs to the business
     if (validatedData.articleId && validatedData.articleId !== (existingOrder as any).articleId) {
-      const article = await Article.findOne({
+      const article = await Article().findOne({
         where: {
           id: validatedData.articleId,
           businessId: businessId,
@@ -61,7 +61,7 @@ export async function PUT(req: NextRequest) {
     const { id, transactionType: _ignoredTransactionType, ...updateData } = validatedData;
 
     // Update the order
-    await Order.update({ ...updateData, transactionType: 'SALE' }, {
+    await Order().update({ ...updateData, transactionType: 'SALE' }, {
       where: {
         id: validatedData.id,
         businessId: businessId,
@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest) {
     });
 
     // Fetch the updated order with article details
-    const updatedOrder = await Order.findByPk(validatedData.id, {
+    const updatedOrder = await Order().findByPk(validatedData.id, {
       include: [
         {
           model: Article,

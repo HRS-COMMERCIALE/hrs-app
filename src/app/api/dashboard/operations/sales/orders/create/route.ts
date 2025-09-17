@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const validatedData: CreateOrderData = createOrderSchema.parse(body);
 
     // Verify article exists and belongs to the business
-    const article = await Article.findOne({
+    const article = await Article().findOne({
       where: {
         id: validatedData.articleId,
         businessId: businessId,
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create the order (force transactionType to SALE)
-    const order = await Order.create({
+    const order = await Order().create({
       businessId,
       articleId: validatedData.articleId,
       qte: validatedData.qte,
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Fetch the created order with article details
-    const createdOrder = await Order.findByPk((order as any).get('id'), {
+    const createdOrder = await Order().findByPk((order as any).get('id'), {
       include: [
         {
           model: Article,
