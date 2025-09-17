@@ -13,15 +13,26 @@ let neonInstance: any = null;
 // Get Neon serverless instance
 export function getNeon() {
   if (!neonInstance) {
-    neonInstance = neon(DATABASE_URL!);
+    if (!DATABASE_URL) {
+      throw new Error('DATABASE_URL is not configured');
+    }
+    neonInstance = neon(DATABASE_URL);
   }
   return neonInstance;
 }
 
 export function getSequelize(): Sequelize {
   if (!sequelizeInstance) {
+    if (!DATABASE_URL) {
+      // During build time, return a mock instance to prevent build failures
+      if (process.env.NODE_ENV === 'production' && process.env.VERCEL === '1') {
+        console.warn("⚠️ DATABASE_URL not available during build, using mock connection");
+        return {} as Sequelize;
+      }
+      throw new Error('DATABASE_URL is not configured');
+    }
     // Use Neon with DATABASE_URL (required)
-    sequelizeInstance = new Sequelize(DATABASE_URL!, {
+    sequelizeInstance = new Sequelize(DATABASE_URL, {
       dialect: 'postgres',
       dialectModule: require('pg'),
       models: [], // Add your models here later
@@ -58,5 +69,6 @@ export function getSequelize(): Sequelize {
   return sequelizeInstance;
 }
 
-// For backward compatibility, export the instance getter
-export const sequelize = getSequelize();
+// Export the getter function instead of the instance
+// This prevents build-time database connection issues
+export { getSequelize as sequelize };

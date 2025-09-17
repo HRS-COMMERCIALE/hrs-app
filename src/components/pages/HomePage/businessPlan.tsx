@@ -36,26 +36,26 @@ const BusinessPlan: React.FC = () => {
     },
     pricingTiers: [
       {
-        name: language.pricingTiers[0].name,
-        price: language.pricingTiers[0].price,
-        currency: language.pricingTiers[0].currency,
-        features: language.pricingTiers[0].features,
-        buttonText: language.pricingTiers[0].buttonText
+        name: language.pricingTiers?.[0]?.name || 'Premium',
+        price: language.pricingTiers?.[0]?.price || '99.99',
+        currency: language.pricingTiers?.[0]?.currency || 'USD',
+        features: language.pricingTiers?.[0]?.features || [],
+        buttonText: language.pricingTiers?.[0]?.buttonText || 'Subscribe'
       },
       {
-        name: language.pricingTiers[1].name,
-        price: language.pricingTiers[1].price,
-        currency: language.pricingTiers[1].currency,
-        features: language.pricingTiers[1].features,
-        buttonText: language.pricingTiers[1].buttonText,
+        name: language.pricingTiers?.[1]?.name || 'Platinum',
+        price: language.pricingTiers?.[1]?.price || '190.99',
+        currency: language.pricingTiers?.[1]?.currency || 'USD',
+        features: language.pricingTiers?.[1]?.features || [],
+        buttonText: language.pricingTiers?.[1]?.buttonText || 'Subscribe',
         popular: true
       },
       {
-        name: language.pricingTiers[2].name,
-        price: language.pricingTiers[2].price,
-        currency: language.pricingTiers[2].currency,
-        features: language.pricingTiers[2].features,
-        buttonText: language.pricingTiers[2].buttonText
+        name: language.pricingTiers?.[2]?.name || 'Diamond',
+        price: language.pricingTiers?.[2]?.price || '270.00',
+        currency: language.pricingTiers?.[2]?.currency || 'USD',
+        features: language.pricingTiers?.[2]?.features || [],
+        buttonText: language.pricingTiers?.[2]?.buttonText || 'Subscribe'
       }
     ],
     customPlan: {
@@ -72,10 +72,12 @@ const BusinessPlan: React.FC = () => {
     }
   };
 
-  const pricingTiers: PricingTier[] = content.pricingTiers.map(tier => ({
-    ...tier,
-    features: tier.features.map(feature => ({ text: feature, included: true }))
-  }));
+  const pricingTiers: PricingTier[] = content.pricingTiers
+    .filter(tier => tier && tier.name) // Filter out any undefined/null tiers
+    .map(tier => ({
+      ...tier,
+      features: (tier.features || []).map(feature => ({ text: feature, included: true }))
+    }));
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
@@ -178,6 +180,10 @@ const BusinessPlan: React.FC = () => {
 
               <button
                 onClick={() => {
+                  if (!tier.name) {
+                    router.push(`/Payment?planId=premium`);
+                    return;
+                  }
                   const planId = tier.name.toLowerCase().replace(/\s+/g, '');
                   const plan = PAYMENT_PLANS[planId];
                   if (plan) {

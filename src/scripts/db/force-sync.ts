@@ -19,7 +19,7 @@ async function forceSync() {
     console.error('❌ Force sync failed:', error);
     process.exit(1);
   } finally {
-    await sequelize.close();
+    await sequelize().close();
   }
 }
 

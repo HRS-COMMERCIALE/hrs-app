@@ -5,13 +5,13 @@ async function addOrderTypeColumn() {
     console.log('Adding type column to orders table...');
     
     // Add the type column with default value 'order'
-    await sequelize.query(`
+    await sequelize().query(`
       ALTER TABLE orders 
       ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'order' NOT NULL
     `);
     
     // Add check constraint to ensure only valid values
-    await sequelize.query(`
+    await sequelize().query(`
       ALTER TABLE orders 
       ADD CONSTRAINT IF NOT EXISTS orders_type_check 
       CHECK (type IN ('order', 'delivery', 'invoice', 'returns'))

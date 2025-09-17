@@ -6,11 +6,11 @@ async function alterSync() {
     console.log('🔄 Starting alter sync...');
     
     // First, authenticate the connection
-    await sequelize.authenticate();
+    await sequelize().authenticate();
     console.log('✅ Database connection established');
     
     // Disable foreign key checks temporarily for alter operations
-    // await sequelize.query('SET session_replication_role = replica;');
+    // await sequelize().query('SET session_replication_role = replica;');
     // console.log('🔓 Foreign key constraints temporarily disabled');
     
     // Alter sync each model individually - this will modify existing tables without dropping them
@@ -26,11 +26,11 @@ async function alterSync() {
     }
     
     // Re-enable foreign key checks
-    // await sequelize.query('SET session_replication_role = DEFAULT;');
+    // await sequelize().query('SET session_replication_role = DEFAULT;');
     // console.log('🔒 Foreign key constraints re-enabled');
     
     // Verify all tables exist
-    const [results] = await sequelize.query(`
+    const [results] = await sequelize().query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
@@ -47,7 +47,7 @@ async function alterSync() {
     
     // Try to re-enable foreign key checks even if there was an error
     try {
-      await sequelize.query('SET session_replication_role = DEFAULT;');
+      await sequelize().query('SET session_replication_role = DEFAULT;');
       console.log('🔒 Foreign key constraints re-enabled after error');
     } catch (fkError) {
       console.error('❌ Failed to re-enable foreign key constraints:', fkError);
@@ -55,7 +55,7 @@ async function alterSync() {
     
     process.exit(1);
   } finally {
-    await sequelize.close();
+    await sequelize().close();
   }
 }
 

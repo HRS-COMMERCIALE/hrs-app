@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Use database transaction for secure operations
-    const transaction = await sequelize.transaction();
+    const transaction = await sequelize().transaction();
 
     try {
       // Check if user already exists with normalized email

@@ -6,11 +6,11 @@ async function alterSyncImproved() {
     console.log('🔄 Starting improved alter sync...');
     
     // First, authenticate the connection
-    await sequelize.authenticate();
+    await sequelize().authenticate();
     console.log('✅ Database connection established');
     
     // Get current database schema
-    const [existingTables] = await sequelize.query(`
+    const [existingTables] = await sequelize().query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
@@ -22,7 +22,7 @@ async function alterSyncImproved() {
     console.log('📋 Existing tables:', existingTableNames);
     
     // Disable foreign key checks temporarily
-    await sequelize.query('SET session_replication_role = replica;');
+    await sequelize().query('SET session_replication_role = replica;');
     console.log('🔓 Foreign key constraints temporarily disabled');
     
     // Sync models with better error handling
@@ -61,11 +61,11 @@ async function alterSyncImproved() {
     }
     
     // Re-enable foreign key checks
-    await sequelize.query('SET session_replication_role = DEFAULT;');
+    await sequelize().query('SET session_replication_role = DEFAULT;');
     console.log('🔒 Foreign key constraints re-enabled');
     
     // Get final database schema
-    const [finalTables] = await sequelize.query(`
+    const [finalTables] = await sequelize().query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
@@ -104,7 +104,7 @@ async function alterSyncImproved() {
     
     // Try to re-enable foreign key checks even if there was an error
     try {
-      await sequelize.query('SET session_replication_role = DEFAULT;');
+      await sequelize().query('SET session_replication_role = DEFAULT;');
       console.log('🔒 Foreign key constraints re-enabled after error');
     } catch (fkError) {
       console.error('❌ Failed to re-enable foreign key constraints:', fkError);
@@ -112,7 +112,7 @@ async function alterSyncImproved() {
     
     process.exit(1);
   } finally {
-    await sequelize.close();
+    await sequelize().close();
   }
 }
 

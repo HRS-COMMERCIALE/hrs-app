@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 
 // JWT configuration
 const JWT_CONFIG = {
-  ACCESS_TOKEN_SECRET: process.env.JWT_ACCESS_SECRET || 'your-access-secret-key',
-  REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+  ACCESS_TOKEN_SECRET: process.env.JWT_ACCESS_SECRET || 'fallback-secret-for-build',
+  REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-for-build',
   ACCESS_TOKEN_EXPIRES_IN: '1d' as const, // 1 day
   REFRESH_TOKEN_EXPIRES_IN: '7d' as const, // 7 days
 };

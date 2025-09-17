@@ -134,7 +134,7 @@ const Footer: React.FC = () => {
                     <p className="text-slate-300 text-sm">{content.contactInfo.phone.label}</p>
                     <div className="space-y-1">
                       {content.contactInfo.phone.numbers.map((number, index) => (
-                        <a key={index} href={`tel:${number.replace(/\s/g, '')}`} className="text-white hover:text-[#3c959d] transition-colors duration-300 block">
+                        <a key={index} href={`tel:${number ? number.replace(/\s/g, '') : ''}`} className="text-white hover:text-[#3c959d] transition-colors duration-300 block">
                           {number}
                         </a>
                       ))}
