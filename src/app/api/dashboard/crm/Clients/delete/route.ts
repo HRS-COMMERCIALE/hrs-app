@@ -29,14 +29,14 @@ export async function DELETE(req: Request) {
     const { id: clientId } = parsed.data;
 
     // Get user's business
-    const business = await Business.findOne({ where: { userId: (auth as any).userId } });
+    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
     const businessId = business.get('id') as number;
 
     // Check if client exists and belongs to user's business
-    const existingClient = await Clients.findOne({
+    const existingClient = await Clients().findOne({
       where: { 
         id: clientId,
         businessId 
@@ -48,7 +48,7 @@ export async function DELETE(req: Request) {
     }
 
     // Delete client
-    const deletedRowsCount = await Clients.destroy({
+    const deletedRowsCount = await Clients().destroy({
       where: { 
         id: clientId,
         businessId 
