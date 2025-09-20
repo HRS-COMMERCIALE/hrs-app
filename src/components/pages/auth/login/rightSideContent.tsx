@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '../../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 import { apiClient } from '../../../../utils/client/client';
 import { getCurrentIP } from '../../../../utils/help/ipProvider/ipProvider';
 import { Alert } from '../../../../components/ui/alerts';
 
 export default function RightSideContent() {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -269,10 +269,10 @@ export default function RightSideContent() {
                             </div>
 
                             <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-[#3c959d] to-slate-800 bg-clip-text text-transparent mb-4 tracking-tight">
-                                {currentTranslations.auth.login.welcomeBack}
+                                {t('auth.login.title')}
                             </h2>
                             <p className="text-base text-slate-600 font-light leading-relaxed">
-                                {currentTranslations.auth.login.subtitle}
+                                {t('auth.login.subtitle')}
                             </p>
                             
                             {/* Decorative line */}
@@ -284,7 +284,7 @@ export default function RightSideContent() {
                             {/* Enhanced Email Field */}
                             <div className="space-y-3">
                                 <label htmlFor="email" className="block text-sm font-bold text-slate-700 tracking-wide uppercase">
-                                    {currentTranslations.auth.login.emailLabel}
+                                    {t('auth.login.email')}
                                 </label>
                                 <div className="relative group">
                                     {/* Enhanced multi-layer glow effect */}
@@ -306,7 +306,7 @@ export default function RightSideContent() {
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             className="relative block w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#3c959d]/20 focus:border-[#3c959d] transition-all duration-200 text-slate-800 text-base"
-                                            placeholder={currentTranslations.auth.login.emailPlaceholder}
+                                            placeholder={t('auth.login.emailPlaceholder')}
                                         />
                                     </div>
                                 </div>
@@ -315,7 +315,7 @@ export default function RightSideContent() {
                             {/* Enhanced Password Field */}
                             <div className="space-y-3">
                                 <label htmlFor="password" className="block text-sm font-bold text-slate-700 tracking-wide uppercase">
-                                    {currentTranslations.auth.login.passwordLabel}
+                                    {t('auth.login.password')}
                                 </label>
                                 <div className="relative group">
                                     {/* Enhanced multi-layer glow effect */}
@@ -337,7 +337,7 @@ export default function RightSideContent() {
                                             value={formData.password}
                                             onChange={handleInputChange}
                                             className="relative block w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4ba5ad]/20 focus:border-[#4ba5ad] transition-all duration-200 text-slate-800 text-base"
-                                            placeholder={currentTranslations.auth.login.passwordPlaceholder}
+                                            placeholder={t('auth.login.passwordPlaceholder')}
                                         />
                                         <button
                                             type="button"
@@ -372,12 +372,12 @@ export default function RightSideContent() {
                                         <div className="absolute -inset-1 bg-gradient-to-r from-[#3c959d]/20 to-[#4ba5ad]/20 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
                                     </div>
                                     <label htmlFor="remember-me" className="ml-3 text-sm text-slate-600 group-hover:text-slate-800 transition-colors duration-200 font-medium cursor-pointer">
-                                        {currentTranslations.auth.login.rememberMe}
+                                        {t('auth.login.rememberMe')}
                                     </label>
                                 </div>
                                 <div>
                                     <a href="#" className="text-sm font-semibold text-[#3c959d] hover:text-[#4ba5ad] transition-all duration-200 hover:underline decoration-2 underline-offset-4 relative group">
-                                        <span className="relative z-10">{currentTranslations.auth.login.forgotPassword}</span>
+                                        <span className="relative z-10">{t('auth.login.forgotPassword')}</span>
                                         <div className="absolute -inset-2 bg-gradient-to-r from-[#3c959d]/10 to-[#4ba5ad]/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
                                     </a>
                                 </div>
@@ -408,11 +408,11 @@ export default function RightSideContent() {
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
-                                                <span className="animate-pulse">{currentTranslations.auth.login.submit.loading}</span>
+                                                <span className="animate-pulse">{t('auth.login.signingIn')}</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center">
-                                                <span>{currentTranslations.auth.login.submit.idle}</span>
+                                                <span>{t('auth.login.signIn')}</span>
                                                 <svg className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                 </svg>
@@ -425,9 +425,9 @@ export default function RightSideContent() {
                             {/* Enhanced Sign Up Link */}
                             <div className="text-center pt-4">
                                 <p className="text-slate-600 text-base">
-                                    {currentTranslations.auth.login.noAccount}{' '}
+                                    {t('auth.login.noAccount')}{' '}
                                     <a href="/register" className="font-semibold text-[#3c959d] hover:text-[#4ba5ad] transition-all duration-200 hover:underline decoration-2 underline-offset-4 relative group">
-                                        <span className="relative z-10">{currentTranslations.auth.login.createAccount}</span>
+                                        <span className="relative z-10">{t('auth.login.signUp')}</span>
                                         <div className="absolute -inset-2 bg-gradient-to-r from-[#3c959d]/10 to-[#4ba5ad]/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
                                     </a>
                                 </p>

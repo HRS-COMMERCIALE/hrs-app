@@ -1,0 +1,685 @@
+{
+  "homePage": {
+    "navbar": {
+      "home": "Home",
+      "features": "Features",
+      "about": "About",
+      "contactUs": "Contact Us",
+      "getStarted": "Get Started",
+      "dashboard": "Dashboard",
+      "login": "Login",
+      "signUp": "Sign Up",
+      "businessPlans": "Business Plans"
+    },
+    "heroSection": {
+      "statusBadge": {
+        "text": "🚀 Growing rapidly with businesses worldwide"
+      },
+      "hero": {
+        "title": {
+          "line1": "Transform Your",
+          "line2": "Business Operations"
+        },
+        "description": {
+          "main": "The only business management platform you'll ever need.",
+          "highlight": " Streamline invoices, suppliers, clients, and analytics",
+          "ending": " with our intelligent, all-in-one solution."
+        }
+      },
+      "cta": {
+        "primaryButton": {
+          "text": "Start Free Trial"
+        },
+        "secondaryButton": {
+          "text": "Watch Demo"
+        }
+      },
+      "trustIndicators": {
+        "setup": "Setup in 5 minutes",
+        "cancel": "Cancel anytime",
+        "security": "Bank-level security"
+      }
+    },
+    "BusinessSolutions": {
+      "badge": "Core Business Solutions",
+      "title1": "Stop Losing Money,",
+      "title2": "Start Growing !",
+      "description": "Most businesses waste 20% of their revenue on inefficiencies. Our platform eliminates waste, automates tedious tasks, and gives you the insights to make more money.",
+      "descriptionHighlight": "Start seeing results in 30 days.",
+      "salesTitle": "Sales & Invoicing",
+      "salesSubtitle": "Get Paid Faster",
+      "salesDescription": "Create professional invoices in seconds. Track payments automatically. Never chase money again.",
+      "salesFeatures": [
+        "Professional invoice templates",
+        "Automatic payment tracking",
+        "Payment reminders",
+        "Multi-currency support"
+      ],
+      "inventoryTitle": "Inventory Management",
+      "inventorySubtitle": "Never Run Out",
+      "inventoryDescription": "Smart stock alerts. Automated reordering. Real-time inventory tracking across all locations.",
+      "inventoryFeatures": [
+        "Real-time stock tracking",
+        "Low stock alerts",
+        "Automated reordering",
+        "Multi-location support"
+      ],
+      "analyticsTitle": "Analytics & Reports",
+      "analyticsSubtitle": "Make Data-Driven Decisions",
+      "analyticsDescription": "Comprehensive dashboards. Profit analysis. Growth insights. Know exactly where your money goes.",
+      "analyticsFeatures": [
+        "Profit & loss reports",
+        "Sales analytics",
+        "Customer insights",
+        "Growth tracking"
+      ],
+      "clientsTitle": "Client Management",
+      "clientsSubtitle": "Build Lasting Relationships",
+      "clientsDescription": "Complete client profiles. Communication history. Payment tracking. Turn customers into advocates.",
+      "clientsFeatures": [
+        "Complete client profiles",
+        "Communication history",
+        "Payment tracking",
+        "Customer segmentation"
+      ],
+      "featuresTitle": "Key Features",
+      "learnMore": "Learn More",
+      "ctaTitle": "Ready to Transform Your Business?",
+      "ctaDescription": "Join thousands of businesses already using our platform to streamline operations and increase profits.",
+      "startFreeTrial": "Start Free Trial",
+      "watchDemo": "Watch Demo"
+    },
+    "container": {
+      "title": "Why Choose HRS?",
+      "subtitle": "Built for Modern Businesses",
+      "description": "We understand the challenges of running a business. That's why we've created a platform that grows with you.",
+      "features": {
+        "feature1": {
+          "title": "All-in-One Platform",
+          "description": "No more juggling multiple tools. Everything you need in one place."
+        },
+        "feature2": {
+          "title": "Easy to Use",
+          "description": "Intuitive design that your team will love from day one."
+        },
+        "feature3": {
+          "title": "24/7 Support",
+          "description": "Our team is here to help you succeed, whenever you need us."
+        }
+      }
+    },
+    "businessOption": {
+      "badge": "Business Workspace",
+      "title": {
+        "chooseYour": "Choose Your",
+        "businessHub": "Business Hub"
+      },
+      "subtitle": "Access your business dashboard, join an existing business, or create a new one to get started.",
+      "buttons": {
+        "joinBusiness": "Join Business",
+        "createBusiness": "Create Business",
+        "createBusinessLimit": "Create Business (Limit Reached)",
+        "viewPlans": "View Plans",
+        "downloadApp": "Download App",
+        "upgradePlan": "Upgrade Plan"
+      },
+      "limits": {
+        "label": "Businesses: {count}/{limit}",
+        "upgradeNote0": "(Upgrade to create businesses)",
+        "upgradeNote1": "(Premium/Platinum limit)",
+        "upgradeNote3": "(Diamond limit)",
+        "reachedDiamond": "You have reached the maximum of 3 businesses allowed for Diamond plan users.",
+        "reachedPremiumOrPlatinum": "You have reached the maximum of 1 business for your current plan. Upgrade to Diamond plan to create up to 3 businesses."
+      },
+      "available": {
+        "title": "Available Businesses",
+        "loading": "Loading businesses...",
+        "error": "Error loading businesses: {error}",
+        "empty": "No businesses found. Create your first business to get started!",
+        "joinedLabel": "Joined:"
+      },
+      "trust": {
+        "secure": "Secure & Encrypted",
+        "global": "Global Access",
+        "team": "Team Collaboration",
+        "fast": "Lightning Fast"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "cards": {
+        "descriptionWithSize": "business with {size} team size",
+        "unknown": "Unknown"
+      }
+    },
+    "aboutUs": {
+      "badge": "About Us",
+      "title": {
+        "line1": "Get to Know",
+        "line2": "Our Company"
+      },
+      "subtitle": "Discover the story behind our mission to transform business management",
+      "comingSoon": "Coming Soon",
+      "description": "This section is currently under development and will soon showcase our company's story, mission, values, and the team behind our innovative business solutions.",
+      "underConstruction": "Under Construction",
+      "constructionNote": "We're working hard to bring you our company story and team information. Check back soon!",
+      "developmentProgress": "Development Progress: 33%",
+      "inDevelopment": "In Development",
+      "exploreNote": "In the meantime, explore our business solutions and pricing plans above"
+    },
+    "footer": {
+      "company": {
+        "name": "Tunisie Business Solutions",
+        "tagline": "Solutions",
+        "description": "Empowering Tunisian businesses with innovative software solutions for growth and success in the digital age.",
+        "logoAlt": "Tunisie Business Solutions Logo"
+      },
+      "quickMenu": {
+        "title": "Quick Menu",
+        "items": {
+          "home": "Home",
+          "businessPlans": "Business Plans",
+          "about": "About Us",
+          "contact": "Contact Us",
+          "features": "Features"
+        }
+      },
+      "contactInfo": {
+        "title": "Contact Info",
+        "email": "Email",
+        "phone": "Phone Numbers",
+        "address": "Address"
+      },
+      "location": {
+        "title": "Our Location",
+        "city": "Tunis, Tunisia",
+        "subtitle": "Capital City",
+        "mapPlaceholder": "Interactive map coming soon"
+      },
+      "legal": {
+        "copyright": "Tunisie Business Solutions. All rights reserved.",
+        "links": {
+          "privacy": "Privacy Policy",
+          "terms": "Terms of Service",
+          "cookies": "Cookie Policy"
+        }
+      }
+    },
+    "businessPlan": {
+      "header": {
+        "badge": {
+          "icon": "💰",
+          "text": "Pricing Plans"
+        },
+        "title": "Choose Your Perfect Plan",
+        "subtitle": "Flexible pricing options designed to grow with your business"
+      },
+      "pricingTiers": [
+        {
+          "name": "Premium",
+          "price": "99.99",
+          "currency": "USD",
+          "features": [
+            "Up to 1 business",
+            "Basic inventory management",
+            "Standard reporting",
+            "Email support"
+          ],
+          "buttonText": "Subscribe"
+        },
+        {
+          "name": "Platinum",
+          "price": "190.99",
+          "currency": "USD",
+          "features": [
+            "Up to 1 business",
+            "Advanced inventory management",
+            "Advanced reporting",
+            "Priority support"
+          ],
+          "buttonText": "Subscribe",
+          "popular": true
+        },
+        {
+          "name": "Diamond",
+          "price": "270.00",
+          "currency": "USD",
+          "features": [
+            "Up to 3 businesses",
+            "Full inventory management",
+            "Custom reporting",
+            "24/7 support"
+          ],
+          "buttonText": "Subscribe"
+        }
+      ],
+      "customPlan": {
+        "name": "Custom",
+        "price": "Contact Us",
+        "description": "Tailored for enterprise needs",
+        "features": [
+          "Unlimited businesses",
+          "Custom integrations",
+          "Dedicated support",
+          "Custom features"
+        ],
+        "buttonText": "Contact Sales"
+      },
+      "footer": {
+        "maintenance": "All plans include regular maintenance and updates",
+        "pricing": "Pricing may vary based on specific requirements",
+        "innovation": "Innovation at Every Step"
+      },
+      "mostPopular": "Most Popular",
+      "defaultSubscribe": "Subscribe"
+    }
+  },
+  "header": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "settings": "Settings",
+      "languageLabel": "Language",
+      "logout": "Logout"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "signingIn": "Signing in...",
+      "leftSide": {
+        "title": {
+          "line1": "Welcome to",
+          "line2": "HRS Business Platform"
+        },
+        "subtitle": "Streamline your business operations with our comprehensive management platform",
+        "features": [
+          {
+            "title": "Analytics",
+            "subtitle": "Real-time insights"
+          },
+          {
+            "title": "Automation",
+            "subtitle": "Streamline workflows"
+          },
+          {
+            "title": "Security",
+            "subtitle": "Bank-level protection"
+          }
+        ],
+        "security": {
+          "soc2": "SOC 2 Compliant",
+          "gdpr": "GDPR Ready"
+        }
+      }
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Get started with HRS today",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "agreeToTerms": "I agree to the Terms of Service and Privacy Policy",
+      "createAccount": "Create Account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "leftSide": {
+        "title": {
+          "line1": "Join Our",
+          "line2": "HRS Platform"
+        },
+        "subtitle": "Create your account and start managing your business with our comprehensive solutions.",
+        "features": [
+          {
+            "title": "Secure Registration",
+            "subtitle": "Bank-level security for your data"
+          },
+          {
+            "title": "Easy Setup",
+            "subtitle": "Get started in minutes"
+          },
+          {
+            "title": "24/7 Support",
+            "subtitle": "We're here to help"
+          }
+        ],
+        "security": {
+          "soc2": "SOC 2 Compliant",
+          "gdpr": "GDPR Ready"
+        }
+      }
+    },
+    "register": {
+      "business": {
+        "title": "Business Information",
+        "subtitle": "Tell us about your business",
+        "businessName": "Business Name",
+        "businessNamePlaceholder": "Enter your business name",
+        "registrationNumber": "Registration Number",
+        "registrationNumberPlaceholder": "TN-123456",
+        "taxId": "Tax ID",
+        "taxIdPlaceholder": "1234567/A/M/000",
+        "cnssCode": "CNSS Code",
+        "cnssCodePlaceholder": "000000-00",
+        "industry": "Industry",
+        "industryPlaceholder": "Select your industry",
+        "website": "Website",
+        "websitePlaceholder": "https://your-website.com",
+        "phone": "Phone Number",
+        "phonePlaceholder": "+1 (555) 123-4567",
+        "employeeCount": "Number of Employees",
+        "employeeCountPlaceholder": "Select employee count",
+        "description": "Business Description",
+        "descriptionPlaceholder": "Briefly describe your business",
+        "logo": "Business Logo",
+        "logoPlaceholder": "Upload your business logo",
+        "required": "Required",
+        "optional": "Optional",
+        "next": "Next Step",
+        "previous": "Previous Step",
+        "employeeCounts": [
+          "1-10",
+          "11-50",
+          "51-200",
+          "201-500",
+          "501-1000",
+          "1000+"
+        ]
+      },
+      "address": {
+        "title": "Business Address",
+        "subtitle": "Where is your business located?",
+        "street": "Street Address",
+        "streetPlaceholder": "Enter street address",
+        "city": "City",
+        "cityPlaceholder": "Enter city",
+        "state": "State/Province",
+        "statePlaceholder": "Enter state or province",
+        "postalCode": "Postal Code",
+        "postalCodePlaceholder": "Enter postal code",
+        "country": "Country",
+        "countryPlaceholder": "Select country",
+        "next": "Next Step",
+        "previous": "Previous Step"
+      },
+      "order": {
+        "title": "Choose Your Plan",
+        "subtitle": "Select the perfect plan for your business",
+        "free": "Free",
+        "pro": "Pro",
+        "enterprise": "Enterprise",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "save": "Save 20%",
+        "mostPopular": "Most Popular",
+        "getStarted": "Get Started",
+        "contactSales": "Contact Sales",
+        "features": {
+          "users": "Users",
+          "storage": "Storage",
+          "support": "Support",
+          "analytics": "Analytics",
+          "api": "API Access",
+          "customization": "Customization"
+        },
+        "previous": "Previous Step",
+        "complete": "Complete Registration"
+      }
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "operations": "Operations",
+      "crm": "CRM",
+      "emails": "Emails",
+      "finance": "Finance & Accounting",
+      "analytics": "Analytics & Insights",
+      "settings": "Settings"
+    },
+    "settings": {
+      "title": "Settings",
+      "companyInfo": "Company Information",
+      "postalCodes": "Postal Codes",
+      "pointOfSale": "Point of Sale Settings"
+    }
+  },
+  "businessPlans": {
+    "hero": {
+      "badge": "Choose Your Plan",
+      "title": {
+        "line1": "Business",
+        "line2": "Plans"
+      },
+      "description": "Choose the perfect plan for your business growth and",
+      "descriptionHighlight": " achieve your goals"
+    },
+    "section": {
+      "title": "Our Business Plans",
+      "subtitle": "Better pricing",
+      "description": "Affordable pricing and packages for smooth billing and efficient productivity",
+      "content": "HRSCommerciale is an online platform designed for small and medium-sized enterprises (SMEs & VSEs), offering comprehensive support in the digitization of their work processes. With advanced technologies and modules usually used by large companies, such as the finance module, human resource management, CRM, street vending, etc., HRSCommerciale helps transform their business by reducing costs and increasing revenue. All at competitive rates, promoting their growth towards new horizons."
+    },
+    "loading": "Loading plans..."
+  },
+  "downloadSaaS": {
+    "hero": {
+      "badge": "HRS Commerciale Desktop Application",
+      "title": {
+        "line1": "Download Your",
+        "line2": "Business Solution"
+      },
+      "description": "Access the full power of HRS Commerciale with our comprehensive desktop application. Manage your entire business from one powerful platform."
+    },
+    "features": {
+      "title": "Everything You Need to Run Your Business",
+      "subtitle": "Our desktop application provides all the tools necessary for complete business management"
+    },
+    "appInfo": {
+      "title": "Why Choose HRS Commerciale?",
+      "subtitle": "Built specifically for Tunisian businesses with local market needs in mind",
+      "sectionTitle": "Comprehensive Business Management",
+      "features": {
+        "pos": "Complete Point of Sale system with barcode scanning",
+        "inventory": "Advanced inventory management with real-time tracking",
+        "crm": "Customer relationship management (CRM) with purchase history",
+        "analytics": "Financial reporting and analytics dashboard",
+        "multiLocation": "Multi-location support for growing businesses",
+        "offline": "Offline capability with cloud synchronization",
+        "languages": "Arabic and French language support",
+        "tax": "Tunisian tax system integration"
+      }
+    },
+    "security": {
+      "title": "Secure & Reliable",
+      "subtitle": "Your business data is protected with enterprise-grade security and 24/7 monitoring",
+      "badge": "Enterprise Grade Security",
+      "features": {
+        "encryption": {
+          "title": "Data Encryption",
+          "description": "All data is encrypted both in transit and at rest with AES-256 military-grade encryption"
+        },
+        "access": {
+          "title": "Secure Access",
+          "description": "Multi-factor authentication, biometric login, and role-based permissions for maximum security"
+        },
+        "support": {
+          "title": "24/7 Support",
+          "description": "Round-the-clock technical support, automated monitoring, and instant issue resolution"
+        }
+      },
+      "certifications": {
+        "iso": "ISO 27001 Certified",
+        "gdpr": "GDPR Compliant",
+        "soc": "SOC 2 Type II",
+        "uptime": "99.9% Uptime"
+      }
+    },
+    "download": {
+      "title": "Ready to Download?",
+      "subtitle": "Get started with HRS Commerciale today",
+      "button": "Download Now",
+      "security": "Secure Download",
+      "offline": "Offline Ready",
+      "progress": {
+        "preparing": "Preparing download...",
+        "starting": "Starting download...",
+        "complete": "Download complete!"
+      },
+      "error": "Download Failed"
+    },
+    "systemRequirements": {
+      "title": "System Requirements",
+      "requirements": {
+        "os": {
+          "name": "Operating System",
+          "value": "Windows 7/10/11, macOS 10.12+, Ubuntu 16.04+"
+        },
+        "ram": {
+          "name": "RAM",
+          "value": "Minimum 2GB, Recommended 4GB+"
+        },
+        "storage": {
+          "name": "Storage",
+          "value": "200MB free space for application"
+        },
+        "network": {
+          "name": "Network",
+          "value": "Offline capable, optional cloud sync"
+        },
+        "display": {
+          "name": "Display",
+          "value": "1024x768 minimum resolution"
+        }
+      }
+    },
+    "loading": "Loading..."
+  },
+  "payment": {
+    "loading": "Loading payment...",
+    "choosePaymentMethod": "Choose Payment Method",
+    "selectPreferredOption": "Select your preferred payment option",
+    "billingEmail": "Billing Email",
+    "verified": "Verified",
+    "billingInformation": "Billing Information",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "address": "Address",
+    "addressPlaceholder": "123 Main Street",
+    "city": "City",
+    "cityPlaceholder": "Tunis",
+    "postalCode": "Postal Code",
+    "postalCodePlaceholder": "1000",
+    "country": "Country",
+    "cardInformation": "Card Information",
+    "cardDetails": "Card Details",
+    "loadingSecureField": "Loading secure card field…",
+    "securedByStripe": "Secured by Stripe",
+    "devModeWarning": "Dev Mode: HTTPS warning is normal for localhost",
+    "creditCard": "Credit Card",
+    "creditCardDescription": "Visa, Mastercard, American Express",
+    "paypal": "PayPal",
+    "paypalDescription": "Pay with your PayPal account",
+    "bankTransfer": "Bank Transfer",
+    "bankTransferDescription": "Direct bank transfer",
+    "comingSoon": "Soon",
+    "completePayment": "Complete Payment",
+    "processing": "Processing...",
+    "backToPlans": "← Back to Plans",
+    "subscribeTo": "Subscribe to",
+    "perMonth": "per month",
+    "billedEveryMonth": "Billed every month",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "totalDueToday": "Total due today",
+    "sslSecured": "SSL Secured",
+    "pciCompliant": "PCI Compliant",
+    "planDescription": "includes unlimited business management, advanced CRM features, priority support, secure cloud storage, and mobile app access for your growing business needs.",
+    "paymentMethodNotAvailable": "This payment method is not yet available. Please select Credit Card.",
+    "paymentMethodComingSoon": "is coming soon! Please select Credit Card for now.",
+    "cardElementNotFound": "Card element not found",
+    "paymentMethodCreationFailed": "Payment method creation failed",
+    "missingPaymentConfig": "Missing payment configuration. Please try again.",
+    "paymentConfirmationFailed": "Payment confirmation failed",
+    "additionalAuthRequired": "Additional authentication is required. Please follow the on-screen prompts or try again.",
+    "cardDeclined": "Your card was declined. Please use a different card or try again.",
+    "paymentCanceled": "Payment was canceled. You can try again when ready.",
+    "paymentNotCompleted": "Payment is not completed yet (status: {status}). Please try again or wait a moment.",
+    "paymentProcessingError": "An error occurred while processing your payment. Please try again.",
+    "stripeKeyMissing": "Stripe publishable key missing (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY).",
+    "stripeKeyInvalid": "Stripe publishable key format looks invalid. It should start with pk_test_ or pk_live_.",
+    "stripeInitFailed": "Stripe failed to initialize. Check your publishable key and network."
+  },
+  "contactUs": {
+    "hero": {
+      "badge": "We're here to help",
+      "title": {
+        "line1": "Contact",
+        "line2": "Us"
+      },
+      "description": "Get in touch with our team and let's discuss how we can",
+      "descriptionHighlight": " help your business grow"
+    },
+    "form": {
+      "title": "Get In Touch",
+      "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+      "contactInfo": {
+        "title": "Contact Information",
+        "subtitle": "We're here to help and answer any question you might have. We look forward to hearing from you."
+      },
+      "fields": {
+        "name": "Full Name *",
+        "email": "Email Address *",
+        "subject": "Subject *",
+        "message": "Message *"
+      },
+      "placeholders": {
+        "name": "Enter your full name",
+        "email": "Enter your email address",
+        "message": "Tell us about your project or inquiry..."
+      },
+      "subjects": {
+        "select": "Select a subject",
+        "general": "General Inquiry",
+        "business": "Business Consultation",
+        "support": "Technical Support",
+        "partnership": "Partnership",
+        "other": "Other"
+      },
+      "button": "Send Message",
+      "sending": "Sending Message...",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message. Please try again.",
+      "networkError": "Network error. Please check your connection and try again.",
+      "replyTime": "We'll reply within 24 hours"
+    },
+    "loading": "Loading contact..."
+  },
+  "common": {
+    "appName": "HRS App",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "appName": "HRS App"
+  }
+}

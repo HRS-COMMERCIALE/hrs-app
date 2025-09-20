@@ -1,9 +1,9 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '../../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 
 export default function LeftSideContent() {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
 
     const [mounted, setMounted] = useState(false);
     
@@ -78,14 +78,14 @@ export default function LeftSideContent() {
                 {/* Enhanced Hero Section */}
                 <div className="text-center mb-12 max-w-xl">
                     <h1 className="text-6xl font-bold mb-8 leading-tight">
-                        <span className="block text-white drop-shadow-lg mb-2">{currentTranslations.auth.leftSide.title.line1}</span>
+                        <span className="block text-white drop-shadow-lg mb-2">{t('auth.login.leftSide.title.line1')}</span>
                         <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">
-                            {currentTranslations.auth.leftSide.title.line2}
+                            {t('auth.login.leftSide.title.line2')}
                         </span>
                     </h1>
                     
                     <p className="text-xl text-slate-300 leading-relaxed max-w-lg mx-auto font-light">
-                        {currentTranslations.auth.leftSide.subtitle}
+                        {t('auth.login.leftSide.subtitle')}
                     </p>
                 </div>
 
@@ -94,22 +94,22 @@ export default function LeftSideContent() {
                     {[
                         {
                             icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                            title: currentTranslations.auth.leftSide.features[0].title,
-                            subtitle: currentTranslations.auth.leftSide.features[0].subtitle,
+                            title: t('auth.login.leftSide.features.0.title'),
+                            subtitle: t('auth.login.leftSide.features.0.subtitle'),
                             color: "#3c959d",
                             gradient: "from-[#3c959d]/20 to-[#4ba5ad]/20"
                         },
                         {
                             icon: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4",
-                            title: currentTranslations.auth.leftSide.features[1].title,
-                            subtitle: currentTranslations.auth.leftSide.features[1].subtitle,
+                            title: t('auth.login.leftSide.features.1.title'),
+                            subtitle: t('auth.login.leftSide.features.1.subtitle'),
                             color: "#4ba5ad",
                             gradient: "from-[#4ba5ad]/20 to-[#ef7335]/20"
                         },
                         {
                             icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-                            title: currentTranslations.auth.leftSide.features[2].title,
-                            subtitle: currentTranslations.auth.leftSide.features[2].subtitle,
+                            title: t('auth.login.leftSide.features.2.title'),
+                            subtitle: t('auth.login.leftSide.features.2.subtitle'),
                             color: "#ef7335",
                             gradient: "from-[#ef7335]/20 to-[#3c959d]/20"
                         }
@@ -139,7 +139,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-emerald-400/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">{currentTranslations.auth.leftSide.security.soc2}</span>
+                        <span className="font-semibold">{t('auth.login.leftSide.security.soc2')}</span>
                     </div>
                     
                     <div className="w-px h-6 bg-slate-600"></div>
@@ -151,7 +151,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-[#3c959d]/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">{currentTranslations.auth.leftSide.security.gdpr}</span>
+                        <span className="font-semibold">{t('auth.login.leftSide.security.gdpr')}</span>
                     </div>
                 </div>
             </div>

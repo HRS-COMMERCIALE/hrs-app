@@ -20,6 +20,7 @@ interface User {
   id: number;
   email: string;
   plan: string;
+  planValidUntil: string | null;
   firstName: string;
   lastName: string;
   title: string;
@@ -33,6 +34,10 @@ interface AuthContextType {
   authState: AuthState;
   user: User | null;
   business: Business | null;
+  businessCount: number;
+  businessLimit: number;
+  canCreateBusiness: boolean;
+  isPaidPlan: boolean;
   checkAuth: () => Promise<void>;
   updateEmailVerification: (verified: boolean) => void;
 }
@@ -45,6 +50,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [user, setUser] = useState<User | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [businessCount, setBusinessCount] = useState<number>(0);
+  const [businessLimit, setBusinessLimit] = useState<number>(0);
+  const [canCreateBusiness, setCanCreateBusiness] = useState<boolean>(false);
 
   // Check authentication status
   const checkAuth = async () => {
@@ -58,16 +66,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setAuthState('authenticated');
         setUser(data.user);
         setBusiness(data.business);
+        setBusinessCount(data.businessCount ?? 0);
+        
+        // Calculate business limit and creation ability
+        const plan = data.user?.plan;
+        const count = data.businessCount ?? 0;
+        
+        let limit = 0;
+        if (plan === 'free') limit = 0;
+        else if (plan === 'Premium' || plan === 'Platinum') limit = 1;
+        else if (plan === 'Diamond') limit = 3;
+        
+        setBusinessLimit(limit);
+        setCanCreateBusiness(plan !== 'free' && plan !== 'custom' && count < limit);
       } else {
         setAuthState('notAuthenticated');
         setUser(null);
         setBusiness(null);
+        setBusinessCount(0);
+        setBusinessLimit(0);
+        setCanCreateBusiness(false);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       setAuthState('notAuthenticated');
       setUser(null);
       setBusiness(null);
+      setBusinessCount(0);
+      setBusinessLimit(0);
+      setCanCreateBusiness(false);
     }
   };
 
@@ -90,6 +117,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authState,
     user,
     business,
+    businessCount,
+    businessLimit,
+    canCreateBusiness,
+    isPaidPlan: !!user && user.plan !== 'free',
     checkAuth,
     updateEmailVerification,
   };

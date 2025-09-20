@@ -1,9 +1,9 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '../../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 
 export default function LeftSideContent() {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
 
     const [mounted, setMounted] = useState(false);
     
@@ -78,14 +78,14 @@ export default function LeftSideContent() {
                 {/* Enhanced Hero Section */}
                 <div className="text-center mb-12 max-w-xl">
                     <h1 className="text-6xl font-bold mb-8 leading-tight">
-                        <span className="block text-white drop-shadow-lg mb-2">Join Our</span>
+                        <span className="block text-white drop-shadow-lg mb-2">{t('auth.signup.leftSide.title.line1')}</span>
                         <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">
-                            HRS Platform
+                            {t('auth.signup.leftSide.title.line2')}
                         </span>
                     </h1>
                     
                     <p className="text-xl text-slate-300 leading-relaxed max-w-lg mx-auto font-light">
-                        Create your account and start managing your business with our comprehensive solutions.
+                        {t('auth.signup.leftSide.subtitle')}
                     </p>
                 </div>
 
@@ -94,22 +94,22 @@ export default function LeftSideContent() {
                     {[
                         {
                             icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
-                            title: "Secure Registration",
-                            subtitle: "Bank-level security for your data",
+                            title: t('auth.signup.leftSide.features.0.title'),
+                            subtitle: t('auth.signup.leftSide.features.0.subtitle'),
                             color: "#3c959d",
                             gradient: "from-[#3c959d]/20 to-[#4ba5ad]/20"
                         },
                         {
                             icon: "M13 10V3L4 14h7v7l9-11h-7z",
-                            title: "Quick Setup",
-                            subtitle: "Get started in minutes",
+                            title: t('auth.signup.leftSide.features.1.title'),
+                            subtitle: t('auth.signup.leftSide.features.1.subtitle'),
                             color: "#4ba5ad",
                             gradient: "from-[#4ba5ad]/20 to-[#ef7335]/20"
                         },
                         {
                             icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-                            title: "Reliable Platform",
-                            subtitle: "99.9% uptime guarantee",
+                            title: t('auth.signup.leftSide.features.2.title'),
+                            subtitle: t('auth.signup.leftSide.features.2.subtitle'),
                             color: "#ef7335",
                             gradient: "from-[#ef7335]/20 to-[#3c959d]/20"
                         }
@@ -139,7 +139,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-emerald-400/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">SOC2 Compliant</span>
+                        <span className="font-semibold">{t('auth.signup.leftSide.security.soc2')}</span>
                     </div>
                     
                     <div className="w-px h-6 bg-slate-600"></div>
@@ -151,7 +151,7 @@ export default function LeftSideContent() {
                             </svg>
                             <div className="absolute -inset-1 bg-[#3c959d]/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-semibold">GDPR Ready</span>
+                        <span className="font-semibold">{t('auth.signup.leftSide.security.gdpr')}</span>
                     </div>
                 </div>
             </div>

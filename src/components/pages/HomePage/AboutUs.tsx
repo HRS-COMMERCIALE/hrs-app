@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useI18n } from '@/i18n/hooks';
 
 const AboutUs: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const { tNested } = useI18n();
+  const language = tNested('homePage.aboutUs');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,6 +26,22 @@ const AboutUs: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  const content = {
+    badge: language('badge'),
+    title: {
+      line1: language('title.line1'),
+      line2: language('title.line2')
+    },
+    subtitle: language('subtitle'),
+    comingSoon: language('comingSoon'),
+    description: language('description'),
+    underConstruction: language('underConstruction'),
+    constructionNote: language('constructionNote'),
+    developmentProgress: language('developmentProgress'),
+    inDevelopment: language('inDevelopment'),
+    exploreNote: language('exploreNote')
+  };
+
   return (
     <section ref={sectionRef} className="py-16 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
       {/* Floating Background Elements */}
@@ -40,18 +59,18 @@ const AboutUs: React.FC = () => {
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping"></div>
             </div>
-            <span className="text-gray-700 font-semibold">About Us</span>
+            <span className="text-gray-700 font-semibold">{content.badge}</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            Get to Know
+            {content.title.line1}
             <span className="block bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] bg-clip-text text-transparent">
-              Our Company
+              {content.title.line2}
             </span>
           </h2>
           
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Discover the story behind our mission to transform business management
+            {content.subtitle}
           </p>
         </div>
 
@@ -73,17 +92,16 @@ const AboutUs: React.FC = () => {
 
                 {/* Placeholder Message */}
                 <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                  Coming Soon
+                  {content.comingSoon}
                 </h3>
                 
                 <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-                  This section is currently under development and will soon showcase our company's story, 
-                  mission, values, and the team behind our innovative business solutions.
+                  {content.description}
                 </p>
 
                 <div className="bg-gradient-to-r from-[#3c959d]/10 to-[#ef7335]/10 border border-[#3c959d]/20 rounded-xl p-6 mb-8">
                   <p className="text-sm text-gray-700 font-medium">
-                    🚧 <span className="text-[#3c959d] font-semibold">Under Construction</span> - We're working hard to bring you our company story and team information. Check back soon!
+                    🚧 <span className="text-[#3c959d] font-semibold">{content.underConstruction}</span> - {content.constructionNote}
                   </p>
                 </div>
 
@@ -92,13 +110,13 @@ const AboutUs: React.FC = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className="bg-gradient-to-r from-[#3c959d] to-[#ef7335] h-2 rounded-full w-1/3 animate-pulse"></div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">Development Progress: 33%</p>
+                  <p className="text-xs text-gray-500 mt-2">{content.developmentProgress}</p>
                 </div>
 
                 {/* Status Badge */}
                 <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-700 shadow-md border border-gray-200">
                   <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
-                  In Development
+                  {content.inDevelopment}
                 </div>
               </div>
             </div>
@@ -108,7 +126,7 @@ const AboutUs: React.FC = () => {
         {/* Additional Info */}
         <div className={`text-center mt-12 transform transition-all duration-1000 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <p className="text-gray-600 text-sm">
-            In the meantime, explore our business solutions and pricing plans above
+            {content.exploreNote}
           </p>
         </div>
       </div>

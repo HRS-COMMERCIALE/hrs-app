@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '../../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 import { apiClient } from '../../../../utils/client/client';
 import { useRouter } from 'next/navigation';
 
 export default function RightSideContent() {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
     const router = useRouter();
 
     const [formData, setFormData] = useState({

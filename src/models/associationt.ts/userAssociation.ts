@@ -5,6 +5,7 @@ import { defineUserLicenseModel } from "../user/UserLicense";
 import { defineLoginAttemptModel } from "../user/LoginAttempt";
 import { defineUserTokenModel } from "../user/UserToken";
 import { definePaymentTransactionModel } from "../user/PaymentTransaction";
+import { defineBuinessUsersModel } from "../user/BuinessUsers";
 
 export function setupUserAssociations(
   sequelize: Sequelize,
@@ -25,6 +26,7 @@ export function setupUserAssociations(
   );
   const UserToken = defineUserTokenModel(sequelize, ModelClass, DataTypesLib);
   const PaymentTransaction = definePaymentTransactionModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessUsers = defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
 
   // Associations
  
@@ -32,6 +34,10 @@ export function setupUserAssociations(
   // User has many businesses
   User.hasMany(Business, { foreignKey: "userId", as: "businesses" });
   Business.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+  // User has many BuinessUsers (membership links)
+  User.hasMany(BuinessUsers, { foreignKey: "userId", as: "businessLinks" });
+  BuinessUsers.belongsTo(User, { foreignKey: "userId", as: "user" });
 
   User.hasMany(UserLicense, { foreignKey: "userId", as: "licenses" });
   UserLicense.belongsTo(User, { foreignKey: "userId", as: "user" });
@@ -45,5 +51,5 @@ export function setupUserAssociations(
   User.hasMany(PaymentTransaction, { foreignKey: "userId", as: "paymentTransactions" });
   PaymentTransaction.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-  return { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction };
+  return { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction, BuinessUsers };
 }

@@ -1,42 +1,41 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLanguageStore } from '../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 
 const HeroSection = () => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
 
-  // Centralized content object for easy text management
-  const { currentTranslations } = useLanguageStore();
-  const language = currentTranslations.homePage.heroSection;
+  const { tNested } = useI18n();
+  const language = tNested('homePage.heroSection');
   const content = {
     statusBadge: {
-      text: language.statusBadge.text
+      text: language('statusBadge.text')
     },
     hero: {
       title: {
-        line1: language.hero.title.line1,
-        line2: language.hero.title.line2
+        line1: language('hero.title.line1'),
+        line2: language('hero.title.line2')
       },
       description: {
-        main: language.hero.description.main,
-        highlight: language.hero.description.highlight,
-        ending: language.hero.description.ending
+        main: language('hero.description.main'),
+        highlight: language('hero.description.highlight'),
+        ending: language('hero.description.ending')
       }
     },
     cta: {
       primaryButton: {
-        text: language.cta.primaryButton.text
+        text: language('cta.primaryButton.text')
       },
       secondaryButton: {
-        text: language.cta.secondaryButton.text
+        text: language('cta.secondaryButton.text')
       }
     },
     trustIndicators: {
-      setup: language.trustIndicators.setup,
-      cancel: language.trustIndicators.cancel,
-      security: language.trustIndicators.security
+      setup: language('trustIndicators.setup'),
+      cancel: language('trustIndicators.cancel'),
+      security: language('trustIndicators.security')
     }
   };
 

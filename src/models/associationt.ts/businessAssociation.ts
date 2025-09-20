@@ -8,6 +8,7 @@ import { defineClientsModel } from "../user/Clients";
 import { defineArticleModel } from "../user/article";
 import { defineFamilyModel } from "../user/family";
 import { defineOrderModel } from "../user/order";
+import { defineBuinessUsersModel } from "../user/BuinessUsers";
 
 export function setupBusinessAssociations(
   sequelize: Sequelize,
@@ -23,6 +24,7 @@ export function setupBusinessAssociations(
   const Article = defineArticleModel(sequelize, ModelClass, DataTypesLib);
   const Family = defineFamilyModel(sequelize, ModelClass, DataTypesLib);
   const Order = defineOrderModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessUsers = defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
 
   // Business has many addresses
   Business.hasMany(Address, { foreignKey: "businessId", as: "addresses" });
@@ -73,9 +75,13 @@ export function setupBusinessAssociations(
   Business.hasMany(Order, { foreignKey: "businessId", as: "orders" });
   Order.belongsTo(Business, { foreignKey: "businessId", as: "business" });
 
+  // Business has many BuinessUsers (membership links)
+  Business.hasMany(BuinessUsers, { foreignKey: "businessId", as: "members" });
+  BuinessUsers.belongsTo(Business, { foreignKey: "businessId", as: "business" });
+
   // Article has many orders
   Article.hasMany(Order, { foreignKey: "articleId", as: "orders" });
   Order.belongsTo(Article, { foreignKey: "articleId", as: "article" });
 
-  return { Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order };
+  return { Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, BuinessUsers };
 }

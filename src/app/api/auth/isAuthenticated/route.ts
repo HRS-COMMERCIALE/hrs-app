@@ -37,6 +37,11 @@ export async function GET(request: NextRequest) {
             code: 'USER_NOT_FOUND'
           }, { status: 401 });
         }
+        
+        // Get user's business count from the user record (more reliable)
+        const businessCount = (user.get("buinessCount") as number) || 0;
+        
+        // Get the first business for display purposes
         const business = await Business().findOne({
           where: { userId: user.get("id") }
         });
@@ -56,6 +61,7 @@ export async function GET(request: NextRequest) {
             mobile: user.get("mobile") as string,
             emailVerified: user.get("emailVerified") as boolean,
           },
+          businessCount,
           business: business ? {
             id: business.get("id") as number,
             businessName: business.get("businessName") as string,
@@ -85,6 +91,10 @@ export async function GET(request: NextRequest) {
           }, { status: 401 });
         }
 
+        // Get user's business count from the user record (more reliable)
+        const businessCount = (user.get("buinessCount") as number) || 0;
+        
+        // Get the first business for display purposes
         const business = await Business().findOne({
           where: { userId: user.get("id") }
         });
@@ -103,6 +113,7 @@ export async function GET(request: NextRequest) {
             id: user.get("id") as number,
             email: user.get("email") as string,
             plan: user.get("plan") as string,
+            planValidUntil: user.get("planValidUntil") as string | null,
             firstName: user.get("firstName") as string,
             lastName: user.get("lastName") as string,
             title: user.get("title") as string,
@@ -110,6 +121,7 @@ export async function GET(request: NextRequest) {
             mobile: user.get("mobile") as string,
             emailVerified: user.get("emailVerified") as boolean,
           },
+          businessCount,
           business: business ? {
             id: business.get("id") as number,
             businessName: business.get("businessName") as string,

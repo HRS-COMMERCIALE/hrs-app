@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useLanguageStore } from '../../../store/languageStore';
-import { useLanguageUtils } from '../../../utils/language/languageUtils';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '../../../store/authProvider';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback } from '../../../components/ui/avatar';
@@ -26,22 +25,23 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
-  // Use the language utility hook
-  const { changeLanguage, currentLanguageCode, currentTranslations } = useLanguageUtils();
+  const t = useTranslations();
+  const locale = useLocale();
+  const pathname = usePathname();
   
   // Use auth hook to check authentication status
   const { authState, user } = useAuth();
 
   // Navigation items - easy to modify here
   const navigationItems = [
-    { id: 'home', label: currentTranslations?.homePage?.navbar?.home || 'Home', href: '/' },
-    { id: 'business-plans', label: 'Business Plans', href: '/businessPlans' },
-    { id: 'about', label: currentTranslations?.homePage?.navbar?.about || 'About', href: '#about' },
-    { id: 'contact', label: currentTranslations?.homePage?.navbar?.contactUs || 'Contact Us', href: '/contactUs' }
+    { id: 'home', label: t('homePage.navbar.home'), href: '/' },
+      { id: 'business-plans', label: t('homePage.navbar.businessPlans'), href: '/businessPlans' },
+    { id: 'about', label: t('homePage.navbar.about'), href: '#about' },
+    { id: 'contact', label: t('homePage.navbar.contactUs'), href: '/contactUs' }
   ];
 
   useEffect(() => {
-  }, [currentTranslations]);
+  }, [locale]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +60,11 @@ export default function Header() {
   ];
 
   const handleLanguageChange = (langCode: string) => {
-    changeLanguage(langCode as any);
+    // Strip current locale prefix from the path and navigate to the same route under new locale
+    const pathWithoutLocale = pathname?.replace(new RegExp(`^/(en|fr|ar)(?=/|$)`), '') || '/';
+    const nextPath = `/${langCode}${pathWithoutLocale || '/'}`;
+    router.push(nextPath);
+    router.refresh();
     setLanguageOpen(false);
   };
 
@@ -103,27 +107,63 @@ export default function Header() {
           className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           size="sm"
         >
-          {currentTranslations?.homePage?.navbar?.dashboard || 'Dashboard'}
+          {t('homePage.navbar.dashboard')}
         </Button>
       );
     }
 
-    // Not authenticated - show login and signup buttons
+    // Not authenticated - show language selector and login/signup buttons
     return (
       <div className="flex items-center space-x-3">
+        {/* Language Selector for non-authenticated users */}
+        <DropdownMenu open={languageOpen} onOpenChange={setLanguageOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="flex items-center space-x-2 text-slate-200 hover:text-[#3c959d] hover:bg-slate-800/30 p-2"
+              size="sm"
+            >
+              <Globe className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {languages.find(lang => lang.code === locale)?.flag}
+              </span>
+              <ChevronDown className="w-3 h-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="bg-gradient-to-br from-[#1a2a4a]/95 to-[#2d7a82]/95 border-[#3c959d]/30 backdrop-blur-xl min-w-[150px]"
+          >
+            <DropdownMenuLabel className="text-slate-400 text-xs font-medium">{t('header.menu.languageLabel')}</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-slate-700/50" />
+            {languages.map((language) => (
+              <DropdownMenuItem
+                key={language.code}
+                onClick={() => handleLanguageChange(language.code)}
+                className={`flex items-center space-x-3 cursor-pointer ${
+                  locale === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
+                } ${language.code === 'ar' ? 'text-right' : ''}`}
+              >
+                <span className="text-base">{language.flag}</span>
+                <span className="font-medium text-sm">{language.name}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <Button 
           onClick={() => router.push('/login')}
           className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-[#3c959d] hover:to-[#4ba5ad] text-slate-100 hover:text-white font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-slate-500/30 hover:border-[#3c959d]/50"
           size="sm"
         >
-          {currentTranslations?.homePage?.navbar?.login || 'Login'}
+          {t('homePage.navbar.login')}
         </Button>
         <Button 
           onClick={() => router.push('/register')}
           className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           size="sm"
         >
-          {currentTranslations?.homePage?.navbar?.signUp || 'Sign Up'}
+          {t('homePage.navbar.signUp')}
         </Button>
       </div>
     );
@@ -144,7 +184,7 @@ export default function Header() {
           className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           size="lg"
         >
-          {currentTranslations?.homePage?.navbar?.dashboard || 'Dashboard'}
+          {t('homePage.navbar.dashboard')}
         </Button>
       );
     }
@@ -157,14 +197,14 @@ export default function Header() {
           className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-[#3c959d] hover:to-[#4ba5ad] text-slate-100 hover:text-white font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-slate-500/30 hover:border-[#3c959d]/50"
           size="lg"
         >
-          {currentTranslations?.homePage?.navbar?.login || 'Login'}
+          {t('homePage.navbar.login')}
         </Button>
         <Button 
           onClick={() => router.push('/register')}
           className="w-full bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] hover:from-[#2d7a82] hover:via-[#3c959d] hover:to-[#e05a2b] text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           size="lg"
         >
-          {currentTranslations?.homePage?.navbar?.signUp || 'Sign Up'}
+          {t('homePage.navbar.signUp')}
         </Button>
       </div>
     );
@@ -177,7 +217,12 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16 lg:h-20">
           {/* Logo Section - Left */}
-          <div className="flex-shrink-0 group cursor-pointer">
+          <button
+            type="button"
+            onClick={() => router.push(`/${locale}`)}
+            className="flex-shrink-0 group cursor-pointer"
+            aria-label="Go to home"
+          >
             <div className="relative">
               <img 
                 src="/logo.png" 
@@ -186,7 +231,7 @@ export default function Header() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[#3c959d]/20 via-transparent to-[#ef7335]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
             </div>
-          </div>
+          </button>
           
           {/* Desktop Navigation - Absolutely Centered - Show for all users */}
           <nav className="hidden lg:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
@@ -258,7 +303,7 @@ export default function Header() {
                     className="text-slate-200 hover:text-[#3c959d] hover:bg-slate-800/30 cursor-pointer"
                   >
                     <User className="w-4 h-4 mr-3" />
-                    Dashboard
+                    {t('header.menu.dashboard')}
                   </DropdownMenuItem>
                   
                   {/* Current Plan Display */}
@@ -285,19 +330,19 @@ export default function Header() {
                     className="text-slate-200 hover:text-[#3c959d] hover:bg-slate-800/30 cursor-pointer"
                   >
                     <Settings className="w-4 h-4 mr-3" />
-                    Settings
+                    {t('header.menu.settings')}
                   </DropdownMenuItem>
                   
                   <DropdownMenuSeparator className="bg-slate-700/50" />
                   
                   {/* Language Selector */}
-                  <DropdownMenuLabel className="text-slate-400 text-xs font-medium">Language</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-slate-400 text-xs font-medium">{t('header.menu.languageLabel')}</DropdownMenuLabel>
                   {languages.map((language) => (
                     <DropdownMenuItem
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
                       className={`flex items-center space-x-3 cursor-pointer ${
-                        currentLanguageCode === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
+                        locale === language.code ? 'text-[#3c959d] bg-[#3c959d]/10' : 'text-slate-200'
                       } ${language.code === 'ar' ? 'text-right' : ''}`}
                     >
                       <span className="text-base">{language.flag}</span>
@@ -313,7 +358,7 @@ export default function Header() {
                     className="text-red-400 hover:text-red-300 hover:bg-red-900/20 cursor-pointer"
                   >
                     <LogOut className="w-4 h-4 mr-3" />
-                    Logout
+                    {t('header.menu.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -398,7 +443,7 @@ export default function Header() {
                   size="lg"
                 >
                   <User className="w-5 h-5 mr-3" />
-                  Dashboard
+                  {t('header.menu.dashboard')}
                 </Button>
               )}
 
@@ -413,7 +458,7 @@ export default function Header() {
                 size="lg"
               >
                 <Settings className="w-5 h-5 mr-3" />
-                Settings
+                {t('header.menu.settings')}
               </Button>
 
               {/* Navigation items for all users */}
@@ -431,15 +476,15 @@ export default function Header() {
               {/* Mobile Language Selector */}
               <div className="pt-4">
                 <Separator className="bg-slate-700/50 mb-4" />
-                <div className="text-slate-400 text-sm mb-3 px-3 font-medium">Language</div>
+                <div className="text-slate-400 text-sm mb-3 px-3 font-medium">{t('header.menu.languageLabel')}</div>
                 <div className="space-y-2">
                   {languages.map((language) => (
                     <Button
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
-                      variant={currentLanguageCode === language.code ? "default" : "ghost"}
+                      variant={locale === language.code ? "default" : "ghost"}
                       className={`w-full justify-start ${
-                        currentLanguageCode === language.code 
+                        locale === language.code 
                           ? 'text-[#3c959d] bg-[#3c959d]/10 border border-[#3c959d]/30' 
                           : 'text-slate-200 hover:bg-slate-800/30'
                       }`}

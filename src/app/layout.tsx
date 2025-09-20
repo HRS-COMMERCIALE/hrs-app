@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LanguageSelector from "@/components/LanguageSelector/LanguageSelector";
 import { AuthProvider } from '@/store/authProvider';
 import { ToastProvider } from '@/components/ui/alerts';
 import { VerificationBanner } from '@/components/shared';
 import QueryProvider from '@/components/providers/QueryProvider';
+ 
 
 
 const geistSans = Geist({
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: "Your app description here.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -36,7 +36,6 @@ export default function RootLayout({
         <AuthProvider>
           <QueryProvider>
             <ToastProvider>
-              <LanguageSelector />
               {children}
               <VerificationBanner />
             </ToastProvider>

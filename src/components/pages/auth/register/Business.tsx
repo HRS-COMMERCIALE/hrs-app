@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback, memo } from 'react';
 import { Building2, Globe, Hash, Users, Upload, Gift } from 'lucide-react';
+import { useI18n } from '@/i18n/hooks';
 
 const INDUSTRY_OPTIONS: string[] = [
     'Software',
@@ -27,14 +28,14 @@ const INDUSTRY_OPTIONS: string[] = [
 ];
 
 // Stable, top-level components to avoid remounts that cause input focus loss
-    const InputField = memo(({ icon: Icon, label, id, name, type = "text", required = false, placeholder, value, onChange, children, autoComplete }: any) => (
+    const InputField = memo(({ icon: Icon, label, id, name, type = "text", required = false, placeholder, value, onChange, children, autoComplete, t }: any) => (
         <div className="space-y-1.5">
             <label htmlFor={id} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <Icon className="w-4 h-4 text-[#3c959d]" />
                 {label}
                 {required && (
                     <span className="ml-2 inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 border border-red-200">
-                        Required
+{t('auth.register.business.required')}
                     </span>
                 )}
             </label>
@@ -81,6 +82,7 @@ type BusinessFormProps = {
 };
 
 export default function BusinessForm({ initialValues, onSubmit, onChange }: BusinessFormProps) {
+    const { t } = useI18n();
     const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
     const [formData, setFormData] = useState<BusinessData>({
         businessName: initialValues?.businessName ?? '',
@@ -278,40 +280,41 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
                             <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
                                 <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                                     <Building2 className="w-5 h-5 text-[#3c959d]" />
-                                    Company Details
+                                    {t('auth.register.business.title')}
                                 </h2>
                                 
                                 <div className="space-y-5">
                                     <InputField
                                         icon={Building2}
-                                        label="Company Name"
+                                        label={t('auth.register.business.businessName')}
                                         id="businessName"
                                         name="businessName"
                                         required
-                                        placeholder="Enter your company name"
+                                        placeholder={t('auth.register.business.businessNamePlaceholder')}
                                         value={formData.businessName}
                                         onChange={handleChange}
                                         autoComplete="organization"
+                                        t={t}
                                     />
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <InputField
                                             icon={Hash}
-                                            label="Registration Number"
+                                            label={t('auth.register.business.registrationNumber')}
                                             id="registrationNumber"
                                             name="registrationNumber"
-                                            placeholder="TN-123456"
+                                            placeholder={t('auth.register.business.registrationNumberPlaceholder')}
                                             value={formData.registrationNumber ?? ''}
                                             onChange={handleChange}
                                             autoComplete="off"
                                         />
                                         <InputField
                                             icon={Hash}
-                                            label="Tax ID"
+                                            label={t('auth.register.business.taxId')}
                                             id="taxId"
                                             name="taxId"
                                             required
-                                            placeholder="1234567/A/M/000"
+                                            placeholder={t('auth.register.business.taxIdPlaceholder')}
                                             value={formData.taxId}
                                             onChange={handleChange}
                                             autoComplete="off"
@@ -319,11 +322,11 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
                                         
                                         <InputField
                                             icon={Hash}
-                                            label="CNSS Code"
+                                            label={t('auth.register.business.cnssCode')}
                                             id="cnssCode"
                                             name="cnssCode"
                                             required
-                                            placeholder="000000-00"
+                                            placeholder={t('auth.register.business.cnssCodePlaceholder')}
                                             value={formData.cnssCode}
                                             onChange={handleChange}
                                             autoComplete="off"
@@ -332,11 +335,11 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
 
                                     <InputField
                                         icon={Building2}
-                                        label="Industry Sector"
+                                        label={t('auth.register.business.industry')}
                                         id="industry"
                                         name="industry"
                                         required
-                                        placeholder="Software, Retail, Manufacturing, etc."
+                                        placeholder={t('auth.register.business.industryPlaceholder')}
                                         value={formData.industry}
                                         onChange={handleChange}
                                     >
@@ -353,7 +356,7 @@ export default function BusinessForm({ initialValues, onSubmit, onChange }: Busi
                                                 }}
                                             >
                                                 <span className={formData.industry ? 'text-slate-900' : 'text-slate-400'}>
-                                                    {formData.industry || 'Software, Retail, Manufacturing, etc.'}
+                                                    {formData.industry || t('auth.register.business.industryPlaceholder')}
                                                 </span>
                                                 <svg className={`h-4 w-4 ml-3 transition-transform ${isIndustryOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
                                                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.084l3.71-3.853a.75.75 0 111.08 1.04l-4.24 4.4a.75.75 0 01-1.08 0l-4.24-4.4a.75.75 0 01.02-1.06z" clipRule="evenodd" />

@@ -2,25 +2,27 @@ import { NextRequest } from "next/server";
 import { registerSchema } from "@/validations/auth/register";
 import { RegisterUser } from "@/services/auth/register/RegisterUser";
 import { ApiResponseHandler } from "@/utils/help/apiResponses";
-import { generateAccessToken, generateRefreshToken } from "@/utils/jwt/jwtUtils";
+import { requireAuth } from "@/app/api/_lib/auth";
+import { User } from "@/models/associationt.ts/association";
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication via cookies
+    const authPayload = await requireAuth(request);
+    if (authPayload instanceof Response) return authPayload;
+
+    // Reject overly large requests early (basic guard, complement with server limits)
+    const contentLength = request.headers.get('content-length');
+    const maxBytes = 10 * 1024 * 1024; // 10MB
+    if (contentLength && Number(contentLength) > maxBytes) {
+      return ApiResponseHandler.badRequest('Request body too large', 'payload_too_large');
+    }
+
     // Handle FormData instead of JSON
     const formData = await request.formData();
     
     // Convert FormData to structured object
     const body: any = {};
-    
-    // Process user data
-    const userData: any = {};
-    for (const [key, value] of formData.entries()) {
-      if (key.startsWith('user[') && key.endsWith(']')) {
-        const fieldName = key.slice(5, -1); // Remove 'user[' and ']' (5 chars)
-        userData[fieldName] = value;
-      }
-    }
-    body.user = userData;
     
     // Process business data
     const businessData: any = {};
@@ -42,17 +44,6 @@ export async function POST(request: NextRequest) {
     }
     body.address = addressData;
     
-    // Process subscription data
-    const subscriptionData: any = {};
-    for (const [key, value] of formData.entries()) {
-      if (key.startsWith('subscription[') && key.endsWith(']')) {
-        const fieldName = key.slice(13, -1); // Remove 'subscription[' and ']' (13 chars)
-        subscriptionData[fieldName] = value;
-      }
-    }
-    body.subscription = subscriptionData;
-
-    // Log the parsed data for debugging
 
     // Validate payload using Zod schema
     const validationResult = registerSchema.safeParse(body);
@@ -66,45 +57,20 @@ export async function POST(request: NextRequest) {
 
     const payload = validationResult.data;
 
-    // Create user
-    const result = await RegisterUser(payload);
+    // Fetch current plan from DB to avoid trusting stale token claims
+    const dbUser = await User().findByPk(authPayload.userId, { attributes: ['id', 'plan'] });
+    if (!dbUser) {
+      return ApiResponseHandler.badRequest('User not found', 'user_not_found');
+    }
 
-    // Generate tokens
-    const accessToken = generateAccessToken({
-      userId: result.newUser.get('id') as number,
-      email: result.newUser.get('email') as string,
-      plan: result.newUser.get('plan') as string,
-    });
+    // Create business and address for the authenticated user with plan enforcement
+    await RegisterUser(payload, authPayload.userId, dbUser.get('plan') as string);
 
-    const refreshToken = generateRefreshToken({
-      userId: result.newUser.get('id') as number
-    });
-
-    // Build response and set cookies
-    const response = ApiResponseHandler.created(
+    // Return success without generating tokens or setting cookies
+    return ApiResponseHandler.created(
       {},
-      "User registered successfully with manager role, business, and address"
+      "Business registered successfully"
     );
-
-    const isProd = process.env.NODE_ENV === 'production';
-
-    response.cookies.set('accessToken', accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 24 * 60 * 60, // 1 day in seconds
-    });
-
-    response.cookies.set('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
-    });
-
-    return response;
 
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -112,24 +78,29 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof Error) {
       // Handle specific error types
-      if (error.message.includes("Password is too weak")) {
+
+      if (error.message.includes("PLAN_FORBIDDEN")) {
+        return ApiResponseHandler.error(
+          error.message.split(':').slice(1).join(':').trim() || "Your plan does not allow creating a business",
+          "plan_forbidden",
+          undefined,
+          403
+        );
+      }
+
+      if (error.message.includes("PLAN_NOT_SUPPORTED")) {
         return ApiResponseHandler.badRequest(
-          "Password validation failed",
-          "password_strength"
+          "Cannot create business for custom plan for now",
+          "plan_not_supported"
         );
       }
 
-      if (error.message.includes("Email already exists")) {
-        return ApiResponseHandler.conflict(
-          "Email already exists",
-          "email_exists"
-        );
-      }
-
-      if (error.message.includes("Mobile number already exists")) {
-        return ApiResponseHandler.conflict(
-          "Mobile number already exists",
-          "mobile_exists"
+      if (error.message.includes("BUSINESS_LIMIT_REACHED")) {
+        return ApiResponseHandler.error(
+          "You have reached the business limit for your plan",
+          "business_limit_reached",
+          undefined,
+          403
         );
       }
 

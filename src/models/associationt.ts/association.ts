@@ -30,12 +30,14 @@ export const Clients = () => initializeModels().Clients;
 export const Article = () => initializeModels().Article;
 export const Family = () => initializeModels().Family;
 export const Order = () => initializeModels().Order;
+export const BuinessUsers = () => initializeModels().BuinessUsers;
 
 // Export array of all models for sync operations (ordered by dependencies)
 // Parent tables first, then child tables
 export const models = () => [
   User(),
   Business(),
+  BuinessUsers(),
   CodesPostaux(),
   Supplier(),
   Clients(),
@@ -54,6 +56,7 @@ export const models = () => [
 export const modelNames = [
   'users',
   'businesses',
+  'business_users',
   'codes_postaux',
   'suppliers',
   'clients',

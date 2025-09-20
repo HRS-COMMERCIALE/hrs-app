@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../store/authProvider';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -82,16 +83,7 @@ function PaymentSuccessContent() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#3c959d] via-[#4ba5ad] to-[#ef7335]">
-        <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3c959d]"></div>
-            <span className="text-lg font-medium text-slate-700">Verifying your payment...</span>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner appName="HRS App" message="Verifying your payment..." />;
   }
 
   if (error) {

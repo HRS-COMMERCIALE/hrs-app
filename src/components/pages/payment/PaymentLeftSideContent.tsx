@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '../../../store/languageStore';
+import { useI18n } from '../../../i18n/hooks';
 
 interface PaymentLeftSideContentProps {
     planName: string;
@@ -9,7 +9,7 @@ interface PaymentLeftSideContentProps {
 }
 
 export default function PaymentLeftSideContent({ planName, planPrice, planCurrency }: PaymentLeftSideContentProps) {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -203,7 +203,7 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
                 {/* Top Section - Plan Name and Price */}
                 <div className="text-center">
                     <h1 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                        Subscribe to {planName}
+                        {t('payment.subscribeTo')} {planName}
                     </h1>
                     
                     <div className="flex items-baseline justify-center mb-2">
@@ -214,7 +214,7 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
                             {planCurrency}
                         </span>
                     </div>
-                    <p className="text-slate-400 text-sm">per month</p>
+                    <p className="text-slate-400 text-sm">{t('payment.perMonth')}</p>
                 </div>
 
                 {/* Middle Section - Design Elements */}
@@ -241,12 +241,12 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
 
                             {/* Description */}
                             <p className="text-slate-300 text-sm mb-3 leading-relaxed">
-                                {planName} includes unlimited business management, advanced CRM features, priority support, secure cloud storage, and mobile app access for your growing business needs.
+                                {planName} {t('payment.planDescription')}
                             </p>
 
                             {/* Billing Cycle */}
                             <div className="flex items-center justify-between">
-                                <span className="text-slate-400 text-xs">Billed every month</span>
+                                <span className="text-slate-400 text-xs">{t('payment.billedEveryMonth')}</span>
                                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -259,14 +259,14 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
                         <div className="space-y-3">
                             {/* Subtotal */}
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-300 text-sm">Subtotal</span>
+                                <span className="text-slate-300 text-sm">{t('payment.subtotal')}</span>
                                 <span className="text-white font-medium">{planPrice} {planCurrency}</span>
                             </div>
 
                             {/* Tax */}
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-slate-300 text-sm">Tax</span>
+                                    <span className="text-slate-300 text-sm">{t('payment.tax')}</span>
                                     <div className="w-3 h-3 bg-slate-500 rounded-full flex items-center justify-center">
                                         <span className="text-xs text-white">i</span>
                                     </div>
@@ -279,7 +279,7 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
 
                             {/* Total */}
                             <div className="flex justify-between items-center">
-                                <span className="text-white font-bold">Total due today</span>
+                                <span className="text-white font-bold">{t('payment.totalDueToday')}</span>
                                 <span className="text-white font-bold text-lg">{planPrice} {planCurrency}</span>
                             </div>
                         </div>
@@ -295,7 +295,7 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
                             </svg>
                             <div className="absolute -inset-1 bg-emerald-400/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-medium">SSL Secured</span>
+                        <span className="font-medium">{t('payment.sslSecured')}</span>
                     </div>
                     
                     <div className="hidden sm:block w-px h-4 bg-slate-600"></div>
@@ -307,7 +307,7 @@ export default function PaymentLeftSideContent({ planName, planPrice, planCurren
                             </svg>
                             <div className="absolute -inset-1 bg-[#3c959d]/20 rounded-full blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
                         </div>
-                        <span className="font-medium">PCI Compliant</span>
+                        <span className="font-medium">{t('payment.pciCompliant')}</span>
                     </div>
                 </div>
             </div>

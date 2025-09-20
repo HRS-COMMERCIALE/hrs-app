@@ -1,42 +1,42 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-import { useLanguageStore } from '../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
+import { useTranslations } from 'next-intl';
 const BusinessSolutions = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
-  const { currentTranslations } = useLanguageStore();
-  const language = currentTranslations.homePage.BusinessSolutions;
+  const t = useTranslations('homePage.BusinessSolutions');
 
   // Content object with all text
   const content = {
-    badge: language.badge,
-    title1: language.title1,
-    title2: language.title2,
-    description: language.description,
-    descriptionHighlight: language.descriptionHighlight,
-    salesTitle: language.salesTitle,
-    salesSubtitle: language.salesSubtitle,
-    salesDescription: language.salesDescription,
-    salesFeatures: language.salesFeatures,
-    inventoryTitle: language.inventoryTitle,
-    inventorySubtitle: language.inventorySubtitle,
-    inventoryDescription: language.inventoryDescription,
-    inventoryFeatures: language.inventoryFeatures,
-    financialTitle: language.financialTitle,
-    financialSubtitle: language.financialSubtitle,
-    financialDescription: language.financialDescription,
-    financialFeatures: language.financialFeatures,
-    customerTitle: language.customerTitle,
-    customerSubtitle: language.customerSubtitle,
-    customerDescription: language.customerDescription,
-    customerFeatures: language.customerFeatures,
-    featuresTitle: language.featuresTitle,
-    learnMore: language.learnMore,
-    ctaTitle: language.ctaTitle,
-    ctaDescription: language.ctaDescription,
-    startFreeTrial: language.startFreeTrial,
-    watchDemo: language.watchDemo
+    badge: t('badge'),
+    title1: t('title1'),
+    title2: t('title2'),
+    description: t('description'),
+    descriptionHighlight: t('descriptionHighlight'),
+    salesTitle: t('salesTitle'),
+    salesSubtitle: t('salesSubtitle'),
+    salesDescription: t('salesDescription'),
+    salesFeatures: t('salesFeatures'),
+    inventoryTitle: t('inventoryTitle'),
+    inventorySubtitle: t('inventorySubtitle'),
+    inventoryDescription: t('inventoryDescription'),
+    inventoryFeatures: t('inventoryFeatures'),
+    analyticsTitle: t('analyticsTitle'),
+    analyticsSubtitle: t('analyticsSubtitle'),
+    analyticsDescription: t('analyticsDescription'),
+    analyticsFeatures: t('analyticsFeatures'),
+    clientsTitle: t('clientsTitle'),
+    clientsSubtitle: t('clientsSubtitle'),
+    clientsDescription: t('clientsDescription'),
+    clientsFeatures: t('clientsFeatures'),
+    featuresTitle: t('featuresTitle'),
+    learnMore: t('learnMore'),
+    ctaTitle: t('ctaTitle'),
+    ctaDescription: t('ctaDescription'),
+    startFreeTrial: t('startFreeTrial'),
+    watchDemo: t('watchDemo')
   };
 
   useEffect(() => {
@@ -106,38 +106,38 @@ const BusinessSolutions = () => {
       )
     },
     {
-      title: content.financialTitle,
-      subtitle: content.financialSubtitle,
-      description: content.financialDescription,
-      features: content.financialFeatures,
+      title: content.analyticsTitle,
+      subtitle: content.analyticsSubtitle,
+      description: content.analyticsDescription,
+      features: content.analyticsFeatures,
       icon: (
         <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
           <defs>
-            <linearGradient id="financialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="analyticsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#3c959d" />
               <stop offset="50%" stopColor="#4ba5ad" />
               <stop offset="100%" stopColor="#ef7335" />
             </linearGradient>
           </defs>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke="url(#financialGradient)" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke="url(#analyticsGradient)" />
         </svg>
       )
     },
     {
-      title: content.customerTitle,
-      subtitle: content.customerSubtitle,
-      description: content.customerDescription,
-      features: content.customerFeatures,
+      title: content.clientsTitle,
+      subtitle: content.clientsSubtitle,
+      description: content.clientsDescription,
+      features: content.clientsFeatures,
       icon: (
         <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24">
           <defs>
-            <linearGradient id="customerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="clientsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#3c959d" />
               <stop offset="50%" stopColor="#4ba5ad" />
               <stop offset="100%" stopColor="#ef7335" />
             </linearGradient>
           </defs>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke="url(#customerGradient)" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 009.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke="url(#clientsGradient)" />
         </svg>
       )
     }
@@ -253,12 +253,17 @@ const BusinessSolutions = () => {
                 <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-slate-700/30">
                   <h4 className="text-xl font-bold text-white mb-6">{content.featuresTitle}</h4>
                   <ul className="space-y-4">
-                    {solutions[activeTab].features.map((feature, index) => (
+                    {Array.isArray(solutions[activeTab].features) ? solutions[activeTab].features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center gap-3 text-slate-300">
                         <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#3c959d] to-[#4ba5ad] flex-shrink-0"></div>
                         <span className="font-medium">{feature}</span>
                       </li>
-                    ))}
+                    )) : (
+                      <li className="flex items-center gap-3 text-slate-300">
+                        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#3c959d] to-[#4ba5ad] flex-shrink-0"></div>
+                        <span className="font-medium">{solutions[activeTab].features}</span>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>

@@ -4,23 +4,15 @@ import { useState, useTransition, useRef, useCallback, useEffect } from 'react';
 import AddressForm, { AddressData } from './Address';
 import BusinessForm, { BusinessData } from './Business';
 import OrderForm, { OrderData } from './Order';
-import SubscriptionForm, { SubscriptionData } from './Subscription';
-import UserForm, { UserData } from './User';
-import { Building2, MapPin, User as UserIcon, CreditCard, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Building2, MapPin, ShoppingCart, AlertCircle } from 'lucide-react';
 
 type CollectedData = {
-    user?: Partial<UserData>;
     business?: Partial<BusinessData>;
     address?: Partial<AddressData>;
-    subscription?: SubscriptionData;
     order?: OrderData;
 };
 
-const plans: Array<{ id: string; name: string; price?: string }> = [
-    { id: 'plan-0', name: 'Basic Plan', price: 'TND 59.99' },
-    { id: 'plan-1', name: 'Pro Plan', price: 'TND 129.00' },
-    { id: 'plan-2', name: 'Enterprise Plan', price: 'TND 270.00' }
-];
+// Plan selection removed
 
 export default function RegisterContainer() {
     const [step, setStep] = useState(0);
@@ -42,14 +34,11 @@ export default function RegisterContainer() {
         }
     }, []);
 
-    const totalSteps = 5;
-    const isSubscriptionStep = step === 0;
-    const isBusinessStep = step === 1;
-    const isAddressStep = step === 2;
-    const isUserStep = step === 3;
-    const isOrderStep = step === 4;
-    const isWideStep = isSubscriptionStep || isBusinessStep || isAddressStep || isUserStep || isOrderStep;
-    const canProceedFromSubscription = !isSubscriptionStep || Boolean(data.subscription?.selectedPlanId);
+    const totalSteps = 3;
+    const isBusinessStep = step === 0;
+    const isAddressStep = step === 1;
+    const isOrderStep = step === 2;
+    const isWideStep = isBusinessStep || isAddressStep || isOrderStep;
     const canProceedFromBusiness = !isBusinessStep || Boolean(
         (data.business?.businessName || '').toString().trim() &&
         (data.business?.taxId || '').toString().trim() &&
@@ -60,10 +49,8 @@ export default function RegisterContainer() {
     );
     const progressPercent = Math.round(((step + 1) / totalSteps) * 100);
     const stepMeta = [
-        { label: 'Subscription', icon: CreditCard },
         { label: 'Business', icon: Building2 },
         { label: 'Address', icon: MapPin },
-        { label: 'User', icon: UserIcon },
         { label: 'Order', icon: ShoppingCart },
     ] as const;
 
@@ -97,14 +84,10 @@ export default function RegisterContainer() {
                 setValidationError(e.detail.message);
                 // Automatically go back to the relevant step based on the error
                 const field = e.detail.field;
-                if (field?.startsWith('user.')) {
-                    setStep(3); // User step
-                } else if (field?.startsWith('business.')) {
-                    setStep(1); // Business step
+                if (field?.startsWith('business.')) {
+                    setStep(0); // Business step
                 } else if (field?.startsWith('address.')) {
-                    setStep(2); // Address step
-                } else if (field?.startsWith('subscription.')) {
-                    setStep(0); // Subscription step
+                    setStep(1); // Address step
                 }
             }
         };
@@ -112,14 +95,6 @@ export default function RegisterContainer() {
         return () => window.removeEventListener('validation-error', handler as any);
     }, []);
 
-    const handleUser = (payload: UserData) => {
-        setData(prev => {
-            const next = { ...prev, user: payload };
-            logCollectedData(next);
-            return next;
-        });
-        goNext();
-    };
     const handleBusiness = (payload: BusinessData) => {
         setData(prev => ({ ...prev, business: payload }));
         goNext();
@@ -132,17 +107,11 @@ export default function RegisterContainer() {
         });
         goNext();
     };
-    const handleSubscription = (payload: SubscriptionData) => {
-        setData(prev => {
-            const next = { ...prev, subscription: payload };
-            logCollectedData(next);
-            return next;
-        });
-        goNext();
-    };
     const handleOrder = (payload: OrderData) => {
         const finalPayload = { ...data, order: payload } as Required<CollectedData>;
         
+        // Submit the business and address data to the API
+        // The Order form will handle the actual submission
     };
 
     // Handle business form changes including logo file
@@ -214,26 +183,13 @@ export default function RegisterContainer() {
 
                 <div className="p-6 md:p-8">
                     {step === 0 && (
-                        <SubscriptionForm
-                            initialValues={data.subscription}
-                            onSubmit={handleSubscription}
-                            onPlanChange={(payload) => {
-                                setData(prev => {
-                                    const next = { ...prev, subscription: payload };
-                                    logCollectedData(next);
-                                    return next;
-                                });
-                            }}
-                        />
-                    )}
-                    {step === 1 && (
                         <BusinessForm
                             initialValues={data.business}
                             onSubmit={handleBusiness}
                             onChange={handleBusinessChange}
                         />
                     )}
-                    {step === 2 && (
+                    {step === 1 && (
                         <AddressForm
                             initialValues={data.address}
                             onSubmit={handleAddress}
@@ -248,45 +204,12 @@ export default function RegisterContainer() {
                             }}
                         />
                     )}
-                    {step === 3 && (
-                        <UserForm
-                            initialValues={data.user}
-                            onSubmit={handleUser}
-                            onChange={(partial) => {
-                                startTransition(() => {
-                                    setData(prev => {
-                                        const next = { ...prev, user: { ...(prev.user ?? {}), ...partial } };
-                                        logCollectedData(next);
-                                        return next;
-                                    });
-                                });
-                            }}
-                        />
-                    )}
-                    {step === 4 && (
+                    {step === 2 && (
                         <OrderForm 
-                            availablePlans={plans} 
-                            selectedPlan={data.subscription ? {
-                                id: data.subscription.selectedPlanId,
-                                name: data.subscription.selectedPlanName,
-                                price: data.subscription.selectedPlanPrice
-                            } : undefined}
+                            availablePlans={[]}
                             initialValues={data.order} 
                             collectedData={data}
                             onSubmit={handleOrder}
-                            onPlanChange={(planId) => {
-                                const selectedPlan = plans.find(p => p.id === planId);
-                                if (!selectedPlan) return;
-                                setData(prev => ({
-                                    ...prev,
-                                    subscription: {
-                                        ...(prev.subscription ?? {} as any),
-                                        selectedPlanId: planId,
-                                        selectedPlanName: selectedPlan.name,
-                                        selectedPlanPrice: selectedPlan.price || ''
-                                    }
-                                }));
-                            }}
                         />
                     )}
                 </div>
@@ -301,23 +224,21 @@ export default function RegisterContainer() {
                         Back
                     </button>
                     <div className="text-sm text-slate-500">
-                        {step === 0 && 'Abonnement'}
-                        {step === 1 && 'Entreprise'}
-                        {step === 2 && 'Adresse'}
-                        {step === 3 && 'Utilisateur'}
-                        {step === 4 && 'Commande'}
+                        {step === 0 && 'Entreprise'}
+                        {step === 1 && 'Adresse'}
+                        {step === 2 && 'Commande'}
                     </div>
                     {step < totalSteps - 1 ? (
                         <button
                             type="button"
                             onClick={goNext}
-                            disabled={!canProceedFromSubscription || !canProceedFromBusiness}
+                            disabled={!canProceedFromBusiness}
                             className={`rounded-lg px-4 py-2 text-white disabled:opacity-50 ${
-                                !canProceedFromSubscription || !canProceedFromBusiness
+                                !canProceedFromBusiness
                                     ? 'bg-slate-300 cursor-not-allowed'
                                     : 'bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335]'
                             }`}
-                            title={!canProceedFromSubscription ? 'Please select a plan to continue' : (!canProceedFromBusiness ? 'Please complete required business fields to continue' : undefined)}
+                            title={!canProceedFromBusiness ? 'Please complete required business fields to continue' : undefined}
                         >
                             Next
                         </button>
@@ -332,7 +253,7 @@ export default function RegisterContainer() {
                                     : 'bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335]'
                             }`}
                         >
-                            Create Account
+                            Create Business
                         </button>
                     )}
                 </div>

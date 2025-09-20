@@ -1,40 +1,59 @@
 'use client';
 
 import React from 'react';
-import { useLanguageStore } from '../../../store/languageStore';
-import { companyInfo } from '../../../lib/config/companyInfo';
+import { companyInfo } from '../../../libs/config/companyInfo';
+import { useI18n } from '@/i18n/hooks';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const { currentTranslations } = useLanguageStore();
-  const language = currentTranslations.homePage.footer;
+  const { tNested } = useI18n();
+  const language = tNested('homePage.footer');
 
   const content = {
     company: {
-      name: companyInfo.name,
-      tagline: companyInfo.tagline,
-      description: companyInfo.description,
-      logoAlt: companyInfo.logoAlt
+      name: language('company.name'),
+      tagline: language('company.tagline'),
+      description: language('company.description'),
+      logoAlt: language('company.logoAlt')
     },
     quickMenu: {
-      title: companyInfo.quickMenu.title,
-      items: companyInfo.quickMenu.items
+      title: language('quickMenu.title'),
+      items: [
+        { label: language('quickMenu.items.home'), href: "/", icon: "home" },
+        { label: language('quickMenu.items.businessPlans'), href: "/businessPlans", icon: "business" },
+        { label: language('quickMenu.items.about'), href: "#about", icon: "about" },
+        { label: language('quickMenu.items.contact'), href: "/contactUs", icon: "contact" },
+        { label: language('quickMenu.items.features'), href: "#features", icon: "features" }
+      ]
     },
     contactInfo: {
-      title: "Contact Info",
-      email: companyInfo.contact.email,
-      phone: companyInfo.contact.phone,
-      address: companyInfo.contact.address
+      title: language('contactInfo.title'),
+      email: {
+        label: language('contactInfo.email'),
+        value: companyInfo.contact.email.value
+      },
+      phone: {
+        label: language('contactInfo.phone'),
+        numbers: companyInfo.contact.phone.numbers
+      },
+      address: {
+        label: language('contactInfo.address'),
+        lines: companyInfo.contact.address.lines
+      }
     },
     location: {
-      title: companyInfo.location.title,
-      city: companyInfo.location.city,
-      subtitle: companyInfo.location.subtitle,
-      mapPlaceholder: companyInfo.location.mapPlaceholder
+      title: language('location.title'),
+      city: language('location.city'),
+      subtitle: language('location.subtitle'),
+      mapPlaceholder: language('location.mapPlaceholder')
     },
     footer: {
-      copyright: `© ${currentYear} ${companyInfo.legal.copyright}`,
-      links: companyInfo.legal.links
+      copyright: `© ${currentYear} ${language('legal.copyright')}`,
+      links: [
+        language('legal.links.privacy'),
+        language('legal.links.terms'),
+        language('legal.links.cookies')
+      ]
     }
   };
 

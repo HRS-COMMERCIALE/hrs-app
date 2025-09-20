@@ -1,292 +1,386 @@
-'use client';
+﻿'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useAuth } from '@/store/authProvider';
+import { useBusiness } from '@/store/businessProvider';
+import { useSidebar } from '@/components/ui/sidebar';
 
-type LeafItem = {
-  name: string;
-  href: string;
-  icon: string;
-};
+// ========================================
+// NEW SHADCN SIDEBAR IMPLEMENTATION
+// ========================================
+// Modern sidebar using shadcn/ui components
+// Following the app's theme and design system
+// ========================================
 
-type SectionItem = {
-  name: string;
-  icon: string;
-  children?: LeafItem[];
-  href?: string;
-};
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const DashboardSidebar = () => {
-  const pathname = usePathname();
-  const { user, business } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    Operations: true,
-    'CRM': false,
-    'Finance & Accounting': false,
-    'Analytics & Insights': false,
-  });
-
-  // Debug logging
-  console.log('DashboardSidebar - User:', user);
-  console.log('DashboardSidebar - Business:', business);
-  console.log('DashboardSidebar - Logo URL:', business?.logoFile);
-
-  const sections: SectionItem[] = useMemo(
-    () => [
+// Navigation data
+const navigationData = [
+  {
+    title: "Operations",
+    items: [
       {
-        name: 'Operations',
-        icon: 'solar:shop-2-bold-duotone',
-        children: [
-          { name: 'Sales', href: '/dashboard/operations/sales', icon: 'solar:cart-large-2-bold-duotone' },
-          { name: 'Purchases', href: '/dashboard/operations/purchases', icon: 'solar:bag-smile-bold-duotone' },
-          { name: 'Inventory', href: '/dashboard/operations/inventory', icon: 'solar:box-bold-duotone' },
-        ],
+        title: "Sales",
+        url: "/dashboard/operations/sales",
+        icon: "solar:cart-large-2-bold-duotone",
       },
       {
-        name: 'CRM',
-        icon: 'solar:users-group-rounded-bold-duotone',
-        children: [
-          { name: 'Clients', href: '/dashboard/crm/clients', icon: 'solar:user-id-bold-duotone' },
-          { name: 'Suppliers', href: '/dashboard/crm/suppliers', icon: 'solar:users-group-two-rounded-bold-duotone' },
-        ],
+        title: "Purchases", 
+        url: "/dashboard/operations/purchases",
+        icon: "solar:bag-smile-bold-duotone",
       },
       {
-        name: 'Emails',
-        icon: 'solar:letter-bold-duotone',
-        href: '/dashboard/emails',
-      },
-      {
-        name: 'Finance & Accounting',
-        icon: 'solar:wallet-money-bold-duotone',
-        children: [
-          { name: 'Cash & Treasury', href: '/dashboard/finance/cash-treasury', icon: 'solar:banknote-bold-duotone' },
-          { name: 'Reports & Accounting', href: '/dashboard/finance/reports-accounting', icon: 'solar:bill-list-bold-duotone' },
-        ],
-      },
-      {
-        name: 'Analytics & Insights',
-        icon: 'solar:chart-2-bold-duotone',
-        children: [
-          { name: 'Statistics & Analytics', href: '/dashboard/analytics/statistics', icon: 'solar:graph-up-bold-duotone' },
-        ],
-    },
-    {
-      name: 'Settings',
-        icon: 'solar:settings-bold-duotone',
-      href: '/dashboard/settings',
+        title: "Inventory",
+        url: "/dashboard/operations/inventory", 
+        icon: "solar:box-bold-duotone",
       },
     ],
-    []
-  );
+  },
+  {
+    title: "CRM",
+    items: [
+      {
+        title: "Clients",
+        url: "/dashboard/crm/clients",
+        icon: "solar:user-id-bold-duotone",
+      },
+      {
+        title: "Suppliers",
+        url: "/dashboard/crm/suppliers", 
+        icon: "solar:users-group-two-rounded-bold-duotone",
+      },
+    ],
+  },
+  {
+    title: "Communication",
+    items: [
+      {
+        title: "Emails",
+        url: "/dashboard/emails",
+        icon: "solar:letter-bold-duotone",
+      },
+    ],
+  },
+  {
+    title: "Finance & Accounting",
+    items: [
+      {
+        title: "Cash & Treasury",
+        url: "/dashboard/finance/cash-treasury",
+        icon: "solar:banknote-bold-duotone",
+      },
+      {
+        title: "Reports & Accounting",
+        url: "/dashboard/finance/reports-accounting",
+        icon: "solar:bill-list-bold-duotone",
+      },
+    ],
+  },
+  {
+    title: "Analytics",
+    items: [
+      {
+        title: "Statistics & Analytics",
+        url: "/dashboard/analytics/statistics",
+        icon: "solar:graph-up-bold-duotone",
+      },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      {
+        title: "Settings",
+        url: "/dashboard/settings",
+        icon: "solar:settings-bold-duotone",
+      },
+    ],
+  },
+];
 
-  const toggleSection = useCallback((name: string) => {
-    setOpenSections((prev) => ({ ...prev, [name]: !prev[name] }));
-  }, []);
+function DashboardSidebar() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { 
+    selectedBusiness, 
+    selectedBusinessId, 
+    userBusinesses,
+    loading, 
+    error, 
+    hasAccess, 
+    isBanned,
+    switchBusiness
+  } = useBusiness();
+  
+  const { open, setOpen } = useSidebar();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Debug logging
+  console.log('Sidebar open state:', open);
+  
+  // Get current businessId from URL params
+  const currentBusinessId = searchParams.get('businessId');
 
-  const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
+  // Ensure businessId is always present in URL
+  useEffect(() => {
+    if (!currentBusinessId && selectedBusinessId) {
+      // If no businessId in URL but we have selectedBusinessId, redirect to include it
+      const currentPath = pathname;
+      const newUrl = `${currentPath}?businessId=${selectedBusinessId}`;
+      router.replace(newUrl);
+    }
+  }, [currentBusinessId, selectedBusinessId, pathname, router]);
 
-  const isActiveHref = (href?: string) => Boolean(href && pathname.startsWith(href));
+  // Helper function to build URLs with businessId parameter
+  const buildUrlWithBusinessId = (href: string) => {
+    if (!currentBusinessId) {
+      // If no businessId in URL, try to get it from selectedBusinessId
+      const businessId = selectedBusinessId || currentBusinessId;
+      if (businessId) {
+        const separator = href.includes('?') ? '&' : '?';
+        return `${href}${separator}businessId=${businessId}`;
+      }
+      return href;
+    }
+    const separator = href.includes('?') ? '&' : '?';
+    return `${href}${separator}businessId=${currentBusinessId}`;
+  };
 
-  return (
-    <aside
-      className={`${isCollapsed ? 'w-20 cursor-pointer' : 'w-72'} bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl relative transition-all duration-300 ease-out motion-reduce:transition-none`}
-      aria-label="Sidebar navigation"
-      onClick={() => {
-        if (isCollapsed) {
-          setIsCollapsed(false);
-        }
-      }}
-    >
-      <div className="p-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm flex items-center justify-center">
+  // Handle logout with proper cleanup
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      // Clear any stored auth data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      // Redirect to login
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force redirect even if logout fails
+      router.push('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+
+  // Show loading state in sidebar content if business data is loading
+  if (loading) {
+            return (
+      <Sidebar variant="inset" className="border-r border-border/50">
+        <SidebarHeader className="border-b border-border/50">
+          <div className="flex items-center gap-3 px-2 py-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20">
               <Image src="/logo.png" alt="HRS App" width={24} height={24} className="object-contain" />
+        </div>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-semibold">HRS App</h1>
+              <p className="text-xs text-muted-foreground">Loading...</p>
             </div>
-            {!isCollapsed && (
-              <div>
-                <h1 className="text-base font-bold text-gray-800">HRS App</h1>
-                <p className="text-gray-500 text-[11px]">Dashboard</p>
-              </div>
-            )}
           </div>
-          {!isCollapsed && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleCollapse();
-              }}
-              aria-pressed={!isCollapsed}
-              aria-label="Collapse sidebar"
-              className="h-9 w-9 flex items-center justify-center rounded-md bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-600 shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              title="Collapse"
-            >
-              <Icon icon="solar:alt-arrow-left-bold-duotone" width={18} height={18} />
-            </button>
-          )}
+        </SidebarHeader>
+        <SidebarContent className="px-2 py-4">
+          <div className="flex items-center justify-center py-8">
+            <Icon icon="solar:loading-bold-duotone" className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
+              return (
+              <div 
+      className={`border-r border-border/50 transition-all duration-500 ease-in-out bg-background ${open ? 'w-64' : 'w-16'} flex flex-col h-full`}
+    >
+      <div className="border-b border-border/50">
+        <div className={`flex items-center ${open ? 'gap-3' : 'justify-center'} px-2 py-3`}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20">
+            <Image src="/logo.png" alt="HRS App" width={24} height={24} className="object-contain" />
+          </div>
+          <div className={`flex flex-col transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'}`}>
+            <h1 className="text-lg font-semibold whitespace-nowrap">HRS App</h1>
+            <p className="text-xs text-muted-foreground whitespace-nowrap">Business Dashboard</p>
+          </div>
         </div>
       </div>
-      
-      <nav className={`px-2 pb-24 ${isCollapsed ? 'pointer-events-none' : ''}`} aria-label="Primary">
-        {/* Decorative gradient rail */}
-        <div className="absolute top-0 right-0 h-full w-px bg-gradient-to-b from-[#3c959d]/30 via-[#ef7335]/30 to-transparent" />
 
-        {sections.map((section) => {
-          const isLeaf = !section.children || section.children.length === 0;
-          const open = openSections[section.name] ?? false;
-          const active = isActiveHref(section.href);
-
-          if (isLeaf) {
-            return (
-              <Link
-                key={section.name}
-                href={section.href || '#'}
-                className={`group flex items-center justify-between px-2 py-2.5 rounded-lg mb-1 transition-all duration-300 motion-reduce:transition-none ${
-                  active
-                    ? 'bg-gradient-to-r from-[#3c959d]/10 to-[#ef7335]/10 text-gray-900 ring-1 ring-[#3c959d]/30'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center flex-shrink-0">
-                    <Icon icon={section.icon} className={active ? 'text-[#3c959d]' : 'text-gray-600'} width={18} height={18} />
-                  </span>
-                  {!isCollapsed && <span className="text-sm font-medium truncate">{section.name}</span>}
-                </span>
-                {!isCollapsed && section.name !== 'Settings' && (
-                  <Icon icon="solar:alt-arrow-right-bold-duotone" className={active ? 'text-[#3c959d]' : 'text-gray-400 group-hover:text-gray-500'} width={18} height={18} />
-                )}
-              </Link>
-            );
-          }
-
-          const hasActiveChild = section.children?.some((c) => isActiveHref(c.href));
-
-          return (
-            <div key={section.name} className="mb-1">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleSection(section.name);
-                }}
-                aria-expanded={open}
-                aria-controls={`section-${section.name}`}
-                className={`group w-full flex items-center justify-between px-2 py-2.5 rounded-lg transition-all duration-300 motion-reduce:transition-none ${
-                  hasActiveChild
-                    ? 'bg-gradient-to-r from-[#3c959d]/10 to-[#ef7335]/10 text-gray-900 ring-1 ring-[#3c959d]/30'
-                    : 'text-gray-800 hover:bg-gray-50'
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center flex-shrink-0">
-                    <Icon icon={section.icon} className={hasActiveChild ? 'text-[#3c959d]' : 'text-gray-600'} width={18} height={18} />
-                  </span>
-                  {!isCollapsed && <span className="text-sm font-semibold truncate">{section.name}</span>}
-                </span>
-                {!isCollapsed && (
-                  <Icon
-                    icon="solar:alt-arrow-down-bold-duotone"
-                    className={`text-gray-400 transition-transform duration-300 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`}
-                    width={18}
-                    height={18}
-                  />
-                )}
-              </button>
-
-              <div
-                id={`section-${section.name}`}
-                className={`overflow-hidden transition-all duration-300 motion-reduce:transition-none ${open && !isCollapsed ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-              >
-                <div className="pl-3 pr-1 py-1">
-                  {section.children?.map((child) => {
-                    const childActive = isActiveHref(child.href);
-            return (
-              <Link
-                        key={child.name}
-                        href={child.href}
-                        className={`flex items-center justify-between rounded-md px-3 py-2 text-sm mb-1 transition-all duration-200 motion-reduce:transition-none ${
-                          childActive
-                            ? 'bg-white shadow-sm ring-1 ring-[#3c959d]/30 text-gray-900'
-                            : 'text-gray-600 hover:bg-white/60 hover:shadow-sm'
-                        }`}
-                      >
-                        <span className="flex items-center gap-3">
-                          <span className="h-7 w-7 rounded-md bg-gradient-to-br from-[#3c959d]/15 to-[#ef7335]/15 flex items-center justify-center flex-shrink-0">
-                            <Icon icon={child.icon} className={childActive ? 'text-[#3c959d]' : 'text-gray-500'} width={16} height={16} />
-                          </span>
-                          <span className="truncate">{child.name}</span>
-                        </span>
-                        <span className={`h-1 w-1 rounded-full ${childActive ? 'bg-[#3c959d]' : 'bg-gray-300'}`} />
-              </Link>
-            );
-          })}
-        </div>
+      <div className={`flex-1 px-2 ${open ? '' : 'px-1'} py-4 overflow-y-auto`}>
+        {navigationData.map((section) => (
+          <div key={section.title} className="mb-4">
+            <div className={`text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-2 transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-h-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+              {section.title}
+            </div>
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive = pathname.startsWith(item.url);
+                return (
+                  <div key={item.title}>
+                    <Link 
+                      href={buildUrlWithBusinessId(item.url)}
+                      className={`flex items-center w-full px-2 py-2 rounded-md text-sm transition-all duration-300 ease-in-out ${
+                        isActive 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'hover:bg-muted hover:text-foreground'
+                      } ${open ? 'justify-start' : 'justify-center'}`}
+                      title={!open ? item.title : undefined}
+                    >
+                      <Icon icon={item.icon} className="h-4 w-4 flex-shrink-0 transition-transform duration-300 ease-in-out" />
+                      <span className={`ml-2 transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap ${open ? 'max-w-32 opacity-100' : 'max-w-0 opacity-0'}`}>
+                        {item.title}
+                      </span>
+                          </Link>
+                        </div>
+                        );
+                      })}
+                    </div>
+                </div>
+        ))}
               </div>
-            </div>
-          );
-        })}
-      </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200/70 bg-white/80 backdrop-blur">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 rounded-full flex items-center justify-center overflow-hidden">
-              {business?.logoFile ? (
-                <Image 
-                  src={business.logoFile} 
-                  alt={business.businessName || "Business Logo"} 
-                  width={36} 
-                  height={36} 
-                  className="object-cover w-full h-full"
-                  onError={(e) => {
-                    console.error('Failed to load business logo:', business.logoFile);
-                    // Fallback to user initials on error
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                  unoptimized={true}
-                />
-              ) : null}
-              {(!business?.logoFile || !business.logoFile) && user?.firstName && user?.lastName ? (
-                <span className="text-sm font-semibold text-gray-700">
-                  {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                </span>
-              ) : null}
-              {(!business?.logoFile || !business.logoFile) && (!user?.firstName || !user?.lastName) ? (
-                <Icon icon="solar:user-bold-duotone" className="text-gray-700" width={16} height={16} />
-              ) : null}
-            </div>
-            {!isCollapsed && (
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-800">
-                  {business?.businessName || (user?.firstName && user?.lastName 
-                    ? `${user.firstName} ${user.lastName}` 
-                    : user?.title || 'User'
+      <div className="border-t border-border/50">
+        <div className={`flex items-center ${open ? 'gap-3' : 'justify-center'} px-2 py-3`}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 hover:bg-muted">
+                <Avatar className="h-8 w-8">
+                  {selectedBusiness?.business?.logoFile ? (
+                    <AvatarImage src={selectedBusiness.business.logoFile} alt={selectedBusiness.business.businessName} />
+                ) : null}
+                  <AvatarFallback className="bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 text-xs font-semibold">
+                    {selectedBusiness?.business?.businessName ? 
+                      selectedBusiness.business.businessName.charAt(0).toUpperCase() : 
+                      (user?.firstName && user?.lastName ? 
+                        `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 
+                        'U'
+                      )
+                    }
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {selectedBusiness?.business?.businessName || (user?.firstName && user?.lastName ? 
+                      `${user.firstName} ${user.lastName}` : 
+                      user?.title || 'User'
+                    )}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email || 'user@example.com'}
+                  </p>
+                  {isBanned && (
+                    <Badge variant="destructive" className="text-xs mt-1 w-fit">
+                      Banned
+                    </Badge>
                   )}
-                </p>
-                <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
-              </div>
-            )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              {/* Business Switching */}
+              {userBusinesses && userBusinesses.length > 1 && (
+                <>
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Switch Business
+                  </DropdownMenuLabel>
+                  {userBusinesses.slice(0, 5).map((business) => (
+                    <DropdownMenuItem
+                      key={business.business?.id}
+                      onClick={() => switchBusiness(business.business?.id!)}
+                      className="cursor-pointer"
+                    >
+                      <Icon icon="solar:buildings-2-bold-duotone" className="mr-2 h-4 w-4" />
+                      <span className="truncate">
+                        {business.business?.businessName || 'Unnamed Business'}
+                      </span>
+                      {selectedBusinessId === business.business?.id && (
+                        <Icon icon="solar:check-circle-bold-duotone" className="ml-auto h-4 w-4 text-green-500" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                  {userBusinesses.length > 5 && (
+                    <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                      +{userBusinesses.length - 5} more businesses
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
+              {/* Settings */}
+              <DropdownMenuItem asChild>
+                <Link href={buildUrlWithBusinessId('/dashboard/settings')} className="cursor-pointer">
+                  <Icon icon="solar:settings-bold-duotone" className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
+              {/* Logout */}
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                {isLoggingOut ? (
+                  <Icon icon="solar:loading-bold-duotone" className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Icon icon="solar:logout-3-bold-duotone" className="mr-2 h-4 w-4" />
+                )}
+                <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <div className={`flex flex-col min-w-0 flex-1 transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'}`}>
+            <p className="text-sm font-medium truncate whitespace-nowrap">
+              {selectedBusiness?.business?.businessName || (user?.firstName && user?.lastName ? 
+                `${user.firstName} ${user.lastName}` : 
+                user?.title || 'User'
+              )}
+            </p>
+            <p className="text-xs text-muted-foreground truncate whitespace-nowrap">
+              {user?.email || 'user@example.com'}
+            </p>
           </div>
-          {!isCollapsed && (
-            <Link href="/logout" className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <Icon icon="solar:logout-3-bold-duotone" width={14} height={14} />
-              Logout
-            </Link>
-          )}
+          </div>
+          </div>
         </div>
-      </div>
-    </aside>
   );
-};
+}
 
 export default React.memo(DashboardSidebar);

@@ -1,4 +1,4 @@
-import { Business } from '@/models/associationt.ts/association';
+import { Business, User, BuinessUsers } from '@/models/associationt.ts/association';
 import type { RegisterSchema } from '@/validations/auth/register';
 import type { Transaction } from 'sequelize';
 import { uploadToCloudinary } from '@/utils/cloudinary';
@@ -33,6 +33,16 @@ export async function createBusiness(payload: RegisterSchema, userId: number, tr
       currency: payload.business.currency,
       website: payload.business.website || '',
       logoFile: logoFilePath,
+    }, { transaction });
+
+    // Create membership record with admin role for the business owner
+    await BuinessUsers().create({
+      userId,
+      businessId: newBusiness.dataValues.id,
+      role: 'admin',
+      joinedAt: new Date(),
+      isOnline: false,
+      isBanned: false,
     }, { transaction });
 
     return newBusiness;

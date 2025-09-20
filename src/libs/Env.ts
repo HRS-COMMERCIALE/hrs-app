@@ -19,6 +19,12 @@ const envSchema = z.object({
     REDIS_PASSWORD: z.string().optional(),
     REDIS_DB: z.string().optional(),
     REDIS_URL: z.string().optional(),
+    // Backblaze B2 configuration
+    BACKBLAZE_APPLICATION_KEY_ID: z.string().optional(),
+    BACKBLAZE_APPLICATION_KEY: z.string().optional(),
+    BACKBLAZE_BUCKET_NAME: z.string().optional(),
+    BACKBLAZE_BUCKET_ID: z.string().optional(),
+    BACKBLAZE_ENDPOINT: z.string().optional(),
 });
 
 function validateEnv() {
@@ -58,6 +64,12 @@ export const env = {
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     REDIS_DB: process.env.REDIS_DB || '0',
     REDIS_URL: process.env.REDIS_URL,
+    // Backblaze B2 configuration
+    BACKBLAZE_APPLICATION_KEY_ID: process.env.BACKBLAZE_APPLICATION_KEY_ID,
+    BACKBLAZE_APPLICATION_KEY: process.env.BACKBLAZE_APPLICATION_KEY,
+    BACKBLAZE_BUCKET_NAME: process.env.BACKBLAZE_BUCKET_NAME,
+    BACKBLAZE_BUCKET_ID: process.env.BACKBLAZE_BUCKET_ID ,
+    BACKBLAZE_ENDPOINT: process.env.BACKBLAZE_ENDPOINT,
 };
 
 

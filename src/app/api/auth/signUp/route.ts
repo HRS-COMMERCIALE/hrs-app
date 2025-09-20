@@ -8,6 +8,14 @@ import { ApiResponseHandler } from '@/utils/help/apiResponses';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[signUp] request start');
+    console.log('[signUp] env check', {
+      hasDbUrl: !!process.env.DATABASE_URL,
+      hasJwt: !!process.env.JWT_ACCESS_SECRET && !!process.env.JWT_REFRESH_SECRET,
+      hasSmtp: !!process.env.SMTP_HOST && !!process.env.SMTP_USER,
+      hasStripe: !!process.env.STRIPE_SECRET_KEY,
+      nodeEnv: process.env.NODE_ENV,
+    });
     // Parse request body
     const body = await request.json();
     
@@ -70,6 +78,15 @@ export async function POST(request: NextRequest) {
 
     // Normalize email (lowercase and trim)
     const normalizedEmail = email.toLowerCase().trim();
+
+    // Quick DB connectivity check (logs a clear error if DB/env is the cause)
+    try {
+      await sequelize().authenticate();
+      console.log('[signUp] DB authenticate OK');
+    } catch (dbErr: any) {
+      console.error('[signUp] DB authenticate FAILED', { message: dbErr?.message, stack: dbErr?.stack });
+      return ApiResponseHandler.internalError('Database connection failed');
+    }
 
     // Use database transaction for secure operations
     const transaction = await sequelize().transaction();
@@ -151,11 +168,12 @@ export async function POST(request: NextRequest) {
     } catch (transactionError) {
       // Rollback transaction on any error
       await transaction.rollback();
+      console.error('[signUp] transaction failed', { message: (transactionError as any)?.message, stack: (transactionError as any)?.stack });
       throw transactionError;
     }
 
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('[signUp] unhandled error', { message: (error as any)?.message, stack: (error as any)?.stack, name: (error as any)?.name });
     
     if (error instanceof Error) {
       // Handle specific error types

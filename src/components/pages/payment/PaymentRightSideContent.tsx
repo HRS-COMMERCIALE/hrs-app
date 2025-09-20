@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import { useLanguageStore } from '../../../store/languageStore';
+import { useI18n } from '../../../i18n/hooks';
 import { useAuth } from '../../../store/authProvider';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
@@ -25,6 +25,7 @@ const SecureStripePaymentForm = forwardRef<any, {
     const stripe = useStripe();
     const elements = useElements();
     const { user } = useAuth();
+    const { t } = useI18n();
     const [cardError, setCardError] = useState<string>('');
     const [stripeInitError, setStripeInitError] = useState<string>('');
     const [billingDetails, setBillingDetails] = useState({
@@ -50,17 +51,17 @@ const SecureStripePaymentForm = forwardRef<any, {
             console.log('Stripe key present:', Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY));
             const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string | undefined;
             if (!pk) {
-                setStripeInitError('Stripe publishable key missing (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY).');
+                setStripeInitError(t('payment.stripeKeyMissing'));
             } else if (!/^pk_(test|live)_/.test(pk)) {
-                setStripeInitError('Stripe publishable key format looks invalid. It should start with pk_test_ or pk_live_.');
+                setStripeInitError(t('payment.stripeKeyInvalid'));
             }
             // Fallback timeout: if Elements not ready after a short delay, show hint
-            const t = setTimeout(() => {
+            const timeout = setTimeout(() => {
                 if (!elements) {
-                    setStripeInitError(prev => prev || 'Stripe failed to initialize. Check your publishable key and network.');
+                    setStripeInitError(prev => prev || t('payment.stripeInitFailed'));
                 }
             }, 2000);
-            return () => clearTimeout(t);
+            return () => clearTimeout(timeout);
         }
     }, [user?.email]);
 
@@ -76,7 +77,7 @@ const SecureStripePaymentForm = forwardRef<any, {
         const cardElement = elements.getElement(CardElement);
         if (!cardElement) {
             setIsProcessing(false);
-            setCardError('Card element not found');
+            setCardError(t('payment.cardElementNotFound'));
             return;
         }
 
@@ -95,7 +96,7 @@ const SecureStripePaymentForm = forwardRef<any, {
 
         if (error) {
             console.error('Error creating payment method:', error);
-                setCardError(error.message || 'Payment method creation failed');
+                setCardError(error.message || t('payment.paymentMethodCreationFailed'));
             setIsProcessing(false);
                 return;
             }
@@ -122,7 +123,7 @@ const SecureStripePaymentForm = forwardRef<any, {
 
             if (!response.ok || !result.success) {
                 console.error('Payment API failed:', result?.error);
-                setCardError(result?.error || 'Failed to create payment');
+                setCardError(result?.error || t('payment.paymentMethodCreationFailed'));
                 setIsProcessing(false);
                 return;
             }
@@ -131,7 +132,7 @@ const SecureStripePaymentForm = forwardRef<any, {
             const clientSecret = result.clientSecret;
             if (!clientSecret) {
                 console.error('Missing client secret from API');
-                setCardError('Missing payment configuration. Please try again.');
+                setCardError(t('payment.missingPaymentConfig'));
                 setIsProcessing(false);
                 return;
             }
@@ -150,7 +151,7 @@ const SecureStripePaymentForm = forwardRef<any, {
 
             if (confirmError) {
                 console.error('Payment confirmation error:', confirmError);
-                setCardError(confirmError.message || 'Payment confirmation failed');
+                setCardError(confirmError.message || t('payment.paymentConfirmationFailed'));
                 setIsProcessing(false);
                 return;
             }
@@ -175,33 +176,33 @@ const SecureStripePaymentForm = forwardRef<any, {
 
             if (paymentIntent && finalStatus === 'requires_action') {
                 console.warn('[Checkout] Payment requires additional authentication after confirmCardPayment. Showing guidance.');
-                setCardError('Additional authentication is required. Please follow the on-screen prompts or try again.');
+                setCardError(t('payment.additionalAuthRequired'));
                 setIsProcessing(false);
                 return;
             }
 
             if (paymentIntent && finalStatus === 'requires_payment_method') {
                 console.error('[Checkout] Payment requires a new payment method (declined/invalid)');
-                setCardError('Your card was declined. Please use a different card or try again.');
+                setCardError(t('payment.cardDeclined'));
                 setIsProcessing(false);
                 return;
             }
 
             if (paymentIntent && finalStatus === 'canceled') {
                 console.error('[Checkout] Payment was canceled by the user or bank');
-                setCardError('Payment was canceled. You can try again when ready.');
+                setCardError(t('payment.paymentCanceled'));
                 setIsProcessing(false);
                 return;
             }
 
             // Fallback unknown state
             console.error('[Checkout] Payment did not reach a final state', { status: finalStatus, paymentIntent });
-            setCardError(`Payment is not completed yet (status: ${finalStatus || 'unknown'}). Please try again or wait a moment.`);
+            setCardError(t('payment.paymentNotCompleted', { status: finalStatus || 'unknown' }));
             setIsProcessing(false);
             return; // Explicit return
         } catch (error) {
             console.error('Payment processing error:', error);
-            setCardError('An error occurred while processing your payment. Please try again.');
+            setCardError(t('payment.paymentProcessingError'));
             setIsProcessing(false);
             return; // Explicitly return to prevent any further processing
         } finally {
@@ -221,7 +222,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                 <div className="flex items-center justify-between">
                     <div>
                         <label className="block text-xs font-medium text-slate-600 mb-1">
-                            Billing Email
+                            {t('payment.billingEmail')}
                         </label>
                         <span className="text-sm font-medium text-slate-800">{billingDetails.email}</span>
                         </div>
@@ -229,7 +230,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                        <span>Verified</span>
+                        <span>{t('payment.verified')}</span>
                 </div>
             </div>
         </div>
@@ -238,19 +239,19 @@ const SecureStripePaymentForm = forwardRef<any, {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {/* Billing Information */}
                 <div className="bg-white border border-slate-200 rounded-md p-3 relative z-10">
-                    <h3 className="text-xs font-semibold text-slate-800 mb-3">Billing Information</h3>
+                    <h3 className="text-xs font-semibold text-slate-800 mb-3">{t('payment.billingInformation')}</h3>
                     
                     <div className="space-y-2">
                         {/* Full Name */}
                         <div>
                             <label className="block text-xs font-medium text-slate-700 mb-1">
-                                Full Name *
+                                {t('payment.fullName')} *
                             </label>
                             <input
                                 type="text"
                                 value={billingDetails.name}
                                 onChange={(e) => setBillingDetails(prev => ({ ...prev, name: e.target.value }))}
-                                placeholder="John Doe"
+                                placeholder={t('payment.fullNamePlaceholder')}
                                 className="w-full px-2 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-[#3c959d]/20 focus:border-[#3c959d] bg-white"
                                 required
                                 disabled={false}
@@ -261,7 +262,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                         {/* Address Line 1 */}
                             <div>
                                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                                Address *
+                                {t('payment.address')} *
                                 </label>
                                     <input
                                         type="text"
@@ -270,7 +271,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                                     ...prev, 
                                     address: { ...prev.address, line1: e.target.value }
                                 }))}
-                                placeholder="123 Main Street"
+                                placeholder={t('payment.addressPlaceholder')}
                                 className="w-full px-2 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-[#3c959d]/20 focus:border-[#3c959d]"
                                 required
                                 disabled={false}
@@ -281,7 +282,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                                    City *
+                                    {t('payment.city')} *
                                 </label>
                                 <input
                                     type="text"
@@ -290,7 +291,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                                         ...prev, 
                                         address: { ...prev.address, city: e.target.value }
                                     }))}
-                                    placeholder="Tunis"
+                                    placeholder={t('payment.cityPlaceholder')}
                                     className="w-full px-2 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-[#3c959d]/20 focus:border-[#3c959d]"
                                     required
                                     disabled={false}
@@ -298,7 +299,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                                    Postal Code *
+                                    {t('payment.postalCode')} *
                                 </label>
                                 <input
                                     type="text"
@@ -307,7 +308,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                                         ...prev, 
                                         address: { ...prev.address, postal_code: e.target.value }
                                     }))}
-                                    placeholder="1000"
+                                    placeholder={t('payment.postalCodePlaceholder')}
                                     className="w-full px-2 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-[#3c959d]/20 focus:border-[#3c959d]"
                                     required
                                     disabled={false}
@@ -318,7 +319,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                         {/* Country */}
                         <div>
                             <label className="block text-xs font-medium text-slate-700 mb-1">
-                                Country *
+                                {t('payment.country')} *
                             </label>
                             <select
                                 value={billingDetails.address.country}
@@ -341,12 +342,12 @@ const SecureStripePaymentForm = forwardRef<any, {
 
                 {/* Card Information */}
                 <div className="bg-white border border-slate-200 rounded-md p-3">
-                    <h3 className="text-xs font-semibold text-slate-800 mb-3">Card Information</h3>
+                    <h3 className="text-xs font-semibold text-slate-800 mb-3">{t('payment.cardInformation')}</h3>
                     
                     <div className="space-y-3">
                             <div>
                                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                                Card Details
+                                {t('payment.cardDetails')}
                                 </label>
                             <div className="p-2 border border-slate-300 rounded focus-within:ring-1 focus-within:ring-[#3c959d]/20 focus-within:border-[#3c959d] bg-white min-h-[40px] relative z-20 pointer-events-auto">
                                 {elements ? (
@@ -377,7 +378,7 @@ const SecureStripePaymentForm = forwardRef<any, {
                                         }}
                                     />
                                 ) : (
-                                    <div className="text-xs text-slate-500">Loading secure card field…</div>
+                                    <div className="text-xs text-slate-500">{t('payment.loadingSecureField')}</div>
                                 )}
                             </div>
                             {cardError && (
@@ -394,14 +395,14 @@ const SecureStripePaymentForm = forwardRef<any, {
                                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
-                                <span>Secured by Stripe</span>
+                                <span>{t('payment.securedByStripe')}</span>
                             </div>
                             {process.env.NODE_ENV === 'development' && (
                                 <div className="flex items-center space-x-1 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                     </svg>
-                                    <span>Dev Mode: HTTPS warning is normal for localhost</span>
+                                    <span>{t('payment.devModeWarning')}</span>
                         </div>
                                 )}
                             </div>
@@ -422,7 +423,7 @@ interface PaymentRightSideContentProps {
 }
 
 export default function PaymentRightSideContent({ planId, planName, planPrice, planCurrency }: PaymentRightSideContentProps) {
-    const { currentTranslations } = useLanguageStore();
+    const { t } = useI18n();
     const [mounted, setMounted] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -436,13 +437,13 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
     const paymentMethods = [
         {
             id: 'credit-card',
-            name: 'Credit Card',
+            name: t('payment.creditCard'),
             icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
             ),
-            description: 'Visa, Mastercard, American Express',
+            description: t('payment.creditCardDescription'),
             color: 'text-blue-600',
             bgColor: 'bg-blue-50',
             borderColor: 'border-blue-200',
@@ -450,13 +451,13 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
         },
         {
             id: 'paypal',
-            name: 'PayPal',
+            name: t('payment.paypal'),
             icon: (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.543-.676c-.95-1.08-2.453-1.71-4.266-1.71H9.673a.641.641 0 0 0-.633.74l1.12 7.106h4.19c.524 0 .968-.382 1.05-.9l1.12-7.106z"/>
                 </svg>
             ),
-            description: 'Pay with your PayPal account',
+            description: t('payment.paypalDescription'),
             color: 'text-yellow-600',
             bgColor: 'bg-yellow-50',
             borderColor: 'border-yellow-200',
@@ -465,13 +466,13 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
         },
         {
             id: 'bank-transfer',
-            name: 'Bank Transfer',
+            name: t('payment.bankTransfer'),
             icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
             ),
-            description: 'Direct bank transfer',
+            description: t('payment.bankTransferDescription'),
             color: 'text-green-600',
             bgColor: 'bg-green-50',
             borderColor: 'border-green-200',
@@ -487,7 +488,7 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
             setShowCreditCardForm(methodId === 'credit-card');
         } else if (method && !method.available) {
             // Show a more informative message for unavailable methods
-            alert(`${method.name} is coming soon! Please select Credit Card for now.`);
+            alert(`${method.name} ${t('payment.paymentMethodComingSoon')}`);
         }
     };
 
@@ -497,7 +498,7 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
         // Check if the selected payment method is available
         const selectedMethod = paymentMethods.find(m => m.id === selectedPaymentMethod);
         if (!selectedMethod || !selectedMethod.available) {
-            alert('This payment method is not yet available. Please select Credit Card.');
+            alert(t('payment.paymentMethodNotAvailable'));
             return;
         }
         
@@ -518,7 +519,7 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
             }
         } catch (error: any) {
             console.error('Payment processing error:', error);
-            alert(error.message || 'An error occurred while processing your payment. Please try again.');
+            alert(error.message || t('payment.paymentProcessingError'));
         } finally {
             setIsProcessing(false);
         }
@@ -643,10 +644,10 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
                         </div>
 
                         <h2 className="text-lg font-bold bg-gradient-to-r from-slate-800 via-[#3c959d] to-slate-800 bg-clip-text text-transparent mb-1 tracking-tight">
-                            Choose Payment Method
+                            {t('payment.choosePaymentMethod')}
                         </h2>
                         <p className="text-xs text-slate-600 font-light leading-relaxed">
-                            Select your preferred payment option
+                            {t('payment.selectPreferredOption')}
                         </p>
                         
                         {/* Decorative line */}
@@ -704,7 +705,7 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
                                         {method.comingSoon && (
                                             <div className="absolute top-1 right-1">
                                                 <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 border-orange-200 px-1 py-0.5 text-xs">
-                                                    Soon
+                                                    {t('payment.comingSoon')}
                                                 </Badge>
                                             </div>
                                         )}
@@ -753,11 +754,11 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                            <span className="animate-pulse text-xs">Processing...</span>
+                                            <span className="animate-pulse text-xs">{t('payment.processing')}</span>
                                     </div>
                                 ) : (
                                     <div className="flex items-center">
-                                            <span className="text-xs">Complete Payment</span>
+                                            <span className="text-xs">{t('payment.completePayment')}</span>
                                             <svg className="ml-1.5 h-3 w-3 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                         </svg>
@@ -774,7 +775,7 @@ export default function PaymentRightSideContent({ planId, planName, planPrice, p
                                     className="text-xs font-medium text-[#3c959d] hover:text-[#4ba5ad] hover:bg-[#3c959d]/10 transition-all duration-200 py-0.5 px-1"
                             >
                                 <a href="/businessPlans">
-                                    ← Back to Plans
+                                    {t('payment.backToPlans')}
                                 </a>
                             </Button>
                             </div>

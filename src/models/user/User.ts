@@ -60,7 +60,11 @@ export function defineUserModel(sequelize: Sequelize, ModelClass: typeof Model, 
         allowNull: true,
       },
       buinessCount:{
-        type: DataTypesLib.STRING,
+        type: DataTypesLib.INTEGER,
+        defaultValue: 0,
+        validate: {
+          min: 0,
+        },
         allowNull: true,
       },
       isBanned:{

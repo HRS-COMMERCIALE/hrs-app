@@ -32,13 +32,11 @@ export class ApiResponseHandler {
     return NextResponse.json(response, { status });
   }
 
-  static validationError(errors: string[], type: string = 'validation_error') {
-    return this.error(
-      'Validation failed',
-      type,
-      errors.join(', '),
-      400
-    );
+  static validationError(errors: string[] | { path: string; message: string }[], type: string = 'validation_error') {
+    const payload = Array.isArray(errors) && errors.length && typeof errors[0] === 'string'
+      ? (errors as string[]).map((msg) => ({ path: 'unknown', message: msg }))
+      : (errors as { path: string; message: string }[]);
+    return NextResponse.json({ success: false, type, error: 'Validation failed', details: payload }, { status: 400 });
   }
 
   static badRequest(error: string, type?: string) {
@@ -47,6 +45,10 @@ export class ApiResponseHandler {
 
   static conflict(error: string, type: string) {
     return this.error(error, type, undefined, 409);
+  }
+
+  static forbidden(error: string, type?: string) {
+    return this.error(error, type, undefined, 403);
   }
 
   static internalError(error: string = 'Internal server error') {

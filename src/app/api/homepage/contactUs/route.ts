@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendContactUsEmail } from '../../../../utils/email/contactUsEmail';
-import { companyInfo } from '../../../../lib/config/companyInfo';
+import { companyInfo } from '../../../../libs/config/companyInfo';
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,5 +1,5 @@
 import { sendEmail, MailOptions } from './mailer';
-import { companyInfo } from '../../lib/config/companyInfo';
+import { companyInfo } from '../../libs/config/companyInfo';
 
 export interface ContactUsData {
   name: string;

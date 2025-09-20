@@ -1,0 +1,679 @@
+{
+  "homePage": {
+    "navbar": {
+      "home": "Accueil",
+      "features": "Fonctionnalités",
+      "about": "À propos",
+      "contactUs": "Contactez-nous",
+      "getStarted": "Commencer",
+      "dashboard": "Tableau de bord",
+      "login": "Connexion",
+      "signUp": "S'inscrire",
+      "businessPlans": "Plans d'entreprise"
+    },
+    "heroSection": {
+      "statusBadge": {
+        "text": "🚀 Croissance rapide avec les entreprises du monde entier"
+      },
+      "hero": {
+        "title": {
+          "line1": "Transformez Vos",
+          "line2": "Opérations Commerciales"
+        },
+        "description": {
+          "main": "La seule plateforme de gestion d'entreprise dont vous aurez jamais besoin.",
+          "highlight": " Rationalisez les factures, fournisseurs, clients et analyses",
+          "ending": " avec notre solution intelligente tout-en-un."
+        }
+      },
+      "cta": {
+        "primaryButton": {
+          "text": "Essai Gratuit"
+        },
+        "secondaryButton": {
+          "text": "Voir la Démo"
+        }
+      },
+      "trustIndicators": {
+        "setup": "Configuration en 5 minutes",
+        "cancel": "Annuler à tout moment",
+        "security": "Sécurité bancaire"
+      }
+    },
+    "BusinessSolutions": {
+      "badge": "Solutions Commerciales Principales",
+      "title1": "Arrêtez de Perdre de l'Argent,",
+      "title2": "Commencez à Grandir !",
+      "description": "La plupart des entreprises gaspillent 20% de leurs revenus sur des inefficacités. Notre plateforme élimine le gaspillage, automatise les tâches fastidieuses et vous donne les informations pour gagner plus d'argent.",
+      "descriptionHighlight": "Commencez à voir des résultats en 30 jours.",
+      "salesTitle": "Ventes et Facturation",
+      "salesSubtitle": "Soyez Payé Plus Vite",
+      "salesDescription": "Créez des factures professionnelles en quelques secondes. Suivez les paiements automatiquement. Ne courez plus après l'argent.",
+      "salesFeatures": [
+        "Modèles de factures professionnels",
+        "Suivi automatique des paiements",
+        "Rappels de paiement",
+        "Support multi-devises"
+      ],
+      "inventoryTitle": "Gestion des Stocks",
+      "inventorySubtitle": "Ne Manquez Jamais",
+      "inventoryDescription": "Alertes de stock intelligentes. Réapprovisionnement automatisé. Suivi d'inventaire en temps réel dans tous les emplacements.",
+      "inventoryFeatures": [
+        "Suivi de stock en temps réel",
+        "Alertes de stock faible",
+        "Réapprovisionnement automatisé",
+        "Support multi-emplacements"
+      ],
+      "analyticsTitle": "Analyses et Rapports",
+      "analyticsSubtitle": "Prenez des Décisions Basées sur les Données",
+      "analyticsDescription": "Tableaux de bord complets. Analyse des profits. Insights de croissance. Sachez exactement où va votre argent.",
+      "analyticsFeatures": [
+        "Rapports de profits et pertes",
+        "Analyses de ventes",
+        "Insights clients",
+        "Suivi de croissance"
+      ],
+      "clientsTitle": "Gestion des Clients",
+      "clientsSubtitle": "Construisez des Relations Durables",
+      "clientsDescription": "Profils clients complets. Historique de communication. Suivi des paiements. Transformez les clients en avocats.",
+      "clientsFeatures": [
+        "Profils clients complets",
+        "Historique de communication",
+        "Suivi des paiements",
+        "Segmentation client"
+      ],
+      "featuresTitle": "Fonctionnalités Clés",
+      "learnMore": "En Savoir Plus",
+      "ctaTitle": "Prêt à Transformer Votre Entreprise ?",
+      "ctaDescription": "Rejoignez des milliers d'entreprises qui utilisent déjà notre plateforme pour rationaliser les opérations et augmenter les profits.",
+      "startFreeTrial": "Essai Gratuit",
+      "watchDemo": "Voir la Démo"
+    },
+    "container": {
+      "title": "Pourquoi Choisir HRS ?",
+      "subtitle": "Conçu pour les Entreprises Modernes",
+      "description": "Nous comprenons les défis de diriger une entreprise. C'est pourquoi nous avons créé une plateforme qui grandit avec vous.",
+      "features": {
+        "feature1": {
+          "title": "Plateforme Tout-en-Un",
+          "description": "Plus besoin de jongler avec plusieurs outils. Tout ce dont vous avez besoin en un seul endroit."
+        },
+        "feature2": {
+          "title": "Facile à Utiliser",
+          "description": "Design intuitif que votre équipe aimera dès le premier jour."
+        },
+        "feature3": {
+          "title": "Support 24/7",
+          "description": "Notre équipe est là pour vous aider à réussir, quand vous en avez besoin."
+        }
+      }
+    },
+    "businessOption": {
+      "badge": "Espace d'Entreprise",
+      "title": {
+        "chooseYour": "Choisissez Votre",
+        "businessHub": "Hub d'Entreprise"
+      },
+      "subtitle": "Accédez à votre tableau de bord, rejoignez une entreprise existante ou créez-en une nouvelle pour commencer.",
+      "buttons": {
+        "joinBusiness": "Rejoindre une Entreprise",
+        "createBusiness": "Créer une Entreprise",
+        "createBusinessLimit": "Créer une Entreprise (Limite atteinte)",
+        "viewPlans": "Voir les Offres",
+        "downloadApp": "Télécharger l'Application",
+        "upgradePlan": "Améliorer le Forfait"
+      },
+      "limits": {
+        "label": "Entreprises : {count}/{limit}",
+        "upgradeNote0": "(Mettez à niveau pour créer des entreprises)",
+        "upgradeNote1": "(Limite Premium/Platinum)",
+        "upgradeNote3": "(Limite Diamond)",
+        "reachedDiamond": "Vous avez atteint le maximum de 3 entreprises autorisées pour le forfait Diamond.",
+        "reachedPremiumOrPlatinum": "Vous avez atteint le maximum de 1 entreprise pour votre forfait actuel. Passez à Diamond pour créer jusqu'à 3 entreprises."
+      },
+      "available": {
+        "title": "Entreprises Disponibles",
+        "loading": "Chargement des entreprises...",
+        "error": "Erreur lors du chargement des entreprises : {error}",
+        "empty": "Aucune entreprise trouvée. Créez votre première entreprise pour commencer !",
+        "joinedLabel": "Rejoint :"
+      },
+      "trust": {
+        "secure": "Sécurisé & Chiffré",
+        "global": "Accès Global",
+        "team": "Collaboration d'Équipe",
+        "fast": "Ultra Rapide"
+      },
+      "status": {
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "cards": {
+        "descriptionWithSize": "entreprise avec une équipe de {size} personnes",
+        "unknown": "Inconnu"
+      }
+    },
+    "aboutUs": {
+      "badge": "À Propos",
+      "title": {
+        "line1": "Découvrez",
+        "line2": "Notre Entreprise"
+      },
+      "subtitle": "Découvrez l'histoire derrière notre mission de transformer la gestion d'entreprise",
+      "comingSoon": "Bientôt Disponible",
+      "description": "Cette section est actuellement en développement et présentera bientôt l'histoire de notre entreprise, notre mission, nos valeurs et l'équipe derrière nos solutions commerciales innovantes.",
+      "underConstruction": "En Construction",
+      "constructionNote": "Nous travaillons dur pour vous apporter l'histoire de notre entreprise et les informations de l'équipe. Revenez bientôt !",
+      "developmentProgress": "Progrès de Développement : 33%",
+      "inDevelopment": "En Développement",
+      "exploreNote": "En attendant, explorez nos solutions commerciales et nos plans tarifaires ci-dessus"
+    },
+    "footer": {
+      "company": {
+        "name": "Solutions Commerciales Tunisiennes",
+        "tagline": "Solutions",
+        "description": "Autonomiser les entreprises tunisiennes avec des solutions logicielles innovantes pour la croissance et le succès à l'ère numérique.",
+        "logoAlt": "Logo Solutions Commerciales Tunisiennes"
+      },
+      "quickMenu": {
+        "title": "Menu Rapide",
+        "items": {
+          "home": "Accueil",
+          "businessPlans": "Plans d'Entreprise",
+          "about": "À Propos",
+          "contact": "Contactez-nous",
+          "features": "Fonctionnalités"
+        }
+      },
+      "contactInfo": {
+        "title": "Informations de Contact",
+        "email": "Email",
+        "phone": "Numéros de Téléphone",
+        "address": "Adresse"
+      },
+      "location": {
+        "title": "Notre Localisation",
+        "city": "Tunis, Tunisie",
+        "subtitle": "Capitale",
+        "mapPlaceholder": "Carte interactive bientôt disponible"
+      },
+      "legal": {
+        "copyright": "Solutions Commerciales Tunisiennes. Tous droits réservés.",
+        "links": {
+          "privacy": "Politique de Confidentialité",
+          "terms": "Conditions d'Utilisation",
+          "cookies": "Politique des Cookies"
+        }
+      }
+    },
+    "businessPlan": {
+      "header": {
+        "badge": {
+          "icon": "💰",
+          "text": "Plans Tarifaires"
+        },
+        "title": "Choisissez Votre Plan Parfait",
+        "subtitle": "Options tarifaires flexibles conçues pour grandir avec votre entreprise"
+      },
+      "pricingTiers": [
+        {
+          "name": "Premium",
+          "price": "99.99",
+          "currency": "USD",
+          "features": [
+            "Jusqu'à 1 entreprise",
+            "Gestion d'inventaire de base",
+            "Rapports standard",
+            "Support par email"
+          ],
+          "buttonText": "S'abonner"
+        },
+        {
+          "name": "Platinum",
+          "price": "190.99",
+          "currency": "USD",
+          "features": [
+            "Jusqu'à 1 entreprise",
+            "Gestion d'inventaire avancée",
+            "Rapports avancés",
+            "Support prioritaire"
+          ],
+          "buttonText": "S'abonner",
+          "popular": true
+        },
+        {
+          "name": "Diamond",
+          "price": "270.00",
+          "currency": "USD",
+          "features": [
+            "Jusqu'à 3 entreprises",
+            "Gestion d'inventaire complète",
+            "Rapports personnalisés",
+            "Support 24/7"
+          ],
+          "buttonText": "S'abonner"
+        }
+      ],
+      "customPlan": {
+        "name": "Personnalisé",
+        "price": "Contactez-nous",
+        "description": "Adapté aux besoins d'entreprise",
+        "features": [
+          "Entreprises illimitées",
+          "Intégrations personnalisées",
+          "Support dédié",
+          "Fonctionnalités personnalisées"
+        ],
+        "buttonText": "Contacter les Ventes"
+      },
+      "footer": {
+        "maintenance": "Tous les plans incluent la maintenance et les mises à jour régulières",
+        "pricing": "Les prix peuvent varier selon les exigences spécifiques",
+        "innovation": "Innovation à Chaque Étape"
+      },
+      "mostPopular": "Le Plus Populaire",
+      "defaultSubscribe": "S'abonner"
+    }
+  },
+  "header": {
+    "menu": {
+      "dashboard": "Tableau de bord",
+      "settings": "Paramètres",
+      "languageLabel": "Langue",
+      "logout": "Déconnexion"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon Retour",
+      "subtitle": "Connectez-vous à votre compte",
+      "email": "Email",
+      "password": "Mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?",
+      "signIn": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "S'inscrire",
+      "emailPlaceholder": "Entrez votre email",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "signingIn": "Connexion en cours...",
+      "leftSide": {
+        "title": {
+          "line1": "Bienvenue sur",
+          "line2": "HRS Business Platform"
+        },
+        "subtitle": "Rationalisez vos opérations commerciales avec notre plateforme de gestion complète",
+        "features": [
+          {
+            "title": "Analytiques",
+            "subtitle": "Insights en temps réel"
+          },
+          {
+            "title": "Automatisation",
+            "subtitle": "Rationaliser les flux de travail"
+          },
+          {
+            "title": "Sécurité",
+            "subtitle": "Protection de niveau bancaire"
+          }
+        ],
+        "security": {
+          "soc2": "Conforme SOC 2",
+          "gdpr": "Prêt RGPD"
+        }
+      }
+    },
+    "signup": {
+      "title": "Créer un Compte",
+      "subtitle": "Commencez avec HRS aujourd'hui",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "agreeToTerms": "J'accepte les Conditions d'Utilisation et la Politique de Confidentialité",
+      "createAccount": "Créer un Compte",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "leftSide": {
+        "title": {
+          "line1": "Rejoignez Notre",
+          "line2": "Plateforme HRS"
+        },
+        "subtitle": "Créez votre compte et commencez à gérer votre entreprise avec nos solutions complètes.",
+        "features": [
+          {
+            "title": "Inscription Sécurisée",
+            "subtitle": "Sécurité de niveau bancaire pour vos données"
+          },
+          {
+            "title": "Configuration Facile",
+            "subtitle": "Commencez en quelques minutes"
+          },
+          {
+            "title": "Support 24/7",
+            "subtitle": "Nous sommes là pour vous aider"
+          }
+        ],
+        "security": {
+          "soc2": "Conforme SOC 2",
+          "gdpr": "Prêt RGPD"
+        }
+      }
+    },
+    "register": {
+      "business": {
+        "title": "Informations de l'Entreprise",
+        "subtitle": "Parlez-nous de votre entreprise",
+        "businessName": "Nom de l'Entreprise",
+        "businessNamePlaceholder": "Entrez le nom de votre entreprise",
+        "industry": "Secteur d'Activité",
+        "industryPlaceholder": "Sélectionnez votre secteur",
+        "website": "Site Web",
+        "websitePlaceholder": "https://votre-site-web.com",
+        "phone": "Numéro de Téléphone",
+        "phonePlaceholder": "+1 (555) 123-4567",
+        "employeeCount": "Nombre d'Employés",
+        "employeeCountPlaceholder": "Sélectionnez le nombre d'employés",
+        "description": "Description de l'Entreprise",
+        "descriptionPlaceholder": "Décrivez brièvement votre entreprise",
+        "logo": "Logo de l'Entreprise",
+        "logoPlaceholder": "Téléchargez le logo de votre entreprise",
+        "required": "Requis",
+        "optional": "Optionnel",
+        "next": "Étape Suivante",
+        "previous": "Étape Précédente",
+        "employeeCounts": [
+          "1-10",
+          "11-50",
+          "51-200",
+          "201-500",
+          "501-1000",
+          "1000+"
+        ]
+      },
+      "address": {
+        "title": "Adresse de l'Entreprise",
+        "subtitle": "Où se trouve votre entreprise ?",
+        "street": "Adresse de la Rue",
+        "streetPlaceholder": "Entrez l'adresse de la rue",
+        "city": "Ville",
+        "cityPlaceholder": "Entrez la ville",
+        "state": "État/Province",
+        "statePlaceholder": "Entrez l'état ou la province",
+        "postalCode": "Code Postal",
+        "postalCodePlaceholder": "Entrez le code postal",
+        "country": "Pays",
+        "countryPlaceholder": "Sélectionnez le pays",
+        "next": "Étape Suivante",
+        "previous": "Étape Précédente"
+      },
+      "order": {
+        "title": "Choisissez Votre Plan",
+        "subtitle": "Sélectionnez le plan parfait pour votre entreprise",
+        "free": "Gratuit",
+        "pro": "Pro",
+        "enterprise": "Entreprise",
+        "monthly": "Mensuel",
+        "yearly": "Annuel",
+        "save": "Économisez 20%",
+        "mostPopular": "Le Plus Populaire",
+        "getStarted": "Commencer",
+        "contactSales": "Contacter les Ventes",
+        "features": {
+          "users": "Utilisateurs",
+          "storage": "Stockage",
+          "support": "Support",
+          "analytics": "Analytiques",
+          "api": "Accès API",
+          "customization": "Personnalisation"
+        },
+        "previous": "Étape Précédente",
+        "complete": "Terminer l'Inscription"
+      }
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "operations": "Opérations",
+      "crm": "CRM",
+      "emails": "Emails",
+      "finance": "Finance et Comptabilité",
+      "analytics": "Analyses et Insights",
+      "settings": "Paramètres"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "companyInfo": "Informations de l'Entreprise",
+      "postalCodes": "Codes Postaux",
+      "pointOfSale": "Paramètres de Point de Vente"
+    }
+  },
+  "businessPlans": {
+    "hero": {
+      "badge": "Choisissez Votre Plan",
+      "title": {
+        "line1": "Plans",
+        "line2": "d'Entreprise"
+      },
+      "description": "Choisissez le plan parfait pour la croissance de votre entreprise et",
+      "descriptionHighlight": " atteignez vos objectifs"
+    },
+    "section": {
+      "title": "Nos Plans d'Entreprise",
+      "subtitle": "Meilleur prix",
+      "description": "Tarification abordable et forfaits pour une facturation fluide et une productivité efficace",
+      "content": "HRSCommerciale est une plateforme en ligne conçue pour les petites et moyennes entreprises (PME & TPE), offrant un support complet dans la numérisation de leurs processus de travail. Avec des technologies avancées et des modules généralement utilisés par les grandes entreprises, comme le module financier, la gestion des ressources humaines, le CRM, la vente de rue, etc., HRSCommerciale aide à transformer leur entreprise en réduisant les coûts et en augmentant les revenus. Tout à des tarifs compétitifs, favorisant leur croissance vers de nouveaux horizons."
+    },
+    "loading": "Chargement des plans..."
+  },
+  "downloadSaaS": {
+    "hero": {
+      "badge": "Application Desktop HRS Commerciale",
+      "title": {
+        "line1": "Téléchargez Votre",
+        "line2": "Solution d'Entreprise"
+      },
+      "description": "Accédez à toute la puissance de HRS Commerciale avec notre application desktop complète. Gérez toute votre entreprise depuis une plateforme puissante."
+    },
+    "features": {
+      "title": "Tout Ce Dont Vous Avez Besoin pour Gérer Votre Entreprise",
+      "subtitle": "Notre application desktop fournit tous les outils nécessaires pour une gestion d'entreprise complète"
+    },
+    "appInfo": {
+      "title": "Pourquoi Choisir HRS Commerciale ?",
+      "subtitle": "Conçu spécifiquement pour les entreprises tunisiennes avec les besoins du marché local à l'esprit",
+      "sectionTitle": "Gestion d'Entreprise Complète",
+      "features": {
+        "pos": "Système de Point de Vente complet avec scan de codes-barres",
+        "inventory": "Gestion d'inventaire avancée avec suivi en temps réel",
+        "crm": "Gestion de la relation client (CRM) avec historique d'achat",
+        "analytics": "Tableau de bord de rapports financiers et d'analyses",
+        "multiLocation": "Support multi-emplacements pour les entreprises en croissance",
+        "offline": "Capacité hors ligne avec synchronisation cloud",
+        "languages": "Support des langues arabe et française",
+        "tax": "Intégration du système fiscal tunisien"
+      }
+    },
+    "security": {
+      "title": "Sécurisé et Fiable",
+      "subtitle": "Vos données d'entreprise sont protégées avec une sécurité de niveau entreprise et une surveillance 24/7",
+      "badge": "Sécurité de Niveau Entreprise",
+      "features": {
+        "encryption": {
+          "title": "Chiffrement des Données",
+          "description": "Toutes les données sont chiffrées en transit et au repos avec un chiffrement militaire AES-256"
+        },
+        "access": {
+          "title": "Accès Sécurisé",
+          "description": "Authentification multi-facteurs, connexion biométrique et permissions basées sur les rôles pour une sécurité maximale"
+        },
+        "support": {
+          "title": "Support 24/7",
+          "description": "Support technique 24h/24, surveillance automatisée et résolution instantanée des problèmes"
+        }
+      },
+      "certifications": {
+        "iso": "Certifié ISO 27001",
+        "gdpr": "Conforme RGPD",
+        "soc": "SOC 2 Type II",
+        "uptime": "99.9% de Disponibilité"
+      }
+    },
+    "download": {
+      "title": "Prêt à Télécharger ?",
+      "subtitle": "Commencez avec HRS Commerciale aujourd'hui",
+      "button": "Télécharger Maintenant",
+      "security": "Téléchargement Sécurisé",
+      "offline": "Prêt Hors Ligne",
+      "progress": {
+        "preparing": "Préparation du téléchargement...",
+        "starting": "Démarrage du téléchargement...",
+        "complete": "Téléchargement terminé !"
+      },
+      "error": "Échec du Téléchargement"
+    },
+    "systemRequirements": {
+      "title": "Exigences Système",
+      "requirements": {
+        "os": {
+          "name": "Système d'Exploitation",
+          "value": "Windows 7/10/11, macOS 10.12+, Ubuntu 16.04+"
+        },
+        "ram": {
+          "name": "RAM",
+          "value": "Minimum 2GB, Recommandé 4GB+"
+        },
+        "storage": {
+          "name": "Stockage",
+          "value": "200MB d'espace libre pour l'application"
+        },
+        "network": {
+          "name": "Réseau",
+          "value": "Capable hors ligne, synchronisation cloud optionnelle"
+        },
+        "display": {
+          "name": "Affichage",
+          "value": "Résolution minimum 1024x768"
+        }
+      }
+    },
+    "loading": "Chargement..."
+  },
+  "payment": {
+    "loading": "Chargement du paiement...",
+    "choosePaymentMethod": "Choisir le Mode de Paiement",
+    "selectPreferredOption": "Sélectionnez votre option de paiement préférée",
+    "billingEmail": "Email de Facturation",
+    "verified": "Vérifié",
+    "billingInformation": "Informations de Facturation",
+    "fullName": "Nom Complet",
+    "fullNamePlaceholder": "Jean Dupont",
+    "address": "Adresse",
+    "addressPlaceholder": "123 Rue Principale",
+    "city": "Ville",
+    "cityPlaceholder": "Tunis",
+    "postalCode": "Code Postal",
+    "postalCodePlaceholder": "1000",
+    "country": "Pays",
+    "cardInformation": "Informations de Carte",
+    "cardDetails": "Détails de la Carte",
+    "loadingSecureField": "Chargement du champ de carte sécurisé…",
+    "securedByStripe": "Sécurisé par Stripe",
+    "devModeWarning": "Mode Dev : L'avertissement HTTPS est normal pour localhost",
+    "creditCard": "Carte de Crédit",
+    "creditCardDescription": "Visa, Mastercard, American Express",
+    "paypal": "PayPal",
+    "paypalDescription": "Payer avec votre compte PayPal",
+    "bankTransfer": "Virement Bancaire",
+    "bankTransferDescription": "Virement bancaire direct",
+    "comingSoon": "Bientôt",
+    "completePayment": "Finaliser le Paiement",
+    "processing": "Traitement...",
+    "backToPlans": "← Retour aux Plans",
+    "subscribeTo": "S'abonner à",
+    "perMonth": "par mois",
+    "billedEveryMonth": "Facturé chaque mois",
+    "subtotal": "Sous-total",
+    "tax": "Taxe",
+    "totalDueToday": "Total dû aujourd'hui",
+    "sslSecured": "Sécurisé SSL",
+    "pciCompliant": "Conforme PCI",
+    "planDescription": "inclut une gestion d'entreprise illimitée, des fonctionnalités CRM avancées, un support prioritaire, un stockage cloud sécurisé et un accès à l'application mobile pour les besoins croissants de votre entreprise.",
+    "paymentMethodNotAvailable": "Cette méthode de paiement n'est pas encore disponible. Veuillez sélectionner Carte de Crédit.",
+    "paymentMethodComingSoon": "arrive bientôt ! Veuillez sélectionner Carte de Crédit pour le moment.",
+    "cardElementNotFound": "Élément de carte non trouvé",
+    "paymentMethodCreationFailed": "Échec de la création de la méthode de paiement",
+    "missingPaymentConfig": "Configuration de paiement manquante. Veuillez réessayer.",
+    "paymentConfirmationFailed": "Échec de la confirmation du paiement",
+    "additionalAuthRequired": "Une authentification supplémentaire est requise. Veuillez suivre les invites à l'écran ou réessayer.",
+    "cardDeclined": "Votre carte a été refusée. Veuillez utiliser une autre carte ou réessayer.",
+    "paymentCanceled": "Le paiement a été annulé. Vous pouvez réessayer quand vous serez prêt.",
+    "paymentNotCompleted": "Le paiement n'est pas encore terminé (statut : {status}). Veuillez réessayer ou attendre un moment.",
+    "paymentProcessingError": "Une erreur s'est produite lors du traitement de votre paiement. Veuillez réessayer.",
+    "stripeKeyMissing": "Clé publique Stripe manquante (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY).",
+    "stripeKeyInvalid": "Le format de la clé publique Stripe semble invalide. Elle devrait commencer par pk_test_ ou pk_live_.",
+    "stripeInitFailed": "Stripe a échoué à s'initialiser. Vérifiez votre clé publique et votre réseau."
+  },
+  "contactUs": {
+    "hero": {
+      "badge": "Nous sommes là pour vous aider",
+      "title": {
+        "line1": "Contactez",
+        "line2": "Nous"
+      },
+      "description": "Contactez notre équipe et discutons de comment nous pouvons",
+      "descriptionHighlight": " aider votre entreprise à grandir"
+    },
+    "form": {
+      "title": "Entrer en Contact",
+      "subtitle": "Nous aimerions avoir de vos nouvelles. Envoyez-nous un message et nous répondrons dès que possible.",
+      "contactInfo": {
+        "title": "Informations de Contact",
+        "subtitle": "Nous sommes là pour vous aider et répondre à toute question que vous pourriez avoir. Nous avons hâte d'avoir de vos nouvelles."
+      },
+      "fields": {
+        "name": "Nom Complet *",
+        "email": "Adresse Email *",
+        "subject": "Sujet *",
+        "message": "Message *"
+      },
+      "placeholders": {
+        "name": "Entrez votre nom complet",
+        "email": "Entrez votre adresse email",
+        "message": "Parlez-nous de votre projet ou demande..."
+      },
+      "subjects": {
+        "select": "Sélectionnez un sujet",
+        "general": "Demande Générale",
+        "business": "Consultation d'Entreprise",
+        "support": "Support Technique",
+        "partnership": "Partenariat",
+        "other": "Autre"
+      },
+      "button": "Envoyer le Message",
+      "sending": "Envoi du Message...",
+      "success": "Message envoyé avec succès !",
+      "error": "Échec de l'envoi du message. Veuillez réessayer.",
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
+      "replyTime": "Nous répondrons dans les 24 heures"
+    },
+    "loading": "Chargement du contact..."
+  },
+  "common": {
+    "appName": "Application HRS",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "appName": "Application HRS"
+  }
+}

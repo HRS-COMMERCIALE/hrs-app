@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useLanguageStore } from '../../../store/languageStore';
+import { useI18n } from '@/i18n/hooks';
 import { PAYMENT_PLANS } from '../../../app/api/stripe-config/PaymentPlanceConfig';
 
 
@@ -22,53 +22,42 @@ interface PricingTier {
 
 const BusinessPlan: React.FC = () => {
   const router = useRouter();
-  const { currentTranslations } = useLanguageStore();
-  const language = currentTranslations.homePage.BusinessPlan;
+  const { tNested } = useI18n();
+  const language = tNested('homePage.businessPlan');
+
+  const pricingTiersRaw = (language as any).raw ? (language as any).raw('pricingTiers') : [];
+  const customPlanFeatures = (language as any).raw ? (language as any).raw('customPlan.features') : [];
 
   const content = {
     header: {
       badge: {
-        icon: language.header.badge.icon,
-        text: language.header.badge.text
+        icon: language('header.badge.icon'),
+        text: language('header.badge.text')
       },
-      title: language.header.title,
-      subtitle: language.header.subtitle
+      title: language('header.title'),
+      subtitle: language('header.subtitle')
     },
     pricingTiers: [
-      {
-        name: language.pricingTiers?.[0]?.name || 'Premium',
-        price: language.pricingTiers?.[0]?.price || '99.99',
-        currency: language.pricingTiers?.[0]?.currency || 'USD',
-        features: language.pricingTiers?.[0]?.features || [],
-        buttonText: language.pricingTiers?.[0]?.buttonText || 'Subscribe'
-      },
-      {
-        name: language.pricingTiers?.[1]?.name || 'Platinum',
-        price: language.pricingTiers?.[1]?.price || '190.99',
-        currency: language.pricingTiers?.[1]?.currency || 'USD',
-        features: language.pricingTiers?.[1]?.features || [],
-        buttonText: language.pricingTiers?.[1]?.buttonText || 'Subscribe',
-        popular: true
-      },
-      {
-        name: language.pricingTiers?.[2]?.name || 'Diamond',
-        price: language.pricingTiers?.[2]?.price || '270.00',
-        currency: language.pricingTiers?.[2]?.currency || 'USD',
-        features: language.pricingTiers?.[2]?.features || [],
-        buttonText: language.pricingTiers?.[2]?.buttonText || 'Subscribe'
-      }
-    ],
+      ...(Array.isArray(pricingTiersRaw) ? pricingTiersRaw : [])
+    ].map((tier: any, idx: number) => ({
+      name: tier?.name ?? ['Premium', 'Platinum', 'Diamond'][idx] ?? 'Premium',
+      price: tier?.price ?? ['99.99', '190.99', '270.00'][idx] ?? '99.99',
+      currency: tier?.currency ?? 'USD',
+      features: (tier?.features ?? []) as string[],
+      buttonText: tier?.buttonText ?? language('defaultSubscribe'),
+      popular: idx === 1 || Boolean(tier?.popular)
+    })),
     customPlan: {
-      name: language.customPlan.name,
-      price: language.customPlan.price,
-      description: language.customPlan.description,
-      features: language.customPlan.features,
-      buttonText: language.customPlan.buttonText
+      name: language('customPlan.name'),
+      price: language('customPlan.price'),
+      description: language('customPlan.description'),
+      features: Array.isArray(customPlanFeatures) ? customPlanFeatures : [],
+      buttonText: language('customPlan.buttonText')
     },
     footer: {
-      maintenance: language.footer.maintenance,
-      pricing: language.footer.pricing,
-      innovation: language.footer.innovation
+      maintenance: language('footer.maintenance'),
+      pricing: language('footer.pricing'),
+      innovation: language('footer.innovation')
     }
   };
 
@@ -108,11 +97,11 @@ const BusinessPlan: React.FC = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {pricingTiers.map((tier, index) => (
             <div
               key={index}
-              className={`relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group flex flex-col ${
+              className={`relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group flex flex-col min-h-[500px] ${
                 tier.popular
                   ? 'border-blue-500 ring-4 ring-blue-100'
                   : 'border-gray-200 hover:border-[#3c959d]/50'
@@ -128,30 +117,30 @@ const BusinessPlan: React.FC = () => {
               {tier.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <span className="bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                    Most Popular
+                    {language('mostPopular')}
                   </span>
                 </div>
               )}
 
-              <div className="text-center mb-6 relative z-10">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <div className="text-center mb-8 relative z-10">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   {tier.name}
                 </h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-4xl font-bold text-gray-900">
                     {tier.price}
                   </span>
-                  <span className="text-base text-gray-500 ml-1">
+                  <span className="text-lg text-gray-500 ml-2">
                     {tier.currency}
                   </span>
                 </div>
               </div>
 
-              <ul className="space-y-2 mb-6 flex-1 relative z-10">
+              <ul className="space-y-4 mb-8 flex-1 relative z-10">
                 {tier.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start">
                     <svg
-                      className={`w-4 h-4 mr-2 mt-0.5 flex-shrink-0 ${
+                      className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${
                         feature.included
                           ? 'text-green-500'
                           : 'text-gray-400'
@@ -166,7 +155,7 @@ const BusinessPlan: React.FC = () => {
                       />
                     </svg>
                     <span
-                      className={`text-xs ${
+                      className={`text-sm ${
                         feature.included
                           ? 'text-gray-700'
                           : 'text-gray-500 line-through'
@@ -193,10 +182,10 @@ const BusinessPlan: React.FC = () => {
                     router.push(`/Payment?planId=premium`);
                   }
                 }}
-                className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 text-sm relative z-10 ${
+                className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 text-base relative z-10 ${
                   tier.popular
-                    ? 'bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white hover:shadow-lg hover:shadow-blue-500/25'
-                    : 'bg-gray-100 text-gray-900 hover:bg-[#3c959d]/10 hover:border-[#3c959d]/50'
+                    ? 'bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105'
+                    : 'bg-gray-100 text-gray-900 hover:bg-[#3c959d]/10 hover:border-[#3c959d]/50 hover:scale-105'
                 }`}
               >
                 {tier.buttonText}
@@ -205,29 +194,29 @@ const BusinessPlan: React.FC = () => {
           ))}
 
           {/* Custom Plan Card */}
-          <div className="relative bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl shadow-xl p-6 border-2 border-purple-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col group">
+          <div className="relative bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl shadow-xl p-8 border-2 border-purple-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col group min-h-[500px]">
             {/* Card Background Glow */}
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-indigo-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
-            <div className="text-center mb-6 relative z-10">
-              <h3 className="text-xl font-bold text-white mb-2">
+            <div className="text-center mb-8 relative z-10">
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {content.customPlan.name}
               </h3>
               <div className="flex items-baseline justify-center">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-4xl font-bold text-white">
                   {content.customPlan.price}
                 </span>
               </div>
-              <p className="text-purple-100 mt-1 text-sm">
+              <p className="text-purple-100 mt-2 text-base">
                 {content.customPlan.description}
               </p>
             </div>
 
-            <ul className="space-y-2 mb-6 flex-1 relative z-10">
+            <ul className="space-y-4 mb-8 flex-1 relative z-10">
               {content.customPlan.features.map((feature, index) => (
                 <li key={index} className="flex items-start">
                   <svg
-                    className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-purple-200"
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-purple-200"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -237,7 +226,7 @@ const BusinessPlan: React.FC = () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="text-xs text-purple-100">
+                  <span className="text-sm text-purple-100">
                     {feature}
                   </span>
                 </li>
@@ -246,7 +235,7 @@ const BusinessPlan: React.FC = () => {
 
             <button 
               onClick={() => router.push(`/Payment?planId=custom`)}
-              className="w-full py-2.5 px-4 rounded-lg font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200 text-sm relative z-10 hover:shadow-lg hover:shadow-purple-500/25"
+              className="w-full py-4 px-6 rounded-xl font-semibold bg-white text-purple-600 hover:bg-purple-50 transition-all duration-200 text-base relative z-10 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105"
             >
               {content.customPlan.buttonText}
             </button>

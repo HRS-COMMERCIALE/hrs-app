@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { extractTokenFromHeader, verifyAccessToken, TokenPayload, isTokenExpired } from '../../../utils/jwt/jwtUtils';
+import { verifyAccessToken, TokenPayload, isTokenExpired } from '../../../utils/jwt/jwtUtils';
 
 export type AuthResult = {
   ok: true;
@@ -13,15 +13,10 @@ export type AuthResult = {
 
 export async function getAuthPayload(req: Request): Promise<AuthResult> {
   try {
-    // 1) Try HTTP-only cookie first (more secure)
+    // Only allow HTTP-only cookie tokens
     const cookieStore = await cookies();
     const cookieToken = cookieStore.get('accessToken')?.value || cookieStore.get('token')?.value || null;
-
-    // 2) Fallback to Authorization: Bearer <token>
-    const authHeader = req.headers.get('authorization');
-    const headerToken = extractTokenFromHeader(authHeader);
-
-    const token = cookieToken || headerToken;
+    const token = cookieToken;
     if (!token) {
       return { 
         ok: false, 

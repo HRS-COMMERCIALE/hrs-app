@@ -36,7 +36,9 @@ export function getSequelize(): Sequelize {
       dialect: 'postgres',
       dialectModule: require('pg'),
       models: [], // Add your models here later
-      logging: (sql) => console.log(`[SQL] ${sql}`), // Clean SQL logging
+      logging: false, //
+      
+      // logging: (sql) => console.log(`[SQL] ${sql}`), // Clean SQL logging Disabled SQL logging
       pool: {
         max: 5,
         min: 0,

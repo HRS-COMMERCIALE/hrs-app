@@ -5,18 +5,14 @@ import { useRouter } from 'next/navigation';
 import { ShoppingCart, CreditCard, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 export interface OrderData {
-    planId: string;
-    seats: number;
-    billingCycle: 'monthly' | 'yearly';
-    coupon?: string;
+    // Simplified - no plan selection needed
+    termsAccepted: boolean;
 }
 
 type OrderFormProps = {
-    availablePlans: Array<{ id: string; name: string; price?: string }>;
-    selectedPlan?: { id: string; name: string; price: string };
+    availablePlans: Array<{ id: string; name: string; price?: string }>; // Keep for compatibility but not used
     initialValues?: Partial<OrderData>;
     onSubmit: (data: OrderData) => void;
-    onPlanChange?: (planId: string) => void;
     collectedData?: unknown;
 };
 
@@ -30,22 +26,17 @@ const formatValidationError = (details: string): string => {
         
         // Map field names to user-friendly labels
         const fieldLabels: Record<string, string> = {
-            'user.firstName': 'First Name',
-            'user.lastName': 'Last Name',
-            'user.email': 'Email',
-            'user.mobile': 'Mobile Number',
-            'user.title': 'Job Title',
             'business.businessName': 'Business Name',
             'business.taxId': 'Tax ID',
             'business.industry': 'Industry',
             'business.currency': 'Currency',
             'business.size': 'Business Size',
             'business.cnssCode': 'CNSS Code',
-            'address.street': 'Street Address',
-            'address.city': 'City',
+            'address.country': 'Country',
             'address.governorate': 'Governorate',
             'address.postalCode': 'Postal Code',
-            'address.country': 'Country'
+            'address.address': 'Address',
+            'address.phone': 'Phone'
         };
         
         const friendlyFieldName = fieldLabels[field] || field.replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -83,13 +74,10 @@ const loadTermsAcceptance = (): boolean => {
     }
 };
 
-export default function OrderForm({ availablePlans, selectedPlan, initialValues, onSubmit, onPlanChange, collectedData }: OrderFormProps) {
+export default function OrderForm({ availablePlans, initialValues, onSubmit, collectedData }: OrderFormProps) {
     const router = useRouter();
     const [formData, setFormData] = useState<OrderData>({
-        planId: initialValues?.planId ?? (selectedPlan?.id ?? availablePlans[0]?.id ?? ''),
-        seats: 1, // Default to 1 seat
-        billingCycle: 'monthly', // Default to monthly
-        coupon: initialValues?.coupon ?? '',
+        termsAccepted: initialValues?.termsAccepted ?? false,
     });
 
     const [showTerms, setShowTerms] = useState(false);
@@ -119,62 +107,14 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
         }
     }, [acceptedTerms]);
 
-    // Plan pricing mapping - using the actual plan names and prices from subscription
-    const planPricing = {
-        'plan-0': { name: 'Basic Plan', price: 59.99 },
-        'plan-1': { name: 'Pro Plan', price: 129.00 },
-        'plan-2': { name: 'Enterprise Plan', price: 270.00 }
-    };
+    // Simplified - no pricing calculations needed
 
-    // Update formData when selectedPlan changes
-    useEffect(() => {
-        if (selectedPlan?.id && selectedPlan.id !== formData.planId) {
-            setFormData(prev => ({
-                ...prev,
-                planId: selectedPlan.id
-            }));
-        }
-    }, [selectedPlan?.id]);
-
-    // Get the actual plan data from subscription or fallback to availablePlans
-    const actualPlan = selectedPlan?.id === formData.planId ? selectedPlan : null;
-    const availablePlan = availablePlans.find(p => p.id === formData.planId);
-    
-    const currentPlan = actualPlan ? {
-        name: actualPlan.name,
-        price: parseFloat(actualPlan.price.replace(/[^\d.]/g, '')) || 0
-    } : availablePlan ? {
-        name: availablePlan.name,
-        price: parseFloat(availablePlan.price?.replace(/[^\d.]/g, '') || '0')
-    } : planPricing[formData.planId as keyof typeof planPricing] || planPricing['plan-0'];
-    
-    const unitPrice = currentPlan.price;
-    const discount = 0; // Always 0 for now
-    const discountAmount = (unitPrice * formData.seats * discount) / 100;
-    const subtotal = unitPrice * formData.seats;
-    const tva = 19; // Always 19%
-    const tvaAmount = (subtotal - discountAmount) * (tva / 100);
-    const totalHT = subtotal - discountAmount;
-    const totalTTC = totalHT + tvaAmount;
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'seats' ? Number(value) : value,
+            [name]: checked,
         }));
-        
-        // If plan changes, notify parent component
-        if (name === 'planId' && onPlanChange) {
-            const updatedFormData: OrderData = {
-                ...formData,
-                planId: value,
-            };
-            // eslint-disable-next-line no-console
-            onPlanChange(value);
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -188,26 +128,21 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
         }
 
         const submission: OrderData = {
-            planId: formData.planId,
-            seats: Math.max(1, Number(formData.seats) || 1),
-            billingCycle: formData.billingCycle,
-            coupon: formData.coupon?.trim() || '',
+            termsAccepted: formData.termsAccepted,
         };
 
         // Notify parent (logging, etc.)
         onSubmit(submission);
 
-        // Build payload expected by the API
+        // Build payload expected by the API (only business and address)
         const data = (collectedData as any) || {};
         const payload = {
-            user: data.user,
             business: data.business,
             address: data.address,
-            subscription: data.subscription,
         };
 
         // Basic guard
-        if (!payload.user || !payload.business || !payload.address || !payload.subscription) {
+        if (!payload.business || !payload.address) {
             setSubmitError('Missing required information. Please complete previous steps.');
             return;
         }
@@ -218,13 +153,6 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             
             // Create FormData to properly handle file uploads
             const formData = new FormData();
-            
-            // Add user data
-            Object.entries(payload.user).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    formData.append(`user[${key}]`, value.toString());
-                }
-            });
             
             // Add business data (including logo file)
             Object.entries(payload.business).forEach(([key, value]) => {
@@ -245,12 +173,7 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                 }
             });
             
-            // Add subscription data
-            Object.entries(payload.subscription).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    formData.append(`subscription[${key}]`, value.toString());
-                }
-            });
+            // No subscription data needed
             
             // Log FormData contents
             for (let [key, value] of formData.entries()) {
@@ -262,16 +185,16 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             });
 
             if (res.ok) {
-                router.push('/verify-email');
+                router.push('/dashboard');
                 return;
             }
 
             // Try to extract server error message
             try {
                 const errorData = await res.json();
-                console.error('❌ Registration failed:', errorData);
+                console.error('❌ Business creation failed:', errorData);
                 
-                // Handle validation errors specifically
+                // Handle specific error types from the API
                 if (errorData.type === 'validation_error' && errorData.details) {
                     const formattedMessage = formatValidationError(errorData.details);
                     const field = getFieldFromError(errorData.details);
@@ -293,12 +216,26 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                     } else {
                         setSubmitError(formattedMessage);
                     }
+                } else if (errorData.type === 'plan_forbidden') {
+                    setSubmitError('Your current plan does not allow creating a business. Please upgrade your plan.');
+                } else if (errorData.type === 'plan_not_supported') {
+                    setSubmitError('Business creation is not available for custom plans at this time.');
+                } else if (errorData.type === 'business_limit_reached') {
+                    setSubmitError('You have reached the maximum number of businesses allowed for your plan.');
+                } else if (errorData.type === 'business_name_exists') {
+                    setSubmitError('A business with this name already exists. Please choose a different name.');
+                } else if (errorData.type === 'tax_id_exists') {
+                    setSubmitError('A business with this Tax ID already exists. Please check your Tax ID.');
+                } else if (errorData.type === 'cnss_code_exists') {
+                    setSubmitError('A business with this CNSS code already exists. Please check your CNSS code.');
+                } else if (errorData.type === 'payload_too_large') {
+                    setSubmitError('The logo file is too large. Please choose a smaller image (max 10MB).');
                 } else {
-                    setSubmitError(errorData?.message || 'Registration failed. Please try again.');
+                    setSubmitError(errorData?.message || 'Business creation failed. Please try again.');
                 }
             } catch {
-                console.error('❌ Registration failed with status:', res.status);
-                setSubmitError('Registration failed. Please try again.');
+                console.error('❌ Business creation failed with status:', res.status);
+                setSubmitError('Business creation failed. Please try again.');
             }
         } catch (err) {
             console.error('❌ Network error during registration:', err);
@@ -323,6 +260,7 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
     const handleTermsAcceptance = () => {
         if (agreeChecked) {
             setAcceptedTerms(true);
+            setFormData(prev => ({ ...prev, termsAccepted: true }));
             setShowTerms(false);
             // Save to localStorage
             saveTermsAcceptance(true);
@@ -334,10 +272,9 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             {/* Top notice */}
             <div className="mb-4 rounded-xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4">
                 <div className="text-sm text-green-800">
-                    <p className="font-semibold mb-1">Congratulations, we are about to finalize the creation of your business account!</p>
+                    <p className="font-semibold mb-1">Ready to create your business!</p>
                     <p>
-                        Once your validation is completed, you will receive an email containing all the access information to your email address:
-                        <span className="ml-1 font-mono bg-green-100 px-2 py-0.5 rounded text-xs">qsfqfqqgqsfgfze@ismartsense.online</span>
+                        Once created, you'll be able to manage your business settings and invite team members.
                     </p>
                 </div>
             </div>
@@ -389,113 +326,37 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
             )}
 
             <form id="order-form" onSubmit={handleSubmit} className="space-y-6" data-terms-accepted={acceptedTerms ? 'true' : 'false'}>
-                {/* Order Configuration */}
-                <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
-                    <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-[#3c959d]" />
-                        Order Configuration
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="planId" className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-1.5">
-                                Plan
-                                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600 border border-red-200">
-                                    Required
-                                </span>
-                            </label>
-                            <select
-                                id="planId"
-                                name="planId"
-                                value={formData.planId}
-                                onChange={handleChange}
-                                required
-                                className="w-full rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 transition-all duration-200 hover:border-slate-300 focus:border-[#3c959d] focus:outline-none focus:ring-2 focus:ring-[#3c959d]/10 focus:shadow-sm"
-                            >
-                                {availablePlans.map(plan => {
-                                    // Find the actual plan data from subscription
-                                    const actualPlan = selectedPlan?.id === plan.id ? selectedPlan : null;
-                                    const displayName = actualPlan?.name || plan.name;
-                                    const displayPrice = actualPlan?.price || '';
-                                    
-                                    return (
-                                        <option key={plan.id} value={plan.id}>
-                                            {displayName} {displayPrice && `(${displayPrice})`}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label htmlFor="coupon" className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-1.5">
-                                Coupon Code (Optional)
-                            </label>
-                            <input
-                                id="coupon"
-                                name="coupon"
-                                value={formData.coupon}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 transition-all duration-200 hover:border-slate-300 focus:border-[#3c959d] focus:outline-none focus:ring-2 focus:ring-[#3c959d]/10 focus:shadow-sm"
-                                placeholder="Enter coupon code"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Pricing Table */}
+                {/* Business Summary */}
                 <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <ShoppingCart className="w-4 h-4 text-[#3c959d]" />
-                        Order Details
+                        Business Summary
                     </h2>
                     
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b border-slate-200">
-                                    <th className="text-left py-2 px-2 font-semibold text-slate-700">Description</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-slate-700">Unit Price</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-slate-700">Discount</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-slate-700">Quantity</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-slate-700">VAT</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-slate-700">Total HT</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="border-b border-slate-100">
-                                    <td className="py-2 px-2 text-slate-800">{currentPlan.name}</td>
-                                    <td className="py-2 px-2 text-right text-slate-800">TND {unitPrice.toFixed(3)}</td>
-                                    <td className="py-2 px-2 text-right text-slate-800">{discount.toFixed(3)}%</td>
-                                    <td className="py-2 px-2 text-right text-slate-800">{formData.seats}</td>
-                                    <td className="py-2 px-2 text-right text-slate-800">{tva.toFixed(3)}%</td>
-                                    <td className="py-2 px-2 text-right text-slate-800">TND {totalHT.toFixed(3)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {/* Totals */}
-                    <div className="mt-4 space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
-                            <span className="text-slate-600">Total Discount:</span>
-                            <span className="font-semibold text-slate-800">TND {discountAmount.toFixed(3)}</span>
+                    <div className="space-y-3 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <span className="text-slate-600">Business Name:</span>
+                                <span className="ml-2 font-semibold text-slate-800">{(collectedData as any)?.business?.businessName || 'Not provided'}</span>
+                            </div>
+                            <div>
+                                <span className="text-slate-600">Industry:</span>
+                                <span className="ml-2 font-semibold text-slate-800">{(collectedData as any)?.business?.industry || 'Not provided'}</span>
+                            </div>
+                            <div>
+                                <span className="text-slate-600">Tax ID:</span>
+                                <span className="ml-2 font-semibold text-slate-800">{(collectedData as any)?.business?.taxId || 'Not provided'}</span>
+                            </div>
+                            <div>
+                                <span className="text-slate-600">Currency:</span>
+                                <span className="ml-2 font-semibold text-slate-800">{(collectedData as any)?.business?.currency || 'Not provided'}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between py-1">
-                            <span className="text-slate-600">Total HT:</span>
-                            <span className="font-semibold text-slate-800">TND {totalHT.toFixed(3)}</span>
-                        </div>
-                        <div className="flex justify-between py-1">
-                            <span className="text-slate-600">Total VAT:</span>
-                            <span className="font-semibold text-slate-800">TND {tvaAmount.toFixed(3)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-t border-slate-200 pt-2">
-                            <span className="text-lg font-bold text-slate-800">Total TTC:</span>
-                            <span className="text-lg font-bold text-[#3c959d]">TND {totalTTC.toFixed(3)}</span>
+                        <div className="pt-2 border-t border-slate-200">
+                            <span className="text-slate-600">Address:</span>
+                            <span className="ml-2 font-semibold text-slate-800">{(collectedData as any)?.address?.address || 'Not provided'}</span>
                         </div>
                     </div>
-
-                    {/* Submit button moved to container footer */}
                 </div>
 
                 {/* Terms of Service */}
@@ -519,6 +380,15 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                             {acceptedTerms ? 'View Terms Again' : 'View Terms'}
                         </button>
                     </div>
+                    
+                    {/* Hidden checkbox for form state */}
+                    <input
+                        type="checkbox"
+                        name="termsAccepted"
+                        checked={formData.termsAccepted}
+                        onChange={handleChange}
+                        className="hidden"
+                    />
                 </div>
 
                 {/* Confirmation Message */}
@@ -526,8 +396,8 @@ export default function OrderForm({ availablePlans, selectedPlan, initialValues,
                     <div className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <div className="text-sm text-green-800">
-                            <p className="font-semibold mb-2">Congratulations, we are about to finalize the creation of your business account!</p>
-                            <p>Once your validation is completed, you will receive an email containing all the access information to your email address: <span className="font-mono bg-green-100 px-2 py-1 rounded text-xs">qsfqfqqgqsfgfze@ismartsense.online</span></p>
+                            <p className="font-semibold mb-2">Ready to create your business!</p>
+                            <p>Once created, you'll be able to manage your business settings, add team members, and start using all the features available in your plan.</p>
                         </div>
                     </div>
                 </div>
