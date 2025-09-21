@@ -3,6 +3,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { usePointOfSale, useCreatePointOfSale, useUpdatePointOfSale, useDeletePointOfSale } from '../../../../hooks/usePointOfSale';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Store } from 'lucide-react';
 
 interface PointOfSale {
   id: number;
@@ -231,12 +233,12 @@ export default function PointOfSale() {
     return (
       <div className="max-w-6xl">
         <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center mx-auto mb-4">
-              <Icon icon="solar:refresh-bold-duotone" className="text-[#3c959d] animate-spin" width={32} height={32} />
-            </div>
-            <p className="text-gray-600">Loading points of sale...</p>
-          </div>
+          <LoadingSpinner 
+            icon={Store}
+            message="Loading points of sale..."
+            variant="default"
+            size="md"
+          />
         </div>
       </div>
     );

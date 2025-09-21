@@ -65,6 +65,7 @@ export default function RegisterContainer() {
     };
     
     const [canSubmitOrder, setCanSubmitOrder] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     // Listen to order terms changes
     useEffect(() => {
@@ -210,6 +211,7 @@ export default function RegisterContainer() {
                             initialValues={data.order} 
                             collectedData={data}
                             onSubmit={handleOrder}
+                            onSubmittingChange={setIsSubmitting}
                         />
                     )}
                 </div>
@@ -246,14 +248,21 @@ export default function RegisterContainer() {
                         <button
                             type="submit"
                             form="order-form"
-                            disabled={!canSubmitOrder}
-                            className={`rounded-lg px-4 py-2 text-white ${
-                                !canSubmitOrder
+                            disabled={!canSubmitOrder || isSubmitting}
+                            className={`rounded-lg px-4 py-2 text-white flex items-center gap-2 ${
+                                !canSubmitOrder || isSubmitting
                                     ? 'bg-slate-300 cursor-not-allowed'
                                     : 'bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335]'
                             }`}
                         >
-                            Create Business
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    Creating Business...
+                                </>
+                            ) : (
+                                'Create Business'
+                            )}
                         </button>
                     )}
                 </div>

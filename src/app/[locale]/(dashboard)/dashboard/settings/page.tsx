@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import CompanyInformation from '../../../../../components/pages/dashboard/settings/CompanyInformation';
 import PostalCodes from '../../../../../components/pages/dashboard/settings/PostalCodes';
 import PointOfSale from '../../../../../components/pages/dashboard/settings/PointOfSale';
+import RoleManagement from '../../../../../components/pages/dashboard/settings/RoleManagement';
 
 type NavItem = {
   id: string;
@@ -21,7 +22,7 @@ type NavSection = {
 
 const sectionsData: NavSection[] = [
   {
-    name: 'Genefdjd',
+    name: 'General',
     icon: 'solar:settings-bold-duotone',
     items: [
       { 
@@ -128,7 +129,7 @@ const sectionsData: NavSection[] = [
     items: [
       { 
         id: 'counter-management', 
-        name: 'Counter Management', 
+        name: 'Role Management', 
         icon: 'mdi:view-grid-plus',
         description: 'Configure system counters and sequences'
       },
@@ -211,9 +212,9 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
         {/* Enhanced Left Navigation */}
-        <aside className="lg:col-span-4 xl:col-span-3 border-r border-gray-100 bg-white/60 backdrop-blur-sm">
+        <aside className="lg:col-span-4 xl:col-span-3 border-r border-gray-100 bg-white/60 backdrop-blur-sm flex flex-col h-[calc(100vh-6rem)]">
           {/* Search Bar */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 flex-shrink-0">
             <div className="relative">
               <Icon icon="solar:magnifer-linear" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width={16} height={16} />
               <input
@@ -226,7 +227,7 @@ export default function SettingsPage() {
             </div>
           </div>
           
-          <nav className="p-4 overflow-auto h-[calc(100vh-120px)]">
+          <nav className="flex-1 overflow-y-auto p-4">
             <div className="space-y-6">
               {filteredSections.map((section) => (
                 <div key={section.name} className="space-y-2">
@@ -292,6 +293,12 @@ export default function SettingsPage() {
               <PostalCodes />
             ) : activeId === 'pos-settings' ? (
               <PointOfSale />
+            ) : activeId === 'users' ? (
+              <RoleManagement />
+            ) : activeId === 'roles-permissions' ? (
+              <RoleManagement />
+            ) : activeId === 'counter-management' ? (
+              <RoleManagement />
             ) : (
               <div className="max-w-2xl">
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">

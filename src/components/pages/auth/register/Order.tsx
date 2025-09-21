@@ -14,6 +14,7 @@ type OrderFormProps = {
     initialValues?: Partial<OrderData>;
     onSubmit: (data: OrderData) => void;
     collectedData?: unknown;
+    onSubmittingChange?: (isSubmitting: boolean) => void;
 };
 
 // Helper function to format validation error messages
@@ -74,7 +75,7 @@ const loadTermsAcceptance = (): boolean => {
     }
 };
 
-export default function OrderForm({ availablePlans, initialValues, onSubmit, collectedData }: OrderFormProps) {
+export default function OrderForm({ availablePlans, initialValues, onSubmit, collectedData, onSubmittingChange }: OrderFormProps) {
     const router = useRouter();
     const [formData, setFormData] = useState<OrderData>({
         termsAccepted: initialValues?.termsAccepted ?? false,
@@ -107,6 +108,18 @@ export default function OrderForm({ availablePlans, initialValues, onSubmit, col
         }
     }, [acceptedTerms]);
 
+    // Notify parent about submitting state
+    useEffect(() => {
+        onSubmittingChange?.(isSubmitting);
+    }, [isSubmitting, onSubmittingChange]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            onSubmittingChange?.(false);
+        };
+    }, [onSubmittingChange]);
+
     // Simplified - no pricing calculations needed
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +132,12 @@ export default function OrderForm({ availablePlans, initialValues, onSubmit, col
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        
+        // Prevent multiple submissions
+        if (isSubmitting) {
+            return;
+        }
+        
         setSubmitError(null);
         setValidationErrors([]);
         
@@ -146,7 +165,6 @@ export default function OrderForm({ availablePlans, initialValues, onSubmit, col
             setSubmitError('Missing required information. Please complete previous steps.');
             return;
         }
-
 
         try {
             setIsSubmitting(true);
@@ -196,25 +214,47 @@ export default function OrderForm({ availablePlans, initialValues, onSubmit, col
                 
                 // Handle specific error types from the API
                 if (errorData.type === 'validation_error' && errorData.details) {
-                    const formattedMessage = formatValidationError(errorData.details);
-                    const field = getFieldFromError(errorData.details);
-                    
-                    if (field) {
-                        setValidationErrors([{
-                            field,
-                            message: formattedMessage
-                        }]);
+                    // Handle array of validation errors
+                    if (Array.isArray(errorData.details)) {
+                        const validationErrors = errorData.details.map((error: any) => ({
+                            field: error.path || 'unknown',
+                            message: error.message || 'Validation error'
+                        }));
+                        setValidationErrors(validationErrors);
                         
-                        // Dispatch event to notify container about validation error
-                        window.dispatchEvent(new CustomEvent('validation-error', {
-                            detail: {
-                                type: 'validation_error',
+                        // Dispatch event for the first error
+                        if (validationErrors.length > 0) {
+                            const firstError = validationErrors[0];
+                            window.dispatchEvent(new CustomEvent('validation-error', {
+                                detail: {
+                                    type: 'validation_error',
+                                    field: firstError.field,
+                                    message: firstError.message
+                                }
+                            }));
+                        }
+                    } else {
+                        // Handle string details (legacy format)
+                        const formattedMessage = formatValidationError(errorData.details);
+                        const field = getFieldFromError(errorData.details);
+                        
+                        if (field) {
+                            setValidationErrors([{
                                 field,
                                 message: formattedMessage
-                            }
-                        }));
-                    } else {
-                        setSubmitError(formattedMessage);
+                            }]);
+                            
+                            // Dispatch event to notify container about validation error
+                            window.dispatchEvent(new CustomEvent('validation-error', {
+                                detail: {
+                                    type: 'validation_error',
+                                    field,
+                                    message: formattedMessage
+                                }
+                            }));
+                        } else {
+                            setSubmitError(formattedMessage);
+                        }
                     }
                 } else if (errorData.type === 'plan_forbidden') {
                     setSubmitError('Your current plan does not allow creating a business. Please upgrade your plan.');

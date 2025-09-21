@@ -12,6 +12,7 @@ import Container from "@/components/pages/HomePage/container"
 import Footer from "@/components/pages/HomePage/footer"
 import PaymentSuccessPopup from '@/components/ui/PaymentSuccessPopup';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Home as HomeIcon, Loader } from 'lucide-react';
 
 function HomeContent() {
   const { authState, user } = useAuth();
@@ -34,7 +35,14 @@ function HomeContent() {
 
   // Show loading state while checking authentication
   if (authState === 'loading') {
-    return <LoadingSpinner appName={t('common.appName')} message={t('common.loading')} />;
+    return (
+      <LoadingSpinner 
+        icon={HomeIcon}
+        message="Loading HRS App..."
+        variant="fullscreen"
+        size="lg"
+      />
+    );
   }
 
   // Show home page with conditional content based on authentication
@@ -72,7 +80,14 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <LoadingSpinner 
+        icon={Loader}
+        message="Loading page..."
+        variant="fullscreen"
+        size="lg"
+      />
+    }>
       <HomeContent />
     </Suspense>
   );

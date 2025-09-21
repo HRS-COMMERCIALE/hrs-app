@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const businessAssociations = await BuinessUsers().findAll({
       where: { 
         userId: authPayload.userId,
-        isBanned: false // Only get non-banned associations
+        status: 'active' // Only get active (non-banned) associations
       },
       include: [
         {
@@ -30,6 +30,10 @@ export async function GET(request: NextRequest) {
             'currency',
             'industry',
             'size',
+            'website',
+            'registrationNumber',
+            'taxId',
+            'cnssCode'
           ]
         }
       ],
@@ -62,8 +66,7 @@ export async function GET(request: NextRequest) {
           website: business.website,
           registrationNumber: business.registrationNumber,
           taxId: business.taxId,
-          cnssCode: business.cnssCode,
-          createdAt: business.createdAt
+          cnssCode: business.cnssCode
         } : null
       };
     }).filter((item: any) => item.business !== null); // Filter out any null businesses

@@ -6,6 +6,23 @@ import { useToast } from '@/components/ui/alerts';
 import { EmailVerificationSuccess } from '@/components/ui/alerts';
 import { useAuth } from '@/store/authProvider';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Mail, 
+  Shield, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle, 
+  ArrowLeft, 
+  RefreshCw,
+  Sparkles,
+  Lock,
+  Eye,
+  EyeOff
+} from 'lucide-react';
 
 interface VerificationResponse {
   success: boolean;
@@ -31,6 +48,7 @@ export default function VerifyEmailPage() {
   const [attempts, setAttempts] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+  const [showCode, setShowCode] = useState(false);
 
   // Rate limiting state
   const [canSendCode, setCanSendCode] = useState(true);
@@ -212,7 +230,7 @@ export default function VerifyEmailPage() {
 
   if (isVerified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <EmailVerificationSuccess 
           onClose={() => router.push('/')}
         />
@@ -223,128 +241,209 @@ export default function VerifyEmailPage() {
   // Show loading state while checking verification status
   if (isCheckingStatus) {
     return (
-      <LoadingSpinner appName="HRS App" message="Checking verification status..." />
+      <LoadingSpinner 
+        icon={Mail}
+        message="Checking verification status..."
+        variant="fullscreen"
+        size="lg"
+      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Verification Form */}
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <div className="mx-auto h-12 w-12 text-blue-600">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 right-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-tilt"></div>
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzEwOF8xNzgpIj4KPHBhdGggZD0iTTQwIDEuNUgwVjBINDBWMS41WiIgZmlsbD0iIzMzMzMzMyIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTA4XzE3OCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K')] opacity-20"></div>
+      </div>
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          ></div>
+        ))}
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="w-full max-w-md">
+          {/* Header Card */}
+          <div className="mb-6 border-0 shadow-2xl bg-white/80 backdrop-blur-sm rounded-lg">
+            <div className="text-center p-6 pb-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg animate-float">
+                <Mail className="w-8 h-8 text-white" />
             </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Verify Your Email
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+                Email Verification
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+              <p className="text-slate-600 text-sm">
               {countdown > 0 
                 ? 'We\'ve sent a verification code to your email address'
                 : 'Enter the verification code sent to your email address'
               }
             </p>
+            </div>
           </div>
 
-          <div className="mt-8 space-y-6">
+          {/* Main Verification Card */}
+          <div className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm rounded-lg">
+            <div className="p-8">
             {/* Verification Code Input */}
-            <div>
-              <label htmlFor="verification-code" className="sr-only">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="verification-code" className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
                 Verification Code
               </label>
               <div className="relative">
-                <input
+                    <Input
                   id="verification-code"
-                  name="verification-code"
-                  type="text"
-                  required
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-2xl tracking-widest"
+                      type={showCode ? "text" : "password"}
                   placeholder="000000"
                   value={verificationCode}
                   onChange={handleCodeChange}
                   onKeyPress={handleKeyPress}
                   maxLength={6}
                   disabled={isLoading}
-                />
+                      className="text-center text-2xl tracking-widest font-mono h-14 border-2 focus:border-blue-500 focus:ring-blue-500/20"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowCode(!showCode)}
+                    >
+                      {showCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
               </div>
             </div>
 
             {/* Verify Button */}
-            <div>
-              <button
+                <Button
                 onClick={verifyEmail}
                 disabled={verificationCode.length !== 6 || isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="w-5 h-5 animate-spin" />
                     Verifying...
                   </div>
                 ) : (
-                  'Verify Email'
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Verify Email
+                    </div>
                 )}
-              </button>
-            </div>
+                </Button>
+
+                <Separator className="my-6" />
 
             {/* Send Code Again Button */}
             <div className="text-center">
-              <button
-                onClick={() => sendVerificationCode(false)} // Pass false for manual call
+                  <Button
+                    onClick={() => sendVerificationCode(false)}
                 disabled={!canSendCode || isSendingCode}
-                className="text-blue-600 hover:text-blue-500 disabled:text-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                    variant="outline"
+                    className="w-full h-10 border-2 hover:bg-slate-50 disabled:opacity-50"
               >
                 {isSendingCode ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className="w-4 h-4 animate-spin" />
                     Sending...
                   </div>
                 ) : canSendCode ? (
-                  'Send code again'
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        Send code again
+                      </div>
                 ) : (
-                  `Send code again in ${formatTime(sendCodeCountdown)}`
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Send code again in {formatTime(sendCodeCountdown)}
+                      </div>
                 )}
-              </button>
+                  </Button>
             </div>
 
             {/* Status Information */}
-            <div className="text-center space-y-2">
+                <div className="space-y-3">
               {countdown > 0 && (
-                <p className="text-sm text-gray-600">
+                    <div className="flex items-center justify-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-800">
                   Code expires in: {formatTime(countdown)}
-                </p>
+                      </span>
+                    </div>
               )}
               
               {attempts > 0 && attempts < MAX_ATTEMPTS && (
-                <p className="text-sm text-orange-600">
+                    <div className="flex items-center justify-center gap-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <AlertCircle className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm font-medium text-orange-800">
                   Attempts: {attempts}/{MAX_ATTEMPTS}
-                </p>
+                      </span>
+                    </div>
               )}
               
               {attempts >= MAX_ATTEMPTS && (
-                <p className="text-sm text-red-600">
+                    <div className="flex items-center justify-center gap-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <span className="text-sm font-medium text-red-800">
                   Too many attempts. Please wait before trying again.
-                </p>
+                      </span>
+                    </div>
               )}
             </div>
 
             {/* Back to Login */}
-            <div className="text-center">
-              <button
+                <div className="text-center pt-4">
+                  <Button
                 onClick={() => router.push('/login')}
-                className="text-gray-600 hover:text-gray-500 text-sm"
+                    variant="ghost"
+                    className="text-slate-600 hover:text-slate-800 hover:bg-slate-100"
               >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Login
-              </button>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Security Features */}
+          <div className="mt-6 border-0 shadow-lg bg-white/70 backdrop-blur-sm rounded-lg">
+            <div className="p-6">
+              <div className="flex items-center justify-center gap-6 text-sm text-slate-600">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-green-600" />
+                  <span>Secure</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span>Encrypted</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <span>Verified</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -5,6 +5,8 @@ import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, 
 import { usePostalCodes, useCreatePostalCode } from '@/hooks/usePostalCodes';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Truck } from 'lucide-react';
 
 type FormState = {
   id?: number;
@@ -424,11 +426,13 @@ export default function Suppliers() {
 
       {/* Table / Content Section */}
       {isLoading ? (
-        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6 text-center text-gray-600">
-          <div className="flex items-center justify-center gap-2">
-            <Icon icon="solar:loading-bold-duotone" className="animate-spin text-[#3c959d]" width={20} height={20} />
-            Loading suppliers...
-          </div>
+        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6">
+          <LoadingSpinner 
+            icon={Truck}
+            message="Loading suppliers..."
+            variant="default"
+            size="md"
+          />
         </div>
       ) : error ? (
         <div className="bg-white/80 rounded-2xl border border-red-200 p-6 text-center text-red-600">

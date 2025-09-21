@@ -28,17 +28,17 @@ export function defineBuinessUsersModel(sequelize: Sequelize, ModelClass: typeof
           key: 'id',
         },
       },
+      status: {
+        type: DataTypesLib.ENUM('pending', 'active', 'banned'),
+        allowNull: false,
+        defaultValue: 'active',
+      },
       role: {
         type: DataTypesLib.ENUM('member', 'manager', 'admin'),
         allowNull: false,
         defaultValue: 'member',
       },
       isOnline: {
-        type: DataTypesLib.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      isBanned: {
         type: DataTypesLib.BOOLEAN,
         allowNull: false,
         defaultValue: false,

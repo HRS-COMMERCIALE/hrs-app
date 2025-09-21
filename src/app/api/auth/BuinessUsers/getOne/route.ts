@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       where: { 
         userId: authPayload.userId,
         businessId: businessIdNum,
-        isBanned: false // Only get non-banned associations
+        status: 'active' // Only get active (non-banned) associations
       },
       include: [
         {

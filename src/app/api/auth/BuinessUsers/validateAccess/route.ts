@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
       where: { 
         userId: authPayload.userId,
         businessId: businessIdNum,
-        isBanned: false // Only allow non-banned associations
+        status: 'active' // Only allow active (non-banned) associations
       },
-      attributes: ["id", "role", "isOnline", "isBanned", "joinedAt", "lastActiveAt"]
+      attributes: ["id", "role", "isOnline", "status", "joinedAt", "lastActiveAt"]
     });
 
     if (!businessAssociation) {
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       associationId: businessAssociation.get("id"),
       role: businessAssociation.get("role"),
       isOnline: businessAssociation.get("isOnline"),
-      isBanned: businessAssociation.get("isBanned"),
+      status: businessAssociation.get("status"),
       joinedAt: businessAssociation.get("joinedAt"),
       lastActiveAt: businessAssociation.get("lastActiveAt"),
       hasAccess: true

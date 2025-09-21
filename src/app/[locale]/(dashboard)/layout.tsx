@@ -4,6 +4,7 @@ import { useAuth } from '@/store/authProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Shield } from 'lucide-react';
 
 export default function DashboardRouteGroupLayout({
   children,
@@ -21,7 +22,14 @@ export default function DashboardRouteGroupLayout({
 
   // Show loading while checking auth
   if (authState === 'loading') {
-    return <LoadingSpinner appName="HRS App" message="Authenticating..." />;
+    return (
+      <LoadingSpinner 
+        icon={Shield}
+        message="Authenticating..."
+        variant="fullscreen"
+        size="lg"
+      />
+    );
   }
 
   // Don't render anything if not authenticated (will redirect)

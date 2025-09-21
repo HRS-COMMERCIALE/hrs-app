@@ -1,9 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, memo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserBusinesses, BusinessAssociation } from '../hooks/useUserBusinesses';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Building2 } from 'lucide-react';
+
+// Memoized loading component to prevent unnecessary re-renders
+const BusinessLoadingScreen = memo(() => (
+  <div className="flex items-center justify-center h-32">
+    <LoadingSpinner icon={Building2} message="Loading business..." variant="minimal" size="md" />
+  </div>
+));
 
 // Business context interface
 interface BusinessContextType {
@@ -101,7 +109,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
 
   // Don't render children if no business selected or user doesn't have access
   if (loading) {
-    return <LoadingSpinner appName="HRS App" message="Loading business..." />;
+    return <BusinessLoadingScreen />;
   }
 
   if (!businessId || !hasAccess || isBanned) {

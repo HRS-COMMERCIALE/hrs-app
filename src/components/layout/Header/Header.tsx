@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useI18n } from '@/i18n/hooks';
 import { useAuth } from '../../../store/authProvider';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback } from '../../../components/ui/avatar';
@@ -25,7 +26,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
-  const t = useTranslations();
+  const { t } = useI18n();
   const locale = useLocale();
   const pathname = usePathname();
   

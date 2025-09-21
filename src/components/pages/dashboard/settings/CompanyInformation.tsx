@@ -5,6 +5,8 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useAuth } from '@/store/authProvider';
 import { useCompanyInformation, useUpdateCompanyInformation } from '../../../../hooks/useCompanyInformation';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Building2, Upload, Save } from 'lucide-react';
 
 // Move options outside component for better performance
 const currencyOptions = [
@@ -218,9 +220,13 @@ console.log("form",form);
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl">
       {isLoading && (
-        <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
-          <Icon icon="solar:refresh-bold-duotone" className="animate-spin" width={16} height={16} />
-          Loading company information...
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <LoadingSpinner 
+            icon={Building2}
+            message="Loading company information..."
+            variant="default"
+            size="sm"
+          />
         </div>
       )}
       
@@ -460,10 +466,14 @@ console.log("form",form);
                       ${(uploadingLogo || isSubmitting) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                     `}>
                       {uploadingLogo ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-[#3c959d] border-t-transparent rounded-full animate-spin"></div>
-                          Uploading...
-                        </>
+                        <div className="flex items-center">
+                          <LoadingSpinner 
+                            icon={Upload}
+                            size="sm"
+                            variant="minimal"
+                          />
+                          <span className="ml-2">Uploading...</span>
+                        </div>
                       ) : (
                         <>
                           <Icon icon="solar:upload-bold-duotone" width={16} height={16} />

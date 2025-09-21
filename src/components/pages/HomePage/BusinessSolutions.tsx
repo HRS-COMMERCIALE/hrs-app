@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/i18n/hooks';
-import { useTranslations } from 'next-intl';
 const BusinessSolutions = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
-  const t = useTranslations('homePage.BusinessSolutions');
+  const { tNested } = useI18n();
+  const t = tNested('homePage.BusinessSolutions');
 
   // Content object with all text
   const content = {

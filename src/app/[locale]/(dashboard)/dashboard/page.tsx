@@ -2,13 +2,13 @@
 
 import { useBusiness } from '@/store/businessProvider';
 import BusinessSelector from '@/components/layout/BusinessSelector';
-import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 
 export default function DashboardPage() {
   const { selectedBusiness, selectedBusinessId } = useBusiness();
 
+  // Loading state is handled by BusinessProvider
   if (!selectedBusiness || !selectedBusiness.business) {
-    return <LoadingSpinner appName="HRS App" message="Loading business..." />;
+    return null;
   }
 
   const business = selectedBusiness.business;

@@ -7,6 +7,7 @@ import { useAuth } from '../../../../store/authProvider';
 import { useDownload } from '../../../../hooks/useDownload';
 import Header from '../../../../components/layout/Header/Header';
 import { LoadingSpinner } from '../../../../components/shared/LoadingSpinner/LoadingSpinner';
+import { Download as DownloadIcon } from 'lucide-react';
 import Footer from '../../../../components/pages/HomePage/footer';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
@@ -141,7 +142,14 @@ export default function DownloadSaaSPage() {
 
   // Show loading while checking auth
   if (isLoading || authState === 'loading') {
-    return <LoadingSpinner appName={t('common.appName')} />;
+    return (
+      <LoadingSpinner 
+        icon={DownloadIcon}
+        message="Loading download page..."
+        variant="fullscreen"
+        size="lg"
+      />
+    );
   }
 
   // Don't render if not authenticated or not paid plan

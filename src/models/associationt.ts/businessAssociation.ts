@@ -9,11 +9,13 @@ import { defineArticleModel } from "../user/article";
 import { defineFamilyModel } from "../user/family";
 import { defineOrderModel } from "../user/order";
 import { defineBuinessUsersModel } from "../user/BuinessUsers";
+import { defineBuinessInvitationModel } from "../user/buinessInvitation";
 
 export function setupBusinessAssociations(
   sequelize: Sequelize,
   ModelClass: typeof Model,
-  DataTypesLib: typeof DataTypes
+  DataTypesLib: typeof DataTypes,
+  externalModels?: any
 ) {
   const Business = defineBusinessModel(sequelize, ModelClass, DataTypesLib);
   const Address = defineAddressModel(sequelize, ModelClass, DataTypesLib);
@@ -24,7 +26,8 @@ export function setupBusinessAssociations(
   const Article = defineArticleModel(sequelize, ModelClass, DataTypesLib);
   const Family = defineFamilyModel(sequelize, ModelClass, DataTypesLib);
   const Order = defineOrderModel(sequelize, ModelClass, DataTypesLib);
-  const BuinessUsers = defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessUsers = externalModels?.BuinessUsers || defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessInvitation = externalModels?.BuinessInvitation || defineBuinessInvitationModel(sequelize, ModelClass, DataTypesLib);
 
   // Business has many addresses
   Business.hasMany(Address, { foreignKey: "businessId", as: "addresses" });
@@ -83,5 +86,9 @@ export function setupBusinessAssociations(
   Article.hasMany(Order, { foreignKey: "articleId", as: "orders" });
   Order.belongsTo(Article, { foreignKey: "articleId", as: "article" });
 
-  return { Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, BuinessUsers };
+  // BuinessUsers has many invitations
+  BuinessUsers.hasMany(BuinessInvitation, { foreignKey: "businessUserId", as: "invitations" });
+  BuinessInvitation.belongsTo(BuinessUsers, { foreignKey: "businessUserId", as: "businessUser" });
+
+  return { Business, Address, CodesPostaux, PointOfSale, Supplier, Clients, Article, Family, Order, BuinessUsers, BuinessInvitation };
 }

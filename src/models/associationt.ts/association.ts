@@ -10,7 +10,7 @@ let businessModels: any = null;
 function initializeModels() {
   if (!userModels || !businessModels) {
     userModels = setupUserAssociations(sequelize(), Model, DataTypes);
-    businessModels = setupBusinessAssociations(sequelize(), Model, DataTypes);
+    businessModels = setupBusinessAssociations(sequelize(), Model, DataTypes, userModels);
   }
   return { ...userModels, ...businessModels };
 }
@@ -31,6 +31,7 @@ export const Article = () => initializeModels().Article;
 export const Family = () => initializeModels().Family;
 export const Order = () => initializeModels().Order;
 export const BuinessUsers = () => initializeModels().BuinessUsers;
+export const BuinessInvitation = () => initializeModels().BuinessInvitation;
 
 // Export array of all models for sync operations (ordered by dependencies)
 // Parent tables first, then child tables
@@ -38,6 +39,7 @@ export const models = () => [
   User(),
   Business(),
   BuinessUsers(),
+  BuinessInvitation(),
   CodesPostaux(),
   Supplier(),
   Clients(),
@@ -57,6 +59,7 @@ export const modelNames = [
   'users',
   'businesses',
   'business_users',
+  'business_invitations',
   'codes_postaux',
   'suppliers',
   'clients',

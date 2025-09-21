@@ -8,6 +8,7 @@ import AboutUs from '@/components/pages/HomePage/AboutUs';
 import Footer from '@/components/pages/HomePage/footer';
 import { companyInfo } from '@/libs/config/companyInfo';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { CreditCard } from 'lucide-react';
 
 export default function BusinessPlansPage() {
     const [mounted, setMounted] = useState(false);
@@ -19,7 +20,7 @@ export default function BusinessPlansPage() {
     }, []);
 
     if (!mounted) {
-        return <LoadingSpinner appName={t('common.appName')} message={t('loading')} />;
+        return <LoadingSpinner icon={CreditCard} message={t('loading')} />;
     }
 
     return (

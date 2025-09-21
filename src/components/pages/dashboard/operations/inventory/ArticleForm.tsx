@@ -7,6 +7,8 @@ import { useSuppliers } from '@/hooks/useSuppliers';
 import { ArticleItem } from '@/hooks/useArticles';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Save } from 'lucide-react';
 
 interface ArticleFormProps {
   article?: ArticleItem | null;
@@ -1077,8 +1079,21 @@ export default function ArticleForm({ article, onClose, onSuccess }: ArticleForm
                 onClick={handleSubmit}
                 className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#3c959d] to-[#ef7335] rounded-lg hover:shadow-lg transition-all duration-200 flex items-center gap-2 shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Icon icon="solar:check-circle-bold-duotone" width={14} height={14} />
-                {isLoading ? 'Saving...' : isEditMode ? 'Update Article' : 'Create Article'}
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <LoadingSpinner 
+                      icon={Save}
+                      size="sm"
+                      variant="minimal"
+                    />
+                    <span className="ml-2">Saving...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Icon icon="solar:check-circle-bold-duotone" width={14} height={14} />
+                    {isEditMode ? 'Update Article' : 'Create Article'}
+                  </>
+                )}
               </motion.button>
             </div>
           </div>

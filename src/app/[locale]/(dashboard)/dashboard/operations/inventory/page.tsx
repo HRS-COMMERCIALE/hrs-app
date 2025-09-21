@@ -7,6 +7,8 @@ import { ArticleItem } from '@/hooks/useArticles';
 import ArticleForm from '@/components/pages/dashboard/operations/inventory/ArticleForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Package, Trash2 } from 'lucide-react';
 
 export default function InventoryPage() {
   const formatPrice = (value: unknown) => {
@@ -78,11 +80,13 @@ export default function InventoryPage() {
   if (isLoading) {
     return (
       <div className="w-full max-w-none px-4 pt-4">
-        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6 text-center text-gray-600">
-          <div className="flex items-center justify-center gap-2">
-            <Icon icon="solar:loading-bold-duotone" className="animate-spin text-[#3c959d]" width={20} height={20} />
-            Loading articles...
-          </div>
+        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6">
+          <LoadingSpinner 
+            icon={Package}
+            message="Loading articles..."
+            variant="default"
+            size="md"
+          />
         </div>
       </div>
     );
@@ -503,10 +507,14 @@ export default function InventoryPage() {
                     className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     {deleteArticleMutation.isPending ? (
-                      <>
-                        <Icon icon="solar:loading-bold-duotone" className="animate-spin" width={16} height={16} />
-                        Deleting...
-                      </>
+                      <div className="flex items-center">
+                        <LoadingSpinner 
+                          icon={Trash2}
+                          size="sm"
+                          variant="minimal"
+                        />
+                        <span className="ml-2">Deleting...</span>
+                      </div>
                     ) : (
                       <>
                         <Icon icon="solar:trash-bin-trash-bold-duotone" width={16} height={16} />

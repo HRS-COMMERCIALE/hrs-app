@@ -6,11 +6,13 @@ import { defineLoginAttemptModel } from "../user/LoginAttempt";
 import { defineUserTokenModel } from "../user/UserToken";
 import { definePaymentTransactionModel } from "../user/PaymentTransaction";
 import { defineBuinessUsersModel } from "../user/BuinessUsers";
+import { defineBuinessInvitationModel } from "../user/buinessInvitation";
 
 export function setupUserAssociations(
   sequelize: Sequelize,
   ModelClass: typeof Model,
-  DataTypesLib: typeof DataTypes
+  DataTypesLib: typeof DataTypes,
+  externalModels?: any
 ) {
   const User = defineUserModel(sequelize, ModelClass, DataTypesLib);
   const Business = defineBusinessModel(sequelize, ModelClass, DataTypesLib);
@@ -26,7 +28,8 @@ export function setupUserAssociations(
   );
   const UserToken = defineUserTokenModel(sequelize, ModelClass, DataTypesLib);
   const PaymentTransaction = definePaymentTransactionModel(sequelize, ModelClass, DataTypesLib);
-  const BuinessUsers = defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessUsers = externalModels?.BuinessUsers || defineBuinessUsersModel(sequelize, ModelClass, DataTypesLib);
+  const BuinessInvitation = externalModels?.BuinessInvitation || defineBuinessInvitationModel(sequelize, ModelClass, DataTypesLib);
 
   // Associations
  
@@ -51,5 +54,13 @@ export function setupUserAssociations(
   User.hasMany(PaymentTransaction, { foreignKey: "userId", as: "paymentTransactions" });
   PaymentTransaction.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-  return { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction, BuinessUsers };
+  // User has many invitations (as the inviter)
+  User.hasMany(BuinessInvitation, { foreignKey: "invitedBy", as: "sentInvitations" });
+  BuinessInvitation.belongsTo(User, { foreignKey: "invitedBy", as: "inviter" });
+
+  // User who used the invitation (might be different from invited user)
+  User.hasMany(BuinessInvitation, { foreignKey: "usedBy", as: "usedInvitations" });
+  BuinessInvitation.belongsTo(User, { foreignKey: "usedBy", as: "usedByUser" });
+
+  return { User, Business, UserLicense, LoginAttempt, UserToken, PaymentTransaction, BuinessUsers, BuinessInvitation };
 }

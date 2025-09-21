@@ -7,6 +7,7 @@ import AboutUs from '../../../components/pages/HomePage/AboutUs';
 import Footer from '../../../components/pages/HomePage/footer';
 import { companyInfo } from '../../../libs/config/companyInfo';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Mail } from 'lucide-react';
 
 export default function ContactUsPage() {
     const { tNested } = useI18n();
@@ -80,7 +81,14 @@ export default function ContactUsPage() {
     };
 
     if (!mounted) {
-        return <LoadingSpinner appName={t('common.appName')} message={t('loading')} />;
+        return (
+            <LoadingSpinner 
+                icon={Mail}
+                message={t('loading')}
+                variant="fullscreen"
+                size="lg"
+            />
+        );
     }
 
     return (

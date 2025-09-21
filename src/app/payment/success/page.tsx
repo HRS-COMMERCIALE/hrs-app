@@ -6,6 +6,7 @@ import { useAuth } from '../../../store/authProvider';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { CheckCircle } from 'lucide-react';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -83,7 +84,14 @@ function PaymentSuccessContent() {
   };
 
   if (loading) {
-    return <LoadingSpinner appName="HRS App" message="Verifying your payment..." />;
+    return (
+      <LoadingSpinner 
+        icon={CheckCircle}
+        message="Verifying your payment..."
+        variant="fullscreen"
+        size="lg"
+      />
+    );
   }
 
   if (error) {

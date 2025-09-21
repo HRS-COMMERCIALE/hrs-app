@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 import { useBusinessAccessValidation } from '@/hooks/useBusinessAccessValidation';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 import { Icon } from '@iconify/react';
+import { Building2, Shield } from 'lucide-react';
 
 // Business validation wrapper component
 function BusinessValidationWrapper({ children }: { children: React.ReactNode }) {
@@ -51,11 +52,13 @@ function BusinessValidationWrapper({ children }: { children: React.ReactNode }) 
           </header>
           <main className="flex-1 overflow-auto p-6">
             {isLoading || isValid === null ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center space-y-4">
-                  <Icon icon="solar:loading-bold-duotone" className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
-                  <p className="text-sm text-muted-foreground">Validating business access...</p>
-                </div>
+              <div className="fixed inset-0 z-40 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+                <LoadingSpinner 
+                  icon={Building2}
+                  message="Validating business access..."
+                  variant="default"
+                  size="lg"
+                />
               </div>
             ) : isValid === true ? (
               children

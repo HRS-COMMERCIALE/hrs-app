@@ -55,7 +55,7 @@ const BusinessOption = () => {
       size: business.size,
       status: businessAssociation.isOnline ? t('status.online') : t('status.offline'),
       description: `${business.industry} ${t('cards.descriptionWithSize', { size: business.size })}`,
-      logo: logos[index % logos.length],
+      logo: business.logoFile || logos[index % logos.length],
       color: colors[index % logos.length],
       borderColor: `border-${colors[index % logos.length].split('-')[1]}-500/30`,
       glowColor: `shadow-${colors[index % logos.length].split('-')[1]}-500/20`,
@@ -200,7 +200,7 @@ const BusinessOption = () => {
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-[#3c959d]" />
                   <span className="text-slate-300">
-                    {t('limits.label', { count: businessCount, limit: businessLimit })}
+                    {t('limits.label', { count: businessCount, limit: businessLimit }) || `Businesses: ${businessCount}/${businessLimit}`}
                     {businessLimit === 0 && ` ${t('limits.upgradeNote0')}`}
                     {businessLimit === 1 && ` ${t('limits.upgradeNote1')}`}
                     {businessLimit === 3 && ` ${t('limits.upgradeNote3')}`}
@@ -228,24 +228,37 @@ const BusinessOption = () => {
             <h3 className="text-2xl font-bold text-white">{t('available.title')}</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {businessesLoading ? (
-            <div className="col-span-full flex items-center justify-center py-12">
-              <div className="text-slate-400">{t('available.loading')}</div>
+            <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+              <div className="relative">
+                <div className="w-12 h-12 border-4 border-slate-600 border-t-[#3c959d] rounded-full animate-spin"></div>
+                <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-[#ef7335] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+              </div>
+              <div className="mt-4 text-slate-300 text-lg font-medium">{t('available.loading')}</div>
+              <div className="mt-2 text-slate-500 text-sm">Loading your businesses...</div>
             </div>
           ) : businessesError ? (
-            <div className="col-span-full flex items-center justify-center py-12">
-              <div className="text-red-400">{t('available.error', { error: String(businessesError) })}</div>
+            <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+                <div className="w-8 h-8 text-red-400">⚠️</div>
+              </div>
+              <div className="text-red-400 text-lg font-medium mb-2">Error Loading Businesses</div>
+              <div className="text-slate-500 text-sm text-center max-w-md">{t('available.error', { error: String(businessesError) })}</div>
             </div>
           ) : transformedBusinesses.length === 0 ? (
-            <div className="col-span-full flex items-center justify-center py-12">
-              <div className="text-slate-400">{t('available.empty')}</div>
+            <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+              <div className="w-16 h-16 rounded-full bg-slate-500/20 flex items-center justify-center mb-4">
+                <Building2 className="w-8 h-8 text-slate-400" />
+              </div>
+              <div className="text-slate-300 text-lg font-medium mb-2">{t('available.empty')}</div>
+              <div className="text-slate-500 text-sm text-center">Create your first business to get started</div>
             </div>
           ) : (
-            transformedBusinesses.map((business, index) => {
-              if (!business) return null;
-              
-              return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {transformedBusinesses.map((business, index) => {
+                if (!business) return null;
+                
+                return (
             <div 
               key={business.id}
               className={`group relative overflow-hidden border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl rounded-2xl ${
@@ -260,8 +273,16 @@ const BusinessOption = () => {
               <div className="relative z-10 p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${business.color} flex items-center justify-center text-lg shadow-lg`}>
-                      {business.logo}
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${business.color} flex items-center justify-center text-lg shadow-lg overflow-hidden`}>
+                      {business.logo && business.logo.startsWith('http') ? (
+                        <img 
+                          src={business.logo} 
+                          alt={business.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{business.logo}</span>
+                      )}
                     </div>
                     <div>
                       <h3 className="text-lg text-white group-hover:text-[#3c959d] transition-colors duration-300 font-semibold">
@@ -310,10 +331,10 @@ const BusinessOption = () => {
                 </div>
               </div>
             </div>
-              );
-            })
+                );
+              })}
+            </div>
           )}
-          </div>
         </div>
 
         {/* Trust Indicators */}

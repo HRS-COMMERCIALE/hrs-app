@@ -6,6 +6,7 @@ import { useI18n } from '@/i18n/hooks';
 import PaymentContainer from '../../../../components/pages/payment/PaymentContainer';
 import { getPlanById, isValidPlanId, PaymentPlan } from '../../../../app/api/stripe-config/PaymentPlanceConfig';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { CreditCard } from 'lucide-react';
 
 function PaymentPageContent() {
     const [mounted, setMounted] = useState(false);
@@ -41,7 +42,14 @@ function PaymentPageContent() {
     }, [mounted, planId, router]);
 
     if (!mounted || !planData) {
-        return <LoadingSpinner appName={tCommon('appName')} message={tPayment('loading')} />;
+        return (
+            <LoadingSpinner 
+                icon={CreditCard}
+                message={tPayment('loading')}
+                variant="fullscreen"
+                size="lg"
+            />
+        );
     }
 
     return (

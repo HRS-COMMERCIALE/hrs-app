@@ -3,6 +3,8 @@
 import React, { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { Users } from 'lucide-react';
 import { usePostalCodes, useCreatePostalCode } from '@/hooks/usePostalCodes';
 import { 
   useClients, 
@@ -573,11 +575,13 @@ export default function Clients() {
       </div>
 
       {loadingList ? (
-        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6 text-center text-gray-600">
-          <div className="flex items-center justify-center gap-2">
-            <Icon icon="solar:loading-bold-duotone" className="animate-spin text-[#3c959d]" width={20} height={20} />
-            Loading clients...
-          </div>
+        <div className="bg-white/80 rounded-2xl border border-gray-200 p-6">
+          <LoadingSpinner 
+            icon={Users}
+            message="Loading clients..."
+            variant="default"
+            size="md"
+          />
         </div>
       ) : errorList ? (
         <div className="bg-white/80 rounded-2xl border border-red-200 p-6 text-center text-red-600">

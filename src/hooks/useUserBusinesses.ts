@@ -18,7 +18,6 @@ export interface BusinessAssociation {
     registrationNumber: string | null;
     taxId: string;
     cnssCode: string;
-    createdAt: string;
   } | null;
 }
 
@@ -34,7 +33,6 @@ export interface BusinessDetails extends BusinessAssociation {
     registrationNumber: string | null;
     taxId: string;
     cnssCode: string;
-    createdAt: string;
     addresses: Array<{
       id: number;
       country: string;

@@ -4,6 +4,8 @@ import React, { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useOrders, useCreateOrder, useUpdateOrder, useDeleteOrder, OrderItem } from '@/hooks/useOrders';
 import { useArticles } from '@/hooks/useArticles';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { ShoppingCart } from 'lucide-react';
 
 type Pagination = {
   currentPage: number;
@@ -440,7 +442,16 @@ export default function SalesOrderPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {isLoading ? (
-                <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">Loading orders...</td></tr>
+                <tr>
+                  <td colSpan={8} className="px-6 py-8 text-center">
+                    <LoadingSpinner 
+                      icon={ShoppingCart}
+                      message="Loading orders..."
+                      variant="default"
+                      size="md"
+                    />
+                  </td>
+                </tr>
               ) : error ? (
                 <tr><td colSpan={8} className="px-6 py-8 text-center text-red-600">{error}</td></tr>
               ) : filteredOrders.length === 0 ? (
