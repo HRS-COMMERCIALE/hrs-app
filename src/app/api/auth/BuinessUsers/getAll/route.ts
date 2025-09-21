@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
     const authPayload = await requireAuth(request);
     if (authPayload instanceof NextResponse) return authPayload;
 
-    // Get all business associations for the user
+    // Get all business associations for the user (including pending)
     const businessAssociations = await BuinessUsers().findAll({
       where: { 
         userId: authPayload.userId,
-        status: 'active' // Only get active (non-banned) associations
+        status: ['active', 'pending'] // Get both active and pending associations
       },
       include: [
         {
@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
       attributes: [
         'id',
         'role',
+        'status',
         'isOnline',
         'joinedAt',
         'lastActiveAt'
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
       return {
         associationId: association.get('id'),
         role: association.get('role'),
+        status: association.get('status') || 'active',
         isOnline: association.get('isOnline'),
         joinedAt: association.get('joinedAt'),
         lastActiveAt: association.get('lastActiveAt'),

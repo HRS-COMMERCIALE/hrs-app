@@ -49,24 +49,24 @@ const BusinessOption = () => {
     const logos = ["🏢", "🌱", "🎨", "⚡", "🚀"];
     
     return {
-      id: business.id,
-      name: business.businessName,
-      industry: business.industry,
-      size: business.size,
-      status: businessAssociation.isOnline ? t('status.online') : t('status.offline'),
-      description: `${business.industry} ${t('cards.descriptionWithSize', { size: business.size })}`,
-      logo: business.logoFile || logos[index % logos.length],
+      id: business?.id || 0,
+      name: business?.businessName || 'Unknown Business',
+      industry: business?.industry || 'Unknown',
+      size: business?.size || 'Unknown',
+      status: businessAssociation?.isOnline ? t('status.online') : t('status.offline'),
+      description: `${business?.industry || 'Unknown'} ${t('cards.descriptionWithSize', { size: business?.size || 'Unknown' })}`,
+      logo: business?.logoFile || logos[index % logos.length],
       color: colors[index % logos.length],
       borderColor: `border-${colors[index % logos.length].split('-')[1]}-500/30`,
       glowColor: `shadow-${colors[index % logos.length].split('-')[1]}-500/20`,
-      features: [business.currency, business.industry, businessAssociation.role],
-      lastActive: businessAssociation.lastActiveAt ? 
+      features: [business?.currency || 'Unknown', business?.industry || 'Unknown', businessAssociation?.role || 'member'],
+      lastActive: businessAssociation?.lastActiveAt ? 
         new Date(businessAssociation.lastActiveAt).toLocaleDateString() : 
-        businessAssociation.joinedAt ? 
+        businessAssociation?.joinedAt ? 
         new Date(businessAssociation.joinedAt).toLocaleDateString() : 
         t('cards.unknown'),
-      role: businessAssociation.role,
-      joinedAt: businessAssociation.joinedAt
+      role: businessAssociation?.role || 'member',
+      joinedAt: businessAssociation?.joinedAt
     };
   }).filter(Boolean);
 
@@ -219,6 +219,30 @@ const BusinessOption = () => {
           )}
         </div>
 
+        {/* Pending Businesses Section */}
+        {transformedBusinesses.some(b => b && businesses.find(bu => bu.business?.id === b.id)?.status === 'pending') && (
+          <div className={`mb-8 transform transition-all duration-1000 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
+                <div className="w-4 h-4 bg-yellow-300 rounded-full animate-pulse"></div>
+              </div>
+              <h3 className="text-2xl font-bold text-white">Pending Approvals</h3>
+            </div>
+            
+            <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                  <h4 className="text-yellow-300 font-semibold">Membership Pending</h4>
+                  <p className="text-yellow-200/80 text-sm">Your business membership requests are awaiting admin approval. You'll be notified once approved.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Available Businesses Section */}
         <div className={`mb-8 transform transition-all duration-1000 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="flex items-center gap-3 mb-6">
@@ -258,76 +282,110 @@ const BusinessOption = () => {
               {transformedBusinesses.map((business, index) => {
                 if (!business) return null;
                 
+                // Find the corresponding business association
+                const businessAssociation = businesses.find(bu => bu.business?.id === business?.id);
+                
                 return (
             <div 
-              key={business.id}
-              className={`group relative overflow-hidden border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl rounded-2xl ${
-                selectedBusiness === business.id ? 'ring-2 ring-[#3c959d] bg-slate-800/70' : ''
+              key={business?.id || index}
+              className={`group relative overflow-hidden border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 rounded-2xl ${
+                businessAssociation?.status === 'pending' 
+                  ? 'cursor-not-allowed opacity-75' 
+                  : 'cursor-pointer hover:scale-[1.02] hover:shadow-xl'
+              } ${
+                selectedBusiness === business?.id ? 'ring-2 ring-[#3c959d] bg-slate-800/70' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => handleBusinessSelect(business.id)}
+              onClick={() => businessAssociation?.status !== 'pending' && business?.id && handleBusinessSelect(business.id)}
             >
               {/* Gradient Background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${business.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`}></div>
+              <div className={`absolute inset-0 bg-gradient-to-br ${business?.color || 'from-slate-500 to-slate-600'} opacity-5 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`}></div>
               
               <div className="relative z-10 p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${business.color} flex items-center justify-center text-lg shadow-lg overflow-hidden`}>
-                      {business.logo && business.logo.startsWith('http') ? (
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${business?.color || 'from-slate-500 to-slate-600'} flex items-center justify-center text-lg shadow-lg overflow-hidden`}>
+                      {business?.logo && business.logo.startsWith('http') ? (
                         <img 
                           src={business.logo} 
-                          alt={business.name}
+                          alt={business?.name || 'Business'}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span>{business.logo}</span>
+                        <span>{business?.logo || '🏢'}</span>
                       )}
                     </div>
                     <div>
                       <h3 className="text-lg text-white group-hover:text-[#3c959d] transition-colors duration-300 font-semibold">
-                        {business.name}
+                        {business?.name || 'Unknown Business'}
                       </h3>
                       <p className="text-slate-400 text-sm">
-                        {business.industry}
+                        {business?.industry || 'Unknown'}
                       </p>
                     </div>
                   </div>
-                  <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-lg text-xs font-medium">
-                    {business.status}
+                  <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                    businessAssociation?.status === 'pending' 
+                      ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' 
+                      : businessAssociation?.isOnline 
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                  }`}>
+                    {businessAssociation?.status === 'pending' 
+                      ? 'Pending Approval' 
+                      : business?.status || 'Unknown'}
                   </span>
                 </div>
                 
                 <p className="text-slate-300 text-sm leading-relaxed mb-4">
-                  {business.description}
+                  {business?.description || 'No description available'}
                 </p>
+                
+                {/* Pending Approval Message */}
+                {businessAssociation?.status === 'pending' && (
+                  <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                      <span className="text-yellow-300 text-sm font-medium">Awaiting Admin Approval</span>
+                    </div>
+                    <p className="text-yellow-200/80 text-xs mt-1">
+                      Your membership request is pending. You'll be notified once approved.
+                    </p>
+                  </div>
+                )}
                 
                 <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
                   <Users className="w-3 h-3" />
-                  <span>{business.size}</span>
+                  <span>{business?.size || 'Unknown'}</span>
                   <span>•</span>
                   <Calendar className="w-3 h-3" />
-                  <span>{business.lastActive}</span>
+                  <span>{business?.lastActive || 'Unknown'}</span>
                       <span>•</span>
-                      <span className="capitalize">{business.role}</span>
+                      <span className="capitalize">{business?.role || 'member'}</span>
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {business.features.map((feature, idx) => (
+                  {business?.features?.map((feature, idx) => (
                     <span key={idx} className="text-xs border border-slate-600/50 bg-slate-800/30 text-slate-300 px-2 py-1 rounded-lg">
                       {feature}
                     </span>
-                  ))}
+                  )) || []}
                 </div>
                 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-700/30">
                   <div className="flex items-center gap-1">
                         <span className="text-xs text-slate-400">{t('available.joinedLabel')}</span>
                         <span className="text-sm text-slate-300 font-medium">
-                          {business.joinedAt ? new Date(business.joinedAt).toLocaleDateString() : t('cards.unknown')}
+                          {business?.joinedAt ? new Date(business.joinedAt).toLocaleDateString() : t('cards.unknown')}
                         </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#3c959d] group-hover:translate-x-1 transition-all duration-300" />
+                  {businessAssociation?.status === 'pending' ? (
+                    <div className="w-4 h-4 text-yellow-400 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    </div>
+                  ) : (
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#3c959d] group-hover:translate-x-1 transition-all duration-300" />
+                  )}
                 </div>
               </div>
             </div>

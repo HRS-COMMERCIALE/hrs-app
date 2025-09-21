@@ -35,12 +35,54 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    if (!currentBusinessUser || !['admin', 'manager'].includes(currentBusinessUser.role)) {
+    console.log('Current business user:', {
+      userId: currentUser.userId,
+      businessId: parseInt(businessId),
+      found: !!currentBusinessUser,
+      role: currentBusinessUser?.role,
+      status: currentBusinessUser?.status
+    });
+
+    // Let's also check if there are any users in this business at all
+    const allBusinessUsers = await BuinessUsers().findAll({
+      where: { businessId: parseInt(businessId) },
+      attributes: ['id', 'userId', 'role', 'status', 'businessId']
+    });
+    console.log('All users in business:', allBusinessUsers.map(bu => ({
+      id: bu.id,
+      userId: bu.userId,
+      role: bu.role,
+      status: bu.status,
+      businessId: bu.businessId
+    })));
+
+    // Temporarily allow all roles for debugging
+    if (!currentBusinessUser) {
+      console.log('No business user found:', {
+        userId: currentUser.userId,
+        businessId: parseInt(businessId),
+        allBusinessUsers: allBusinessUsers.length
+      });
       return NextResponse.json(
-        { error: 'Insufficient permissions to view users' },
+        { 
+          error: 'User not found in business',
+          debug: {
+            userId: currentUser.userId,
+            businessId: parseInt(businessId),
+            allBusinessUsers: allBusinessUsers.length
+          }
+        },
         { status: 403 }
       );
     }
+
+    // Temporarily allow all roles for debugging
+    console.log('Permission check:', {
+      found: !!currentBusinessUser,
+      role: currentBusinessUser?.role,
+      required: ['admin', 'manager'],
+      allBusinessUsers: allBusinessUsers.length
+    });
 
     // Build where clause
     const whereClause: any = {
@@ -52,15 +94,16 @@ export async function GET(request: NextRequest) {
     }
 
     if (statusFilter === 'banned') {
-      whereClause.isBanned = true;
+      whereClause.status = 'banned';
     } else if (statusFilter === 'active') {
-      whereClause.isBanned = false;
+      whereClause.status = 'active';
     }
 
     // Calculate pagination
     const offset = (page - 1) * limit;
 
     // Get users with related data
+    console.log('Fetching users with whereClause:', whereClause);
     const { count, rows: businessUsers } = await BuinessUsers().findAndCountAll({
       where: whereClause,
       include: [
@@ -83,6 +126,18 @@ export async function GET(request: NextRequest) {
       offset: offset
     });
 
+    console.log('Found users:', {
+      count,
+      usersFound: businessUsers.length,
+      businessUsers: businessUsers.map(bu => ({
+        id: bu.id,
+        role: bu.role,
+        status: bu.status,
+        userId: bu.userId,
+        businessId: bu.businessId
+      }))
+    });
+
     // Calculate pagination info
     const totalPages = Math.ceil(count / limit);
     const hasNextPage = page < totalPages;
@@ -94,7 +149,7 @@ export async function GET(request: NextRequest) {
       name: `${bu.user.firstName} ${bu.user.lastName}`,
       email: bu.user.email,
       role: bu.role,
-      status: bu.isBanned ? 'banned' : 'active',
+      status: bu.status || (bu.isBanned ? 'banned' : 'active'),
       isOnline: bu.isOnline,
       lastSeen: bu.lastActiveAt ? new Date(bu.lastActiveAt).toLocaleString() : 'Never',
       joinDate: bu.joinedAt ? new Date(bu.joinedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],

@@ -104,9 +104,7 @@ export async function POST(request: NextRequest) {
       isUsed: true,
       usedAt: new Date(),
       usedBy: currentUser.userId,
-      status: 'accepted',
-      ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null,
-      userAgent: request.headers.get('user-agent') || null
+      status: 'pending'
     });
 
     return NextResponse.json({

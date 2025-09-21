@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '@/i18n/hooks';
 import { apiClient } from '../../../../utils/client/client';
 import { useRouter } from 'next/navigation';
-import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
-import { UserPlus } from 'lucide-react';
 
 export default function RightSideContent() {
     const { t } = useI18n();
@@ -698,13 +696,9 @@ export default function RightSideContent() {
                                     
                                     <div className="relative flex items-center justify-center py-2.5 px-4 text-white font-semibold text-sm group-hover:scale-[0.995] transition-all duration-200 tracking-wide">
                                         {isLoading ? (
-                                            <div className="flex items-center">
-                                                <LoadingSpinner 
-                                                    icon={UserPlus}
-                                                    size="sm"
-                                                    variant="minimal"
-                                                />
-                                                <span className="ml-2 animate-pulse text-xs">Creating...</span>
+                                            <div className="flex items-center justify-center">
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                                <span>Creating...</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center">

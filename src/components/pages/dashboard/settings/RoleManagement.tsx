@@ -61,6 +61,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import InvitationManagement from './InvitationManagement';
+import { useBusiness } from '@/store/businessProvider';
 
 // Types
 interface User {
@@ -68,7 +69,7 @@ interface User {
   name: string;
   email: string;
   role: 'admin' | 'manager' | 'member';
-  status: 'active' | 'banned';
+  status: 'active' | 'pending' | 'banned';
   isOnline: boolean;
   lastSeen: string;
   joinDate: string;
@@ -92,10 +93,13 @@ const roleConfig = {
 
 const statusConfig = {
   active: { label: 'Active', color: 'bg-green-100 text-green-800' },
+  pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
   banned: { label: 'Banned', color: 'bg-red-100 text-red-800' },
 };
 
-export default function RoleManagement({ businessId = 1 }: { businessId?: number }) {
+export default function RoleManagement({ businessId }: { businessId?: number }) {
+  const { selectedBusinessId } = useBusiness();
+  const actualBusinessId = businessId || selectedBusinessId || 1;
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -116,7 +120,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
-        businessId: businessId.toString(),
+        businessId: actualBusinessId.toString(),
         page: page.toString(),
         limit: itemsPerPage.toString(),
         role: roleFilter,
@@ -131,6 +135,11 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
         setTotalPages(data.pagination.totalPages);
         setTotalItems(data.pagination.totalItems);
         setCurrentPage(data.pagination.currentPage);
+      } else {
+        const errorData = await response.json();
+        console.error('Error fetching users:', errorData);
+        // Show error in UI
+        setUsers([]);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -148,7 +157,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
         },
         body: JSON.stringify({
           userId,
-          businessId,
+          businessId: actualBusinessId,
           action,
           newRole,
           banReason
@@ -168,7 +177,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
 
   const deleteUser = async (userId: string) => {
     try {
-      const response = await fetch(`/api/dashboard/settings/UserManagement/delte?id=${userId}&businessId=${businessId}`, {
+      const response = await fetch(`/api/dashboard/settings/UserManagement/delte?id=${userId}&businessId=${actualBusinessId}`, {
         method: 'DELETE',
       });
 
@@ -185,8 +194,9 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
 
   // Load users on component mount and when filters change
   useEffect(() => {
+    console.log('RoleManagement: Fetching users for businessId:', actualBusinessId);
     fetchUsers(1);
-  }, [roleFilter, statusFilter, searchTerm, businessId]);
+  }, [roleFilter, statusFilter, searchTerm, actualBusinessId]);
 
   // Filter users based on search and filters (client-side filtering for better UX)
   const filteredUsers = users.filter(user => {
@@ -336,7 +346,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
       <InvitationManagement 
         isOpen={isInvitationManagementOpen}
         onClose={() => setIsInvitationManagementOpen(false)}
-        businessId={1}
+        businessId={actualBusinessId}
       />
 
 
@@ -406,6 +416,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
               <SelectContent className="rounded-xl border-0 shadow-xl">
                 <SelectItem value="all" className="rounded-lg">All Status</SelectItem>
                 <SelectItem value="active" className="rounded-lg">Active</SelectItem>
+                <SelectItem value="pending" className="rounded-lg">Pending</SelectItem>
                 <SelectItem value="banned" className="rounded-lg">Banned</SelectItem>
               </SelectContent>
             </Select>
@@ -460,6 +471,20 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
                 onClick={() => {
                   setSearchTerm('');
                   setRoleFilter('all');
+                  setStatusFilter('pending');
+                }}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  statusFilter === 'pending' && !searchTerm && roleFilter === 'all'
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Pending
+              </button>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setRoleFilter('all');
                   setStatusFilter('banned');
                 }}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
@@ -501,21 +526,21 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
           {/* Professional Table Content */}
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Activity</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50/50">
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">User</th>
+                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Role</th>
+                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Status</th>
+                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-20">Activity</th>
+                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Dept</th>
+                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Joined</th>
+                    <th className="px-1 py-3 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider w-14">Actions</th>
+                  </tr>
+                </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={7} className="px-4 py-8 text-center">
                       <LoadingSpinner 
                         icon={Users}
                         message="Loading users..."
@@ -526,7 +551,7 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={7} className="px-4 py-8 text-center">
                       <div className="flex flex-col items-center justify-center space-y-4">
                         <div className="p-4 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl">
                           <Users className="h-8 w-8 text-emerald-600" />
@@ -542,45 +567,45 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
                   filteredUsers.map((user, index) => (
                   <tr key={user.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
                     {/* User Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-3 whitespace-nowrap w-48">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm">
+                        <div className="flex-shrink-0 h-8 w-8">
+                          <Avatar className="h-8 w-8 ring-1 ring-white shadow-sm">
                             <AvatarImage src={generateAvatar(user.name)} alt={user.name} />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 text-gray-700 font-semibold text-sm">
+                            <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 text-gray-700 font-semibold text-xs">
                               {user.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                         </div>
-                        <div className="ml-4 min-w-0 flex-1">
+                        <div className="ml-3 min-w-0 flex-1">
                           <div className="text-sm font-semibold text-gray-900 truncate">
                             {user.name}
                           </div>
-                          <div className="text-sm text-gray-500 truncate">
-                            {user.email}
+                          <div className="text-xs text-gray-500 truncate max-w-[180px]" title={user.email}>
+                            {user.email.length > 18 ? `${user.email.substring(0, 18)}...` : user.email}
                           </div>
                         </div>
                       </div>
                     </td>
 
                     {/* Role Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge className={cn("inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium", roleConfig[user.role].color)}>
+                    <td className="px-0 py-3 whitespace-nowrap text-center w-16">
+                      <Badge className={cn("inline-flex items-center gap-1 px-2 py-1 text-sm font-medium", roleConfig[user.role as keyof typeof roleConfig]?.color || 'bg-gray-100 text-gray-800')}>
                         {getRoleIcon(user.role)}
-                        {roleConfig[user.role].label}
+                        <span className="hidden sm:inline">{roleConfig[user.role as keyof typeof roleConfig]?.label || user.role}</span>
                       </Badge>
                     </td>
 
                     {/* Status Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge className={cn("inline-flex items-center px-2.5 py-1 text-xs font-medium", statusConfig[user.status].color)}>
-                        {statusConfig[user.status].label}
+                    <td className="px-0 py-3 whitespace-nowrap text-center w-16">
+                      <Badge className={cn("inline-flex items-center px-2 py-1 text-sm font-medium", statusConfig[user.status as keyof typeof statusConfig]?.color || 'bg-gray-100 text-gray-800')}>
+                        {statusConfig[user.status as keyof typeof statusConfig]?.label || user.status}
                       </Badge>
                     </td>
 
                     {/* Activity Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                    <td className="px-0 py-3 whitespace-nowrap text-center w-20">
+                      <div className="flex items-center justify-center">
                         <div className={`h-2 w-2 rounded-full mr-2 ${user.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                         <span className={`text-sm font-medium ${user.isOnline ? 'text-green-600' : 'text-gray-500'}`}>
                           {user.isOnline ? 'Online' : user.lastSeen}
@@ -589,25 +614,25 @@ export default function RoleManagement({ businessId = 1 }: { businessId?: number
                     </td>
 
                     {/* Department Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-0 py-3 whitespace-nowrap text-center w-16">
                       <div className="text-sm font-medium text-gray-900">
                         {user.department || 'N/A'}
                       </div>
                     </td>
 
                     {/* Join Date Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-0 py-3 whitespace-nowrap text-center w-16">
                       <div className="text-sm font-medium text-gray-900">
                         {new Date(user.joinDate).toLocaleDateString('en-US', { 
                           month: 'short', 
                           day: 'numeric', 
-                          year: 'numeric' 
+                          year: '2-digit' 
                         })}
                       </div>
                     </td>
 
                     {/* Actions Column */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-1 py-3 whitespace-nowrap text-right text-sm font-medium w-14">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-gray-100">

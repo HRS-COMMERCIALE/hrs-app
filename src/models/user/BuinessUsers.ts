@@ -51,6 +51,7 @@ export function defineBuinessUsersModel(sequelize: Sequelize, ModelClass: typeof
         type: DataTypesLib.DATE,
         allowNull: true,
       },
+      
       joinedAt: {
         type: DataTypesLib.DATE,
         allowNull: true,

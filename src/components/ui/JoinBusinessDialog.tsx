@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, Link, Hash, ArrowRight, Copy, Check } from 'lucide-react';
+import { Users, Hash, ArrowRight, Copy, Check } from 'lucide-react';
 
 interface JoinBusinessDialogProps {
   open: boolean;
@@ -19,32 +19,48 @@ interface JoinBusinessDialogProps {
 }
 
 const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenChange }) => {
-  const [businessUrl, setBusinessUrl] = useState('');
   const [businessCode, setBusinessCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!businessUrl.trim() || !businessCode.trim()) return;
+    if (!businessCode.trim()) return;
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      // Handle success/error here
-      onOpenChange(false);
-      setBusinessUrl('');
-      setBusinessCode('');
-    }, 2000);
-  };
+    try {
+      const response = await fetch('/api/dashboard/settings/invitation/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          invitationCode: businessCode.trim(),
+          acceptTerms: true
+        })
+      });
 
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(businessUrl);
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Success - show success message and close dialog
+        alert('Successfully joined the business! Your membership is pending approval.');
+        onOpenChange(false);
+        setBusinessCode('');
+        // Refresh the page to show updated business list
+        window.location.reload();
+      } else {
+        // Error - show error message
+        alert(data.error || 'Failed to join business. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error joining business:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyCode = () => {
@@ -64,45 +80,11 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
             Join Business
           </DialogTitle>
           <DialogDescription className="text-slate-300 text-base">
-            Enter the business URL and invitation code to join
+            Enter the invitation code to join a business
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Business URL Field */}
-          <div className="space-y-2">
-            <Label htmlFor="businessUrl" className="text-white font-medium">
-              Business URL
-            </Label>
-            <div className="relative">
-              <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input
-                id="businessUrl"
-                type="url"
-                placeholder="https://company.business.com"
-                value={businessUrl}
-                onChange={(e) => setBusinessUrl(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500"
-                required
-              />
-              {businessUrl && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyUrl}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-slate-700"
-                >
-                  {copiedUrl ? (
-                    <Check className="w-3 h-3 text-green-400" />
-                  ) : (
-                    <Copy className="w-3 h-3 text-slate-400" />
-                  )}
-                </Button>
-              )}
-            </div>
-          </div>
-
           {/* Business Code Field */}
           <div className="space-y-2">
             <Label htmlFor="businessCode" className="text-white font-medium">
@@ -144,10 +126,10 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
                 <Users className="w-3 h-3 text-blue-400" />
               </div>
               <div className="text-sm text-slate-300">
-                <p className="font-medium text-blue-400 mb-1">How to get these details:</p>
+                <p className="font-medium text-blue-400 mb-1">How to get the invitation code:</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• Ask your business admin for the invitation URL</li>
-                  <li>• Get the invitation code from your team lead</li>
+                  <li>• Ask your business admin for the invitation code</li>
+                  <li>• Get the code from your team lead</li>
                   <li>• Check your email for invitation details</li>
                 </ul>
               </div>
@@ -158,7 +140,7 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
           <div className="flex flex-col gap-3">
             <Button 
               type="submit"
-              disabled={!businessUrl.trim() || !businessCode.trim() || isSubmitting}
+              disabled={!businessCode.trim() || isSubmitting}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSubmitting ? (

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 export interface BusinessAssociation {
   associationId: number;
   role: 'member' | 'manager' | 'admin';
+  status: 'active' | 'pending' | 'banned' | 'inactive';
   isOnline: boolean;
   isBanned: boolean;
   joinedAt: string | null;
