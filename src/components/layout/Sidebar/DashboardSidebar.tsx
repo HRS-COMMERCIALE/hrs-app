@@ -197,13 +197,13 @@ function DashboardSidebar() {
 
   // Show loading state in sidebar content if business data is loading
   if (loading) {
-            return (
+    return (
       <Sidebar variant="inset" className="border-r border-border/50">
         <SidebarHeader className="border-b border-border/50">
           <div className="flex items-center gap-3 px-2 py-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20">
               <Image src="/logo.png" alt="HRS App" width={24} height={24} className="object-contain" />
-        </div>
+            </div>
             <div className="flex flex-col">
               <h1 className="text-lg font-semibold">HRS App</h1>
               <p className="text-xs text-muted-foreground">Loading...</p>
@@ -213,70 +213,64 @@ function DashboardSidebar() {
         <SidebarContent className="px-2 py-4">
           <div className="flex items-center justify-center py-8">
             <Icon icon="solar:loading-bold-duotone" className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+          </div>
         </SidebarContent>
       </Sidebar>
     );
   }
 
-              return (
-              <div 
-      className={`border-r border-border/50 transition-all duration-500 ease-in-out bg-background ${open ? 'w-64' : 'w-16'} flex flex-col h-full`}
-    >
-      <div className="border-b border-border/50">
-        <div className={`flex items-center ${open ? 'gap-3' : 'justify-center'} px-2 py-3`}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20">
-            <Image src="/logo.png" alt="HRS App" width={24} height={24} className="object-contain" />
+  return (
+    <Sidebar variant="inset" collapsible="icon" className="border-r border-border/50 [&_[data-slot=sidebar-container]]:!z-0">
+      <SidebarHeader className="border-b border-border/50">
+        <div className="flex items-center gap-3 px-2 py-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex-shrink-0">
+            <Image src="/logo.png" alt="HRS App" width={20} height={20} className="object-contain" />
           </div>
-          <div className={`flex flex-col transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'}`}>
-            <h1 className="text-lg font-semibold whitespace-nowrap">HRS App</h1>
-            <p className="text-xs text-muted-foreground whitespace-nowrap">Business Dashboard</p>
+          <div className="flex flex-col flex-1 group-data-[collapsible=icon]:hidden">
+            <h1 className="text-lg font-semibold">HRS App</h1>
+            <p className="text-xs text-muted-foreground">Business Dashboard</p>
           </div>
         </div>
-      </div>
+      </SidebarHeader>
 
-      <div className={`flex-1 px-2 ${open ? '' : 'px-1'} py-4 overflow-y-auto`}>
+      <SidebarContent className="px-2 py-4">
         {navigationData.map((section) => (
-          <div key={section.title} className="mb-4">
-            <div className={`text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-2 transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-h-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <SidebarGroup key={section.title}>
+            <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {section.title}
-            </div>
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const isActive = pathname.startsWith(item.url);
-                return (
-                  <div key={item.title}>
-                    <Link 
-                      href={buildUrlWithBusinessId(item.url)}
-                      className={`flex items-center w-full px-2 py-2 rounded-md text-sm transition-all duration-300 ease-in-out ${
-                        isActive 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'hover:bg-muted hover:text-foreground'
-                      } ${open ? 'justify-start' : 'justify-center'}`}
-                      title={!open ? item.title : undefined}
-                    >
-                      <Icon icon={item.icon} className="h-4 w-4 flex-shrink-0 transition-transform duration-300 ease-in-out" />
-                      <span className={`ml-2 transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap ${open ? 'max-w-32 opacity-100' : 'max-w-0 opacity-0'}`}>
-                        {item.title}
-                      </span>
-                          </Link>
-                        </div>
-                        );
-                      })}
-                    </div>
-                </div>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map((item) => {
+                  // Remove locale prefix for comparison
+                  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
+                  const isActive = pathWithoutLocale.startsWith(item.url);
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={buildUrlWithBusinessId(item.url)}>
+                          <Icon icon={item.icon} className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         ))}
-              </div>
+      </SidebarContent>
 
-      <div className="border-t border-border/50">
-        <div className={`flex items-center ${open ? 'gap-3' : 'justify-center'} px-2 py-3`}>
+      <SidebarFooter className="border-t border-border/50">
+        <div className="flex items-center gap-3 px-2 py-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 hover:bg-muted">
                 <Avatar className="h-8 w-8">
                   {selectedBusiness?.business?.logoFile ? (
                     <AvatarImage src={selectedBusiness.business.logoFile} alt={selectedBusiness.business.businessName} />
-                ) : null}
+                  ) : null}
                   <AvatarFallback className="bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 text-xs font-semibold">
                     {selectedBusiness?.business?.businessName ? 
                       selectedBusiness.business.businessName.charAt(0).toUpperCase() : 
@@ -366,7 +360,7 @@ function DashboardSidebar() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <div className={`flex flex-col min-w-0 flex-1 transition-all duration-500 ease-in-out overflow-hidden ${open ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'}`}>
+          <div className="flex flex-col min-w-0 flex-1">
             <p className="text-sm font-medium truncate whitespace-nowrap">
               {selectedBusiness?.business?.businessName || (user?.firstName && user?.lastName ? 
                 `${user.firstName} ${user.lastName}` : 
@@ -377,9 +371,9 @@ function DashboardSidebar() {
               {user?.email || 'user@example.com'}
             </p>
           </div>
-          </div>
-          </div>
         </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
 

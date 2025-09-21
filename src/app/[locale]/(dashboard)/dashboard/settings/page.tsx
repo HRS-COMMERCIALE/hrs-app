@@ -21,7 +21,7 @@ type NavSection = {
 
 const sectionsData: NavSection[] = [
   {
-    name: 'General',
+    name: 'Genefdjd',
     icon: 'solar:settings-bold-duotone',
     items: [
       { 
@@ -208,39 +208,8 @@ export default function SettingsPage() {
 
   return (
     <div className="bg-gradient-to-br from-gray-50/50 to-white overflow-hidden w-full min-h-screen -mt-6 -mx-6 rounded-none shadow-none border-0">
-      {/* Enhanced Header */}
-      <div className="px-6 py-6 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <span className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center shadow-sm">
-                <Icon icon={activeItem?.icon || DEFAULT_ICON} className="text-[#3c959d]" width={24} height={24} />
-              </span>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{activeItem?.name || 'Settings'}</h1>
-                <p className="text-sm text-gray-600 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#3c959d]"></span>
-                  {activeSection?.name}
-                  {activeItem?.description && (
-                    <>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-500">{activeItem.description}</span>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <button className="h-10 w-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors">
-              <Icon icon="solar:question-circle-bold-duotone" className="text-gray-500" width={18} height={18} />
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-140px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
         {/* Enhanced Left Navigation */}
         <aside className="lg:col-span-4 xl:col-span-3 border-r border-gray-100 bg-white/60 backdrop-blur-sm">
           {/* Search Bar */}
@@ -257,7 +226,7 @@ export default function SettingsPage() {
             </div>
           </div>
           
-          <nav className="p-4 overflow-auto h-[calc(100vh-220px)]">
+          <nav className="p-4 overflow-auto h-[calc(100vh-120px)]">
             <div className="space-y-6">
               {filteredSections.map((section) => (
                 <div key={section.name} className="space-y-2">
