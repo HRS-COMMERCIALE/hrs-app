@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 interface BusinessAccessValidationResult {
@@ -19,11 +19,16 @@ export function useBusinessAccessValidation(): BusinessAccessValidationResult {
   const [error, setError] = useState<string | null>(null);
   const [businessId, setBusinessId] = useState<number | null>(null);
   const [isBanned, setIsBanned] = useState(false);
+  const hasBackgroundValidatedRef = useRef(false);
+
+  // simple in-memory cache per session
+  const cacheRef = useRef<Map<number, { valid: boolean; isBanned: boolean }>>(
+    new Map()
+  );
 
   useEffect(() => {
     const validateBusinessAccess = async () => {
       try {
-        setIsLoading(true);
         setError(null);
 
         // Get businessId from URL params
@@ -46,27 +51,49 @@ export function useBusinessAccessValidation(): BusinessAccessValidationResult {
 
         setBusinessId(businessIdNum);
 
-        // Call the validation API
-        const response = await fetch(`/api/auth/BuinessUsers/validateAccess?businessId=${businessIdNum}`, {
-          method: 'GET',
-          credentials: 'include', // Include cookies for authentication
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          // User has access to this business
-          setIsValid(true);
-          setIsBanned(data.data.isBanned || false);
+        // Serve from cache without blocking UI, then background revalidate
+        const cached = cacheRef.current.get(businessIdNum);
+        if (cached) {
+          setIsValid(cached.valid);
+          setIsBanned(cached.isBanned);
+          setIsLoading(false);
         } else {
-          // User doesn't have access to this business
-          setError(data.message || 'Access denied: You do not have permission to access this business');
-          setIsValid(false);
-          // Redirect to home page
-          router.push('/');
+          // first time: show minimal loading only once
+          setIsLoading(true);
+        }
+
+        // Background validation (or first validation)
+        const doValidate = async () => {
+          const response = await fetch(`/api/auth/BuinessUsers/validateAccess?businessId=${businessIdNum}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          const data = await response.json();
+          if (response.ok && data.success) {
+            cacheRef.current.set(businessIdNum, {
+              valid: true,
+              isBanned: data.data.isBanned || false,
+            });
+            setIsValid(true);
+            setIsBanned(data.data.isBanned || false);
+            setIsLoading(false);
+          } else {
+            setError(data.message || 'Access denied: You do not have permission to access this business');
+            setIsValid(false);
+            setIsLoading(false);
+            router.push('/');
+          }
+        };
+
+        // avoid duplicate background calls on fast re-renders
+        if (!hasBackgroundValidatedRef.current) {
+          hasBackgroundValidatedRef.current = true;
+          void doValidate();
+          // reset flag after microtask so next businessId change can re-run
+          setTimeout(() => {
+            hasBackgroundValidatedRef.current = false;
+          }, 0);
         }
       } catch (err) {
         console.error('Error validating business access:', err);
@@ -75,12 +102,13 @@ export function useBusinessAccessValidation(): BusinessAccessValidationResult {
         // Redirect to home page on error
         router.push('/');
       } finally {
-        setIsLoading(false);
+        // isLoading is controlled based on cache/validation outcome
       }
     };
 
     validateBusinessAccess();
-  }, [searchParams, router]);
+    // only re-run when businessId actually changes
+  }, [searchParams.get('businessId'), router]);
 
   return {
     isValid,

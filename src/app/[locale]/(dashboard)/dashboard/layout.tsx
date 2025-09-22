@@ -202,18 +202,8 @@ function BusinessValidationWrapper({ children }: { children: React.ReactNode }) 
             </DropdownMenu>
           </header>
           <main className="flex-1 overflow-auto p-6">
-            {isLoading || isValid === null ? (
-              <div className="fixed inset-0 z-40 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-                <LoadingSpinner 
-                  icon={Building2}
-                  message="Validating business access..."
-                  variant="default"
-                  size="lg"
-                />
-              </div>
-            ) : isValid === true ? (
-              children
-            ) : null}
+            {/* Render content while background-validating; only block when explicitly denied */}
+            {isValid === false ? null : children}
           </main>
         </SidebarInset>
       </div>
