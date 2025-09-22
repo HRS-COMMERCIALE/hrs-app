@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { createArticleSchema } from '@/validations/dashboard/operations/inventory/article/articleValidation';
 import { uploadToCloudinary } from '@/utils/cloudinary';
 
@@ -56,12 +57,11 @@ export async function POST(req: Request) {
 
     const validatedData = validationResult.data;
 
-    // Get user's business
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const businessId = business.get('id') as number;
+    // Business authorization (create)
+    const businessIdInput = (formData.get('businessId') as string) || new URL(req.url).searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'create');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Check if article name already exists for this business
     const existingArticle = await Article().findOne({
@@ -174,13 +174,13 @@ export async function POST(req: Request) {
     const createdArticle = await Article().findByPk(created.get('id') as number, {
       include: [
         {
-          model: Family,
+          model: Family(),
           as: 'family',
           attributes: ['id', 'name'],
           required: false,
         },
         {
-          model: Supplier,
+          model: Supplier(),
           as: 'supplier',
           attributes: ['id', 'name'],
           required: false,

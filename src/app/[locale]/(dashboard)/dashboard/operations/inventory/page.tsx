@@ -104,7 +104,7 @@ export default function InventoryPage() {
   }
 
   return (
-    <div className="w-full max-w-none px-4 pt-4">
+    <div className="w-full max-w-[1800px] mx-auto px-2 md:px-6 lg:px-8 pt-4">
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm mb-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 lg:space-y-6">
           {/* Search and Filters */}
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
@@ -181,7 +181,7 @@ export default function InventoryPage() {
           </div>
 
           {/* Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
             <div className="relative">
               <select
                 value={selectedType}
@@ -224,7 +224,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Reports & Status Section */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 rounded-xl border border-gray-200">
+        <div className="mt-6 lg:mt-8 p-4 lg:p-6 bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 rounded-xl border border-gray-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-[#3c959d] to-[#ef7335] flex items-center justify-center">
               <Icon icon="solar:chart-bold-duotone" className="text-white" width={12} height={12} />
@@ -232,7 +232,7 @@ export default function InventoryPage() {
             <h3 className="text-base font-semibold text-gray-900">Reports & Status</h3>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-4">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -311,19 +311,19 @@ export default function InventoryPage() {
           <table className="w-full">
             <thead className="bg-gray-50/80 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Article</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Family</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Supplier</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Price</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Article</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Family</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Supplier</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Stock</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Price</th>
+                <th className="px-6 lg:px-8 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {articles.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 lg:px-8 py-12 text-center">
                     <div className="text-gray-500">
                       <Icon icon="solar:box-bold-duotone" className="mx-auto mb-2 text-gray-300" width={32} height={32} />
                       <p className="text-sm">No articles found</p>
@@ -339,7 +339,7 @@ export default function InventoryPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="hover:bg-gray-50/50 transition-colors"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-6 lg:px-8 py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg overflow-hidden bg-gradient-to-br from-[#3c959d]/15 to-[#ef7335]/15 flex items-center justify-center">
                           {article.imageUrl ? (
@@ -360,7 +360,7 @@ export default function InventoryPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 lg:px-8 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         article.typeArticle === 'product' 
                           ? 'bg-green-100 text-green-800' 
@@ -369,13 +369,13 @@ export default function InventoryPage() {
                         {article.typeArticle || 'N/A'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{article.family?.name || 'N/A'}</td>
-                    <td className="px-6 py-4 text-gray-700">{article.supplier?.name || article.fournisseur || 'N/A'}</td>
-                    <td className="px-6 py-4 text-gray-700">{article.qteEnStock || 0}</td>
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className="px-6 lg:px-8 py-4 text-gray-700">{article.family?.name || 'N/A'}</td>
+                    <td className="px-6 lg:px-8 py-4 text-gray-700">{article.supplier?.name || article.fournisseur || 'N/A'}</td>
+                    <td className="px-6 lg:px-8 py-4 text-gray-700">{article.qteEnStock || 0}</td>
+                    <td className="px-6 lg:px-8 py-4 text-gray-700">
                       {formatPrice(article.prixVenteTTC)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 lg:px-8 py-4">
                       <div className="flex items-center gap-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -406,7 +406,7 @@ export default function InventoryPage() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="bg-gray-50/80 border-t border-gray-200 px-6 py-4">
+          <div className="bg-gray-50/80 border-t border-gray-200 px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
                 Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to{' '}

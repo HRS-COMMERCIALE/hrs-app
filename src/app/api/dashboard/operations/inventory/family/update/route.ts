@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, Family } from '@/models/associationt.ts/association';
+import { Family } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { updateFamilySchema } from '@/validations/dashboard/operations/inventory/family/familyValidation';
 
 export async function PUT(req: Request) {
@@ -27,12 +28,11 @@ export async function PUT(req: Request) {
 
     const { id, name } = validationResult.data;
 
-    // Get user's business
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const businessId = business.get('id') as number;
+    // Business authorization (update)
+    const businessIdInput = new URL(req.url).searchParams.get('businessId') || (body?.businessId as string | undefined);
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'update');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Find the family to update
     const family = await Family().findOne({

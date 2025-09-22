@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, Article } from '@/models/associationt.ts/association';
+import { Article } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { deleteArticleSchema } from '@/validations/dashboard/operations/inventory/article/articleValidation';
 import { deleteFromCloudinary } from '@/utils/cloudinary';
 
@@ -29,12 +30,11 @@ export async function DELETE(req: Request) {
 
     const { id: articleId } = parsed.data;
 
-    // Get user's business
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const businessId = business.get('id') as number;
+    // Business authorization (delete)
+    const businessIdInput = searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'delete');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Find the article to delete
     const article = await Article().findOne({

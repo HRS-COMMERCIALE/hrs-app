@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { updateArticleSchema } from '@/validations/dashboard/operations/inventory/article/articleValidation';
 import { uploadToCloudinary, deleteFromCloudinary } from '@/utils/cloudinary';
 
@@ -53,12 +54,11 @@ export async function PUT(req: Request) {
 
     const { id, ...validatedData } = validationResult.data;
 
-    // Get user's business
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const businessId = business.get('id') as number;
+    // Business authorization (update)
+    const businessIdInput = (formData.get('businessId') as string) || new URL(req.url).searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'update');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Find the article to update
     const article = await Article().findOne({
@@ -171,13 +171,13 @@ export async function PUT(req: Request) {
     const updatedArticle = await Article().findByPk(id, {
       include: [
         {
-          model: Family,
+          model: Family(),
           as: 'family',
           attributes: ['id', 'name'],
           required: false,
         },
         {
-          model: Supplier,
+          model: Supplier(),
           as: 'supplier',
           attributes: ['id', 'name'],
           required: false,

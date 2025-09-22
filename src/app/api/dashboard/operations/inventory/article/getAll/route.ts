@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { Article, Family, Supplier } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { getArticlesQuerySchema } from '@/validations/dashboard/operations/inventory/article/articleValidation';
 import { Op } from 'sequelize';
 
@@ -29,12 +30,11 @@ export async function GET(req: Request) {
 
     const { page, limit, search, typeArticle, natureArticle, familyId, supplierId } = parsed.data;
 
-    // Get user's business
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const businessId = business.get('id') as number;
+    // Business authorization
+    const businessIdInput = searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'read');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Build where clause
     const whereClause: any = { businessId };
@@ -80,13 +80,13 @@ export async function GET(req: Request) {
       order: [['id', 'DESC']], // Most recent first
       include: [
         {
-          model: Family,
+          model: Family(),
           as: 'family',
           attributes: ['id', 'name'],
           required: false,
         },
         {
-          model: Supplier,
+          model: Supplier(),
           as: 'supplier',
           attributes: ['id', 'name'],
           required: false,

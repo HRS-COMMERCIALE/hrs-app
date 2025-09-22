@@ -7,8 +7,7 @@ import { useSuppliers } from '@/hooks/useSuppliers';
 import { ArticleItem } from '@/hooks/useArticles';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
-import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
-import { Save } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface ArticleFormProps {
   article?: ArticleItem | null;
@@ -1080,14 +1079,10 @@ export default function ArticleForm({ article, onClose, onSuccess }: ArticleForm
                 className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#3c959d] to-[#ef7335] rounded-lg hover:shadow-lg transition-all duration-200 flex items-center gap-2 shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="flex items-center">
-                    <LoadingSpinner 
-                      icon={Save}
-                      size="sm"
-                      variant="minimal"
-                    />
-                    <span className="ml-2">Saving...</span>
-                  </div>
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Saving...</span>
+                  </>
                 ) : (
                   <>
                     <Icon icon="solar:check-circle-bold-duotone" width={14} height={14} />

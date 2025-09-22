@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
 export interface ArticleItem {
   id: number;
@@ -124,7 +125,7 @@ export interface ArticlesResponse {
   };
 }
 
-const fetchArticles = async (params: GetArticlesParams = {}): Promise<ArticlesResponse> => {
+const fetchArticles = async (params: GetArticlesParams & { businessId?: number } = {}): Promise<ArticlesResponse> => {
   const searchParams = new URLSearchParams();
   
   if (params.page) searchParams.set('page', params.page.toString());
@@ -134,6 +135,7 @@ const fetchArticles = async (params: GetArticlesParams = {}): Promise<ArticlesRe
   if (params.natureArticle) searchParams.set('natureArticle', params.natureArticle);
   if (params.familyId) searchParams.set('familyId', params.familyId.toString());
   if (params.supplierId) searchParams.set('supplierId', params.supplierId.toString());
+  if (params.businessId) searchParams.set('businessId', params.businessId.toString());
 
   const response = await fetch(`/api/dashboard/operations/inventory/article/getAll?${searchParams.toString()}`, {
     method: 'GET',
@@ -147,7 +149,7 @@ const fetchArticles = async (params: GetArticlesParams = {}): Promise<ArticlesRe
   return await response.json();
 };
 
-const createArticle = async (data: CreateArticleData): Promise<ArticleItem> => {
+const createArticle = async (data: CreateArticleData & { businessId: number }): Promise<ArticleItem> => {
   const formData = new FormData();
   
   // Add all fields to FormData
@@ -182,7 +184,7 @@ const createArticle = async (data: CreateArticleData): Promise<ArticleItem> => {
   return body.data;
 };
 
-const updateArticle = async (data: UpdateArticleData): Promise<ArticleItem> => {
+const updateArticle = async (data: UpdateArticleData & { businessId: number }): Promise<ArticleItem> => {
   const formData = new FormData();
   
   // Add all fields to FormData
@@ -217,8 +219,8 @@ const updateArticle = async (data: UpdateArticleData): Promise<ArticleItem> => {
   return body.data;
 };
 
-const deleteArticle = async (id: number): Promise<void> => {
-  const response = await fetch(`/api/dashboard/operations/inventory/article/delete?id=${id}`, {
+const deleteArticle = async (id: number, businessId: number): Promise<void> => {
+  const response = await fetch(`/api/dashboard/operations/inventory/article/delete?id=${id}&businessId=${businessId}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: { Accept: 'application/json' },
@@ -230,16 +232,25 @@ const deleteArticle = async (id: number): Promise<void> => {
 };
 
 export const useArticles = (params?: GetArticlesParams) => {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useQuery({
-    queryKey: ['articles', params],
-    queryFn: () => fetchArticles(params),
+    queryKey: ['articles', { ...params, businessId }],
+    queryFn: () => fetchArticles({ ...params, businessId }),
   });
 };
 
 export const useCreateArticle = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: createArticle,
+    mutationFn: (payload: CreateArticleData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return createArticle({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
     },
@@ -248,8 +259,14 @@ export const useCreateArticle = () => {
 
 export const useUpdateArticle = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: updateArticle,
+    mutationFn: (payload: UpdateArticleData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return updateArticle({ ...payload, businessId });
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
     },
@@ -258,8 +275,14 @@ export const useUpdateArticle = () => {
 
 export const useDeleteArticle = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: deleteArticle,
+    mutationFn: (id: number) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return deleteArticle(id, businessId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
     },

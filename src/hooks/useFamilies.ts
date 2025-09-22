@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
 export interface FamilyItem {
   id: number;
@@ -32,12 +33,13 @@ export interface FamiliesResponse {
   };
 }
 
-const fetchFamilies = async (params: GetFamiliesParams = {}): Promise<FamilyItem[]> => {
+const fetchFamilies = async (params: GetFamiliesParams & { businessId?: number } = {}): Promise<FamilyItem[]> => {
   const searchParams = new URLSearchParams();
   
   if (params.page) searchParams.set('page', params.page.toString());
   if (params.limit) searchParams.set('limit', params.limit.toString());
   if (params.search) searchParams.set('search', params.search);
+  if (params.businessId) searchParams.set('businessId', params.businessId.toString());
 
   const response = await fetch(`/api/dashboard/operations/inventory/family/getAll?${searchParams.toString()}`, {
     method: 'GET',
@@ -52,8 +54,8 @@ const fetchFamilies = async (params: GetFamiliesParams = {}): Promise<FamilyItem
   return body.data;
 };
 
-const createFamily = async (data: CreateFamilyData): Promise<FamilyItem> => {
-  const response = await fetch('/api/dashboard/operations/inventory/family/add', {
+const createFamily = async (data: CreateFamilyData & { businessId: number }): Promise<FamilyItem> => {
+  const response = await fetch(`/api/dashboard/operations/inventory/family/add?businessId=${data.businessId}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -67,8 +69,8 @@ const createFamily = async (data: CreateFamilyData): Promise<FamilyItem> => {
   return body.data;
 };
 
-const updateFamily = async (data: UpdateFamilyData): Promise<FamilyItem> => {
-  const response = await fetch('/api/dashboard/operations/inventory/family/update', {
+const updateFamily = async (data: UpdateFamilyData & { businessId: number }): Promise<FamilyItem> => {
+  const response = await fetch(`/api/dashboard/operations/inventory/family/update?businessId=${data.businessId}`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -82,8 +84,8 @@ const updateFamily = async (data: UpdateFamilyData): Promise<FamilyItem> => {
   return body.data;
 };
 
-const deleteFamily = async (id: number): Promise<void> => {
-  const response = await fetch(`/api/dashboard/operations/inventory/family/delete?id=${id}`, {
+const deleteFamily = async (id: number, businessId: number): Promise<void> => {
+  const response = await fetch(`/api/dashboard/operations/inventory/family/delete?id=${id}&businessId=${businessId}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: { Accept: 'application/json' },
@@ -95,16 +97,25 @@ const deleteFamily = async (id: number): Promise<void> => {
 };
 
 export const useFamilies = (params?: GetFamiliesParams) => {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useQuery({
-    queryKey: ['families', params],
-    queryFn: () => fetchFamilies(params),
+    queryKey: ['families', { ...params, businessId }],
+    queryFn: () => fetchFamilies({ ...params, businessId }),
   });
 };
 
 export const useCreateFamily = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: createFamily,
+    mutationFn: (payload: CreateFamilyData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return createFamily({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] });
     },
@@ -113,8 +124,14 @@ export const useCreateFamily = () => {
 
 export const useUpdateFamily = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: updateFamily,
+    mutationFn: (payload: UpdateFamilyData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return updateFamily({ ...payload, businessId });
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['families'] });
     },
@@ -123,8 +140,14 @@ export const useUpdateFamily = () => {
 
 export const useDeleteFamily = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: deleteFamily,
+    mutationFn: (id: number) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return deleteFamily(id, businessId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] });
     },
