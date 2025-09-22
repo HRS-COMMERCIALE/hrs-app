@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
-import { Business, CodesPostaux, Clients } from '@/models/associationt.ts/association';
+import { CodesPostaux, Clients } from '@/models/associationt.ts/association';
 import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { createClientSchema } from '@/validations/dashboard/crm/clients/clients';
 
@@ -49,11 +49,8 @@ export async function POST(req: Request) {
       codesPostauxId,
     } = parsed.data;
 
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'create');
+    const businessIdInput = new URL(req.url).searchParams.get('businessId') || (body?.businessId as string | undefined);
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'create');
     if (!authz.ok) return authz.response;
     const businessId = authz.businessId;
 

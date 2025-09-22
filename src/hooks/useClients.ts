@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
 export interface ClientItem {
   id: number;
@@ -82,7 +83,7 @@ export interface ClientsResponse {
   };
 }
 
-const fetchClients = async (params: GetClientsParams = {}): Promise<ClientsResponse> => {
+const fetchClients = async (params: GetClientsParams & { businessId?: number } = {}): Promise<ClientsResponse> => {
   const searchParams = new URLSearchParams();
   
   if (params.page) searchParams.set('page', params.page.toString());
@@ -91,6 +92,7 @@ const fetchClients = async (params: GetClientsParams = {}): Promise<ClientsRespo
   if (params.type) searchParams.set('type', params.type);
   if (params.category) searchParams.set('category', params.category);
   if (params.governorate) searchParams.set('governorate', params.governorate);
+  if (params.businessId) searchParams.set('businessId', params.businessId.toString());
 
   const response = await fetch(`/api/dashboard/crm/Clients/getAll?${searchParams.toString()}`, {
     method: 'GET',
@@ -104,8 +106,8 @@ const fetchClients = async (params: GetClientsParams = {}): Promise<ClientsRespo
   return await response.json();
 };
 
-const fetchClient = async (id: number): Promise<ClientItem> => {
-  const response = await fetch(`/api/dashboard/crm/Clients/getOne?id=${id}`, {
+const fetchClient = async (id: number, businessId: number): Promise<ClientItem> => {
+  const response = await fetch(`/api/dashboard/crm/Clients/getOne?id=${id}&businessId=${businessId}`, {
     method: 'GET',
     credentials: 'include',
     headers: { Accept: 'application/json' },
@@ -118,8 +120,8 @@ const fetchClient = async (id: number): Promise<ClientItem> => {
   return body.data;
 };
 
-const createClient = async (data: CreateClientData): Promise<void> => {
-  const response = await fetch('/api/dashboard/crm/Clients/create', {
+const createClient = async (data: CreateClientData & { businessId: number }): Promise<void> => {
+  const response = await fetch(`/api/dashboard/crm/Clients/create?businessId=${data.businessId}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -131,8 +133,8 @@ const createClient = async (data: CreateClientData): Promise<void> => {
   }
 };
 
-const updateClient = async (data: UpdateClientData): Promise<ClientItem> => {
-  const response = await fetch('/api/dashboard/crm/Clients/update', {
+const updateClient = async (data: UpdateClientData & { businessId: number }): Promise<ClientItem> => {
+  const response = await fetch(`/api/dashboard/crm/Clients/update?businessId=${data.businessId}`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -146,8 +148,8 @@ const updateClient = async (data: UpdateClientData): Promise<ClientItem> => {
   return body.data;
 };
 
-const deleteClient = async (id: number): Promise<void> => {
-  const response = await fetch(`/api/dashboard/crm/Clients/delete?id=${id}`, {
+const deleteClient = async (id: number, businessId: number): Promise<void> => {
+  const response = await fetch(`/api/dashboard/crm/Clients/delete?id=${id}&businessId=${businessId}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: { Accept: 'application/json' },
@@ -159,24 +161,39 @@ const deleteClient = async (id: number): Promise<void> => {
 };
 
 export const useClients = (params?: GetClientsParams) => {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useQuery({
-    queryKey: ['clients', params],
-    queryFn: () => fetchClients(params),
+    queryKey: ['clients', { ...params, businessId }],
+    queryFn: () => fetchClients({ ...params, businessId }),
   });
 };
 
 export const useClient = (id: number) => {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useQuery({
-    queryKey: ['client', id],
-    queryFn: () => fetchClient(id),
-    enabled: !!id,
+    queryKey: ['client', id, businessId],
+    queryFn: () => {
+      if (!businessId) throw new Error('Missing businessId');
+      return fetchClient(id, businessId);
+    },
+    enabled: !!id && !!businessId,
   });
 };
 
 export const useCreateClient = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: createClient,
+    mutationFn: (payload: CreateClientData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return createClient({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
@@ -185,8 +202,14 @@ export const useCreateClient = () => {
 
 export const useUpdateClient = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: updateClient,
+    mutationFn: (payload: UpdateClientData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return updateClient({ ...payload, businessId });
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['client', data.id] });
@@ -196,8 +219,14 @@ export const useUpdateClient = () => {
 
 export const useDeleteClient = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: deleteClient,
+    mutationFn: (id: number) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return deleteClient(id, businessId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
