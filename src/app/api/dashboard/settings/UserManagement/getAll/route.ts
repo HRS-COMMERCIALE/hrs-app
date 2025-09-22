@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       where: { businessId: parseInt(businessId) },
       attributes: ['id', 'userId', 'role', 'status', 'businessId']
     });
-    console.log('All users in business:', allBusinessUsers.map(bu => ({
+    console.log('All users in business:', allBusinessUsers.map((bu: any) => ({
       id: bu.id,
       userId: bu.userId,
       role: bu.role,
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     console.log('Found users:', {
       count,
       usersFound: businessUsers.length,
-      businessUsers: businessUsers.map(bu => ({
+      businessUsers: businessUsers.map((bu: any) => ({
         id: bu.id,
         role: bu.role,
         status: bu.status,
@@ -156,7 +156,9 @@ export async function GET(request: NextRequest) {
       department: 'General', // You can add department field to BuinessUsers if needed
       isBanned: bu.isBanned,
       bannedReason: bu.bannedReason,
-      bannedAt: bu.bannedAt
+      bannedAt: bu.bannedAt,
+      bannedUntil: bu.bannedUntil,
+      banInterval: bu.banInterval
     }));
 
     return NextResponse.json({

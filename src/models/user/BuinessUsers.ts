@@ -51,6 +51,14 @@ export function defineBuinessUsersModel(sequelize: Sequelize, ModelClass: typeof
         type: DataTypesLib.DATE,
         allowNull: true,
       },
+      bannedUntil: {
+        type: DataTypesLib.DATE,
+        allowNull: true,
+      },
+      banInterval: {
+        type: DataTypesLib.ENUM('1h', '1d', '7d', 'permanent'),
+        allowNull: true,
+      },
       
       joinedAt: {
         type: DataTypesLib.DATE,

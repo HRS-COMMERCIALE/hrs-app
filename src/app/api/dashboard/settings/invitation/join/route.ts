@@ -98,13 +98,13 @@ export async function POST(request: NextRequest) {
       joinedAt: new Date()
     });
 
-    // Update invitation as used
+    // Update invitation as used and expired (one-time use)
     await invitation.update({
       userId: currentUser.userId,
       isUsed: true,
       usedAt: new Date(),
       usedBy: currentUser.userId,
-      status: 'pending'
+      status: 'expired' // Mark as expired to prevent reuse
     });
 
     return NextResponse.json({

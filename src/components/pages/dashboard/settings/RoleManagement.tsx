@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import InvitationManagement from './InvitationManagement';
 import { useBusiness } from '@/store/businessProvider';
+import { useAuth } from '@/store/authProvider';
 
 // Types
 interface User {
@@ -77,6 +79,8 @@ interface User {
   isBanned?: boolean;
   bannedReason?: string;
   bannedAt?: string;
+  bannedUntil?: string;
+  banInterval?: '1h' | '1d' | '7d' | 'permanent';
 }
 
 // Helper function to generate avatar with initials
@@ -99,6 +103,7 @@ const statusConfig = {
 
 export default function RoleManagement({ businessId }: { businessId?: number }) {
   const { selectedBusinessId } = useBusiness();
+  const { user: currentUser } = useAuth();
   const actualBusinessId = businessId || selectedBusinessId || 1;
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,13 +112,19 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
+  const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
   const [isInvitationManagementOpen, setIsInvitationManagementOpen] = useState(false);
+  const [banReason, setBanReason] = useState('');
+  const [banInterval, setBanInterval] = useState<'1h' | '1d' | '7d' | 'permanent'>('1d');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
+
 
   // API functions
   const fetchUsers = async (page: number = currentPage) => {
@@ -148,7 +159,7 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
     }
   };
 
-  const updateUser = async (userId: string, action: string, newRole?: string, banReason?: string) => {
+  const updateUser = async (userId: string, action: string, newRole?: string, banReason?: string, banInterval?: string) => {
     try {
       const response = await fetch('/api/dashboard/settings/UserManagement/update', {
         method: 'PUT',
@@ -160,18 +171,27 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
           businessId: actualBusinessId,
           action,
           newRole,
-          banReason
+          banReason,
+          banInterval
         }),
       });
 
       if (response.ok) {
+        const data = await response.json();
         await fetchUsers(); // Refresh the list
+        
+        // Show success message
+        if (data.success) {
+          showNotification('success', `User ${action} successful!`);
+        }
       } else {
         const errorData = await response.json();
         console.error('Error updating user:', errorData.error);
+        showNotification('error', `Error: ${errorData.error}`);
       }
     } catch (error) {
       console.error('Error updating user:', error);
+      showNotification('error', 'Network error occurred');
     }
   };
 
@@ -216,9 +236,36 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
 
   const handleStatusChange = async (userId: string, newStatus: string) => {
     if (newStatus === 'banned') {
-      await updateUser(userId, 'ban', undefined, 'Banned by admin');
+      // Open ban dialog instead of directly banning
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        setSelectedUser(user);
+        setIsBanDialogOpen(true);
+      }
     } else if (newStatus === 'active') {
       await updateUser(userId, 'unban');
+    }
+  };
+
+  const handleBanUser = async () => {
+    if (selectedUser) {
+      await updateUser(selectedUser.id, 'ban', undefined, banReason, banInterval);
+      setIsBanDialogOpen(false);
+      setBanReason('');
+      setBanInterval('1d');
+      setSelectedUser(null);
+    }
+  };
+
+  const handleApproveUser = async (userId: string) => {
+    if (confirm('Are you sure you want to approve this user?')) {
+      await updateUser(userId, 'approve');
+    }
+  };
+
+  const handleRejectUser = async (userId: string) => {
+    if (confirm('Are you sure you want to reject this user? This will remove them from the business.')) {
+      await updateUser(userId, 'reject');
     }
   };
 
@@ -228,10 +275,51 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
     }
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchUsers(1);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
 
   const getRoleIcon = (role: string) => {
     const IconComponent = roleConfig[role as keyof typeof roleConfig]?.icon || User;
     return <IconComponent className="h-4 w-4" />;
+  };
+
+  // Get current user's role from the users list
+  const getCurrentUserRole = (): 'admin' | 'manager' | 'member' => {
+    if (!currentUser) return 'member';
+    const currentUserInList = users.find(u => u.email === currentUser.email);
+    return currentUserInList?.role || 'member';
+  };
+
+  // Check if this is the current user's own account
+  const isCurrentUser = (user: User): boolean => {
+    return currentUser !== null && user.email === currentUser.email;
+  };
+
+  // Check if current user can modify target user based on role hierarchy
+  const canModifyUser = (targetUser: User): boolean => {
+    // Don't allow modification of own account
+    if (isCurrentUser(targetUser)) {
+      return false;
+    }
+    
+    const roleHierarchy = { 'member': 1, 'manager': 2, 'admin': 3 };
+    const currentUserRole = getCurrentUserRole();
+    const currentUserLevel = roleHierarchy[currentUserRole];
+    const targetUserLevel = roleHierarchy[targetUser.role];
+    
+    return currentUserLevel > targetUserLevel;
   };
 
   return (
@@ -517,9 +605,21 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                   <p className="text-sm text-gray-500">{filteredUsers.length} total users</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-                {filteredUsers.length} users
-              </Badge>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2 rounded-xl border-gray-200 hover:bg-gray-50"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                  {filteredUsers.length} users
+                </Badge>
+              </div>
             </div>
           </div>
 
@@ -529,12 +629,14 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50/50">
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">User</th>
-                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Role</th>
-                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Status</th>
-                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-20">Activity</th>
-                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Dept</th>
-                    <th className="px-0 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider w-16">Joined</th>
-                    <th className="px-1 py-3 text-right text-sm font-semibold text-gray-600 uppercase tracking-wider w-14">Actions</th>
+                    <th className="px-0 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">Role</th>
+                    <th className="px-0 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">Status</th>
+                    <th className="px-0 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">Activity</th>
+                    <th className="px-0 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">Dept</th>
+                    <th className="px-0 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">Joined</th>
+                    <th className="px-1 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-14">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -565,7 +667,11 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                   </tr>
                 ) : (
                   filteredUsers.map((user, index) => (
-                  <tr key={user.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
+                  <tr key={user.id} className={`hover:bg-gray-50 transition-colors ${
+                    isCurrentUser(user) 
+                      ? 'bg-blue-50/50 border-l-4 border-blue-500' 
+                      : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+                  }`}>
                     {/* User Column */}
                     <td className="px-3 py-3 whitespace-nowrap w-48">
                       <div className="flex items-center">
@@ -578,8 +684,15 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                           </Avatar>
                         </div>
                         <div className="ml-3 min-w-0 flex-1">
-                          <div className="text-sm font-semibold text-gray-900 truncate">
-                            {user.name}
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-semibold text-gray-900 truncate">
+                              {user.name}
+                            </div>
+                            {isCurrentUser(user) && (
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5">
+                                You
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-xs text-gray-500 truncate max-w-[180px]" title={user.email}>
                             {user.email.length > 18 ? `${user.email.substring(0, 18)}...` : user.email}
@@ -633,43 +746,92 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
 
                     {/* Actions Column */}
                     <td className="px-1 py-3 whitespace-nowrap text-right text-sm font-medium w-14">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-gray-100">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                      {!isCurrentUser(user) ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className={`h-8 w-8 rounded-lg hover:bg-gray-100 ${
+                                !canModifyUser(user) && user.status === 'active' 
+                                  ? 'opacity-50 cursor-not-allowed' 
+                                  : ''
+                              }`}
+                              disabled={!canModifyUser(user) && user.status === 'active'}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 rounded-xl border-0 shadow-xl">
                           <DropdownMenuLabel className="font-semibold text-sm">Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setIsRoleDialogOpen(true);
-                            }}
-                            className="rounded-lg text-sm"
-                          >
-                            <Settings className="h-4 w-4 mr-2" />
-                            Change Role
-                          </DropdownMenuItem>
-                          {user.status === 'active' ? (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(user.id, 'banned')}
-                              className="text-red-600 rounded-lg text-sm"
-                            >
-                              <Ban className="h-4 w-4 mr-2" />
-                              Ban User
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(user.id, 'active')}
-                              className="text-green-600 rounded-lg text-sm"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Unban User
-                            </DropdownMenuItem>
+                          
+                          {/* Pending User Actions */}
+                          {user.status === 'pending' && (
+                            <>
+                              <DropdownMenuItem 
+                                onClick={() => handleApproveUser(user.id)}
+                                className="text-green-600 rounded-lg text-sm"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Approve User
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleRejectUser(user.id)}
+                                className="text-red-600 rounded-lg text-sm"
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Reject User
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                            </>
                           )}
-                          <DropdownMenuSeparator />
+                          
+                          {/* Active User Actions */}
+                          {user.status === 'active' && (
+                            <>
+                              {canModifyUser(user) && (
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsRoleDialogOpen(true);
+                                  }}
+                                  className="rounded-lg text-sm"
+                                >
+                                  <Settings className="h-4 w-4 mr-2" />
+                                  Change Role
+                                </DropdownMenuItem>
+                              )}
+                              {canModifyUser(user) && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(user.id, 'banned')}
+                                  className="text-red-600 rounded-lg text-sm"
+                                >
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Ban User
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                            </>
+                          )}
+                          
+                          {/* Banned User Actions */}
+                          {user.status === 'banned' && (
+                            <>
+                              {canModifyUser(user) && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(user.id, 'active')}
+                                  className="text-green-600 rounded-lg text-sm"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Unban User
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                            </>
+                          )}
+                          
+                          {/* Remove User Action */}
                           <DropdownMenuItem 
                             onClick={() => handleDeleteUser(user.id)}
                             className="text-red-600 rounded-lg text-sm"
@@ -679,6 +841,13 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs px-2 py-1">
+                            Your account
+                          </Badge>
+                        </div>
+                      )}
                     </td>
                   </tr>
                   ))
@@ -715,8 +884,9 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-0 shadow-xl">
                   <SelectItem value="member" className="rounded-lg">Member</SelectItem>
-                  <SelectItem value="manager" className="rounded-lg">Manager</SelectItem>
-                  <SelectItem value="admin" className="rounded-lg">Admin</SelectItem>
+                  {getCurrentUserRole() === 'admin' && (
+                    <SelectItem value="manager" className="rounded-lg">Manager</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -738,6 +908,102 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Ban User Dialog */}
+      <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-red-100 to-rose-100 rounded-xl">
+                <Ban className="h-6 w-6 text-red-600" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Ban User</DialogTitle>
+            </div>
+            <DialogDescription className="text-gray-600 text-base">
+              Ban {selectedUser?.name} from the business
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">Ban Duration</Label>
+              <Select value={banInterval} onValueChange={(value: any) => setBanInterval(value)}>
+                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/80">
+                  <SelectValue placeholder="Select ban duration" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-0 shadow-xl">
+                  <SelectItem value="1h" className="rounded-lg">1 Hour</SelectItem>
+                  <SelectItem value="1d" className="rounded-lg">1 Day</SelectItem>
+                  <SelectItem value="7d" className="rounded-lg">7 Days</SelectItem>
+                  <SelectItem value="permanent" className="rounded-lg">Permanent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">Reason (Optional)</Label>
+              <Input
+                placeholder="Enter reason for ban..."
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                className="h-12 rounded-xl border-gray-200 bg-white/80"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsBanDialogOpen(false);
+                setBanReason('');
+                setBanInterval('1d');
+                setSelectedUser(null);
+              }}
+              className="rounded-xl border-gray-200 hover:bg-gray-50"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleBanUser}
+              className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl"
+            >
+              Ban User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Custom Notification */}
+      {notification && (
+        <div className={`fixed top-0 left-0 right-0 z-50 transform transition-all duration-300 ${
+          notification.type === 'success' ? 'bg-green-50 border-b border-green-200 text-green-800' :
+          notification.type === 'error' ? 'bg-red-50 border-b border-red-200 text-red-800' :
+          'bg-blue-50 border-b border-blue-200 text-blue-800'
+        } shadow-lg p-4`}>
+          <div className="flex items-center justify-center gap-3 max-w-4xl mx-auto">
+            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+              notification.type === 'success' ? 'bg-green-100' :
+              notification.type === 'error' ? 'bg-red-100' :
+              'bg-blue-100'
+            }`}>
+              {notification.type === 'success' ? (
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              ) : notification.type === 'error' ? (
+                <XCircle className="w-4 h-4 text-red-600" />
+              ) : (
+                <Clock className="w-4 h-4 text-blue-600" />
+              )}
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-sm font-medium">{notification.message}</p>
+            </div>
+            <button
+              onClick={() => setNotification(null)}
+              className="flex-shrink-0 p-1 hover:bg-black/5 rounded-full transition-colors"
+            >
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

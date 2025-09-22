@@ -16,9 +16,10 @@ export async function PUT(request: NextRequest) {
     const { 
       userId, 
       businessId,
-      action, // 'changeRole', 'ban', 'unban'
+      action, // 'changeRole', 'ban', 'unban', 'approve', 'reject'
       newRole,
-      banReason
+      banReason,
+      banInterval // '1h', '1d', '7d', 'permanent'
     } = body;
 
     // Validate required fields
@@ -29,15 +30,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if current user has permission to manage users (admin only)
+    // Check if current user has permission to manage users (admin or manager)
     const currentBusinessUser = await BuinessUsers().findOne({
       where: { 
         userId: currentUser.userId,
-        businessId: parseInt(businessId)
+        businessId: parseInt(businessId),
+        status: 'active'
       }
     });
 
-    if (!currentBusinessUser || currentBusinessUser.role !== 'admin') {
+    if (!currentBusinessUser || !['admin', 'manager'].includes(currentBusinessUser.role)) {
       return NextResponse.json(
         { error: 'Insufficient permissions to manage users' },
         { status: 403 }
@@ -59,13 +61,43 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Prevent admin from modifying their own role or banning themselves
-    if (targetBusinessUser.userId === currentUser.userId) {
+    // Prevent users from modifying their own account (except for some actions)
+    if (targetBusinessUser.userId === currentUser.userId && ['ban', 'changeRole'].includes(action)) {
       return NextResponse.json(
         { error: 'Cannot modify your own account' },
         { status: 400 }
       );
     }
+
+    // Role hierarchy enforcement
+    const roleHierarchy = { 'member': 1, 'manager': 2, 'admin': 3 };
+    const currentUserRoleLevel = roleHierarchy[currentBusinessUser.role as keyof typeof roleHierarchy];
+    const targetUserRoleLevel = roleHierarchy[targetBusinessUser.role as keyof typeof roleHierarchy];
+
+    // Check if current user can modify target user based on role hierarchy
+    if (currentUserRoleLevel <= targetUserRoleLevel && ['ban', 'changeRole'].includes(action)) {
+      return NextResponse.json(
+        { error: `Cannot ${action} users with equal or higher role` },
+        { status: 403 }
+      );
+    }
+
+    // Helper function to calculate ban end date
+    const calculateBanEndDate = (interval: string): Date | null => {
+      const now = new Date();
+      switch (interval) {
+        case '1h':
+          return new Date(now.getTime() + 60 * 60 * 1000);
+        case '1d':
+          return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        case '7d':
+          return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        case 'permanent':
+          return null;
+        default:
+          return null;
+      }
+    };
 
     let updatedUser;
 
@@ -78,30 +110,81 @@ export async function PUT(request: NextRequest) {
           );
         }
         
+        // Only admins can promote to admin or manager
+        if (['admin', 'manager'].includes(newRole) && currentBusinessUser.role !== 'admin') {
+          return NextResponse.json(
+            { error: 'Only admins can assign admin or manager roles' },
+            { status: 403 }
+          );
+        }
+        
         updatedUser = await targetBusinessUser.update({
           role: newRole
         });
         break;
 
       case 'ban':
+        if (!banInterval || !['1h', '1d', '7d', 'permanent'].includes(banInterval)) {
+          return NextResponse.json(
+            { error: 'Valid ban interval is required (1h, 1d, 7d, permanent)' },
+            { status: 400 }
+          );
+        }
+        
+        const bannedUntil = calculateBanEndDate(banInterval);
+        
         updatedUser = await targetBusinessUser.update({
-          isBanned: true,
+          status: 'banned',
           bannedReason: banReason || 'No reason provided',
-          bannedAt: new Date()
+          bannedAt: new Date(),
+          bannedUntil: bannedUntil,
+          banInterval: banInterval
         });
         break;
 
       case 'unban':
         updatedUser = await targetBusinessUser.update({
-          isBanned: false,
+          status: 'active',
           bannedReason: null,
-          bannedAt: null
+          bannedAt: null,
+          bannedUntil: null,
+          banInterval: null
         });
         break;
 
+      case 'approve':
+        if (targetBusinessUser.status !== 'pending') {
+          return NextResponse.json(
+            { error: 'User is not pending approval' },
+            { status: 400 }
+          );
+        }
+        
+        updatedUser = await targetBusinessUser.update({
+          status: 'active',
+          joinedAt: new Date()
+        });
+        break;
+
+      case 'reject':
+        if (targetBusinessUser.status !== 'pending') {
+          return NextResponse.json(
+            { error: 'User is not pending approval' },
+            { status: 400 }
+          );
+        }
+        
+        // Remove the user from the business
+        await targetBusinessUser.destroy();
+        
+        return NextResponse.json({
+          success: true,
+          message: 'User request rejected and removed from business'
+        });
+
       default:
         return NextResponse.json(
-          { error: 'Invalid action. Must be changeRole, ban, or unban' },
+          { error: 'Invalid action. Must be changeRole, ban, unban, approve, or reject' },
           { status: 400 }
         );
     }
@@ -111,9 +194,11 @@ export async function PUT(request: NextRequest) {
       user: {
         id: updatedUser.id,
         role: updatedUser.role,
-        isBanned: updatedUser.isBanned,
+        status: updatedUser.status,
         bannedReason: updatedUser.bannedReason,
-        bannedAt: updatedUser.bannedAt
+        bannedAt: updatedUser.bannedAt,
+        bannedUntil: updatedUser.bannedUntil,
+        banInterval: updatedUser.banInterval
       }
     });
 
