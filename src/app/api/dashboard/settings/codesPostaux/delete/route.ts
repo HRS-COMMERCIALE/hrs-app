@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { CodesPostaux, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { CodesPostaux } from '@/models/associationt.ts/association';
 
 export async function DELETE(req: Request) {
   const auth = await requireAuth(req);
@@ -8,23 +9,20 @@ export async function DELETE(req: Request) {
 
   try {
     const body = await req.json();
-    const { ids } = body || {};
+    const { ids, businessId } = body || {};
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
       return NextResponse.json({ error: 'Missing or invalid ids array' }, { status: 400 });
     }
 
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessId, 'delete');
+    if (!authz.ok) return authz.response;
 
     // Check if all postal codes belong to this business
     const existingPostalCodes = await CodesPostaux().findAll({
       where: { 
         id: ids,
-        businessId 
+        businessId: authz.businessId 
       }
     });
 
@@ -36,7 +34,7 @@ export async function DELETE(req: Request) {
     await CodesPostaux().destroy({
       where: { 
         id: ids,
-        businessId 
+        businessId: authz.businessId 
       }
     });
 

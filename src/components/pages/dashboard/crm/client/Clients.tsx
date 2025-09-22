@@ -6,6 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 import { Users } from 'lucide-react';
 import { usePostalCodes, useCreatePostalCode } from '@/hooks/usePostalCodes';
+import { useBusiness } from '@/store/businessProvider';
+import ClientFilters from './components/ClientFilters';
+import ClientTable from './components/ClientTable';
+import ExportMenu from './components/ExportMenu';
+import PaginationBar from './components/PaginationBar';
+import DeleteConfirmModal from './components/DeleteConfirmModal';
+import PostalCodeModal from './components/PostalCodeModal';
 import { 
   useClients, 
   useCreateClient, 
@@ -69,7 +76,8 @@ const emptyClientForm: ClientFormState = {
 // Remove the old API function as we're using hooks now
 
 export default function Clients() {
-  const { data: postalCodes = [], refetch: refetchPostalCodes } = usePostalCodes();
+  const { selectedBusinessId } = useBusiness();
+  const { data: postalCodes = [], refetch: refetchPostalCodes } = usePostalCodes(selectedBusinessId);
   const createPostalCode = useCreatePostalCode();
 
   // CRUD hooks
@@ -432,6 +440,7 @@ export default function Clients() {
         code: postalForm.code.trim(),
         city: postalForm.city.trim(),
         location: postalForm.location.trim(),
+        businessId: selectedBusinessId as number,
       });
       await refetchPostalCodes();
       setShowPostalModal(false);
@@ -444,16 +453,22 @@ export default function Clients() {
 
   return (
     <div className="w-full max-w-none px-4 pt-4">
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 to-gray-100 rounded-3xl border border-gray-200/50 p-6 shadow-sm mb-6">
+        <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-br from-emerald-400/10 to-orange-400/10 rounded-full -translate-y-14 translate-x-14"></div>
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-br from-teal-400/10 to-emerald-400/10 rounded-full translate-y-10 -translate-x-10"></div>
+        <div className="relative flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
-              <Icon icon="solar:users-group-two-rounded-bold-duotone" className="text-[#3c959d]" width={20} height={20} />
+            <span className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#3c959d] to-[#ef7335] flex items-center justify-center shadow-sm">
+              <Icon icon="solar:users-group-two-rounded-bold-duotone" className="text-white" width={20} height={20} />
             </span>
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">Client Management</h3>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Client Management</h3>
               <p className="text-sm text-gray-600">Create and manage your clients</p>
             </div>
+          </div>
+          <div className="hidden md:flex items-center gap-2">
+            <span className="px-3 py-1.5 text-xs rounded-full bg-white/70 text-gray-700 border border-gray-200">CRM</span>
+            <span className="px-3 py-1.5 text-xs rounded-full bg-white/70 text-gray-700 border border-gray-200">Management</span>
           </div>
           <div className="flex items-center gap-3 relative">
             <button
@@ -463,115 +478,22 @@ export default function Clients() {
               <Icon icon="solar:add-circle-bold-duotone" width={16} height={16} />
               Add Client
             </button>
-            <button
-              onClick={() => setExportOpen((v) => !v)}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium transition-colors flex items-center gap-2"
-              title="Export options"
-            >
-              <Icon icon="solar:document-bold-duotone" width={16} height={16} />
-              Export
-              <Icon icon="solar:alt-arrow-down-bold" width={14} height={14} />
-            </button>
-            {exportOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-10">
-                <button onClick={openClientsPdf} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                  <Icon icon="solar:printer-bold-duotone" width={14} height={14} />
-                  Print now
-                </button>
-                <button onClick={previewClientsPdf} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                  <Icon icon="solar:document-text-bold-duotone" width={14} height={14} />
-                  Open preview
-                </button>
-                <button onClick={downloadClientsPdf} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                  <Icon icon="solar:download-bold-duotone" width={14} height={14} />
-                  Download PDF
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {/* Search and Filters */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Icon icon="solar:magnifer-linear" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width={16} height={16} />
-            <input
-              type="text"
-              placeholder="Search by name, email, type..."
-                value={filters.search}
-                onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white/80 backdrop-blur-sm focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d] focus:bg-white transition-all text-sm"
+            <ExportMenu
+              isOpen={exportOpen}
+              onToggle={() => setExportOpen((v) => !v)}
+              onPrintNow={openClientsPdf}
+              onOpenPreview={previewClientsPdf}
+              onDownloadPdf={downloadClientsPdf}
             />
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="h-2 w-2 rounded-full bg-[#3c959d]"></span>
-              {pagination?.totalItems || 0} clients
-            </div>
-          </div>
-
-          {/* Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <select
-                value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white/80 backdrop-blur-sm focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d] appearance-none"
-              >
-                <option value="">All Types</option>
-                <option value="Central">Central</option>
-                <option value="Branch">Branch</option>
-              </select>
-              <Icon icon="solar:alt-arrow-down-bold-duotone" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" width={14} height={14} />
-            </div>
-            <div className="relative">
-              <select
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white/80 backdrop-blur-sm focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d] appearance-none"
-              >
-                <option value="">All Categories</option>
-                <option value="State">State</option>
-                <option value="Private">Private</option>
-              </select>
-              <Icon icon="solar:alt-arrow-down-bold-duotone" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" width={14} height={14} />
-            </div>
-            <div className="relative">
-              <select
-                value={filters.governorate}
-                onChange={(e) => handleFilterChange('governorate', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white/80 backdrop-blur-sm focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d] appearance-none"
-              >
-                <option value="">All Governorates</option>
-                <option value="Ariana">Ariana</option>
-                <option value="Béja">Béja</option>
-                <option value="Ben Arous">Ben Arous</option>
-                <option value="Bizerte">Bizerte</option>
-                <option value="Gabès">Gabès</option>
-                <option value="Gafsa">Gafsa</option>
-                <option value="Jendouba">Jendouba</option>
-                <option value="Kairouan">Kairouan</option>
-                <option value="Kasserine">Kasserine</option>
-                <option value="Kébili">Kébili</option>
-                <option value="Kef">Kef</option>
-                <option value="Mahdia">Mahdia</option>
-                <option value="Manouba">Manouba</option>
-                <option value="Médenine">Médenine</option>
-                <option value="Monastir">Monastir</option>
-                <option value="Nabeul">Nabeul</option>
-                <option value="Sfax">Sfax</option>
-                <option value="Sidi Bouzid">Sidi Bouzid</option>
-                <option value="Siliana">Siliana</option>
-                <option value="Sousse">Sousse</option>
-                <option value="Tataouine">Tataouine</option>
-                <option value="Tozeur">Tozeur</option>
-                <option value="Tunis">Tunis</option>
-                <option value="Zaghouan">Zaghouan</option>
-              </select>
-              <Icon icon="solar:alt-arrow-down-bold-duotone" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" width={14} height={14} />
-            </div>
-          </div>
         </div>
+
+        <ClientFilters
+          filters={filters}
+          totalItems={pagination?.totalItems || 0}
+          onSearchChange={handleSearchChange}
+          onFilterChange={handleFilterChange}
+        />
       </div>
 
       {loadingList ? (
@@ -590,120 +512,24 @@ export default function Clients() {
         </div>
       ) : (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50/80 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Phone</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Address</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Postal code</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {clients.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
-                      <div className="text-gray-500">
-                        <Icon icon="solar:users-group-two-rounded-bold-duotone" className="mx-auto mb-2 text-gray-300" width={32} height={32} />
-                        <p className="text-sm">No clients found</p>
-                        {filters.search && <p className="text-xs mt-1">Try adjusting your search terms</p>}
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  clients.map((c) => {
-                    const pc = postalCodes.find((p) => p.id === c.codesPostauxId);
-                    return (
-                      <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/15 to-[#ef7335]/15 flex items-center justify-center">
-                              <Icon icon="solar:user-bold-duotone" className="text-[#3c959d]" width={14} height={14} />
-                            </span>
-                            <span className="font-medium text-gray-900">{c.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            c.type === 'Central' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-green-100 text-green-800'
-                          }`}>
-                            {c.type}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">{c.email || '-'}</td>
-                        <td className="px-6 py-4 text-gray-700">{c.phone1 || c.phone2 || c.phone3 || '-'}</td>
-                        <td className="px-6 py-4 text-gray-700">{c.address}</td>
-                        <td className="px-6 py-4 text-gray-700">{pc ? `${pc.code} - ${pc.city}` : '-'}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => startEdit(c)}
-                              className="p-2 text-[#3c959d] hover:bg-[#3c959d]/10 rounded-lg transition-colors"
-                              title="Edit client"
-                            >
-                              <Icon icon="solar:pen-bold-duotone" width={16} height={16} />
-                            </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => openDeleteConfirm(c)}
-                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete client"
-                            >
-                              <Icon icon="solar:trash-bin-trash-bold-duotone" width={16} height={16} />
-                            </motion.button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+          <ClientTable
+            clients={clients as any}
+            postalCodes={postalCodes}
+            onEdit={(c) => startEdit(c as any)}
+            onDelete={(c) => openDeleteConfirm(c as any)}
+          />
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div className="bg-gray-50/80 border-t border-gray-200 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to{' '}
-                  {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} of{' '}
-                  {pagination.totalItems} results
-                </div>
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={!pagination.hasPrevPage}
-                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Previous
-                  </motion.button>
-                  <span className="px-3 py-2 text-sm font-medium text-gray-700">
-                    Page {pagination.currentPage} of {pagination.totalPages}
-                  </span>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={!pagination.hasNextPage}
-                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Next
-                  </motion.button>
-                </div>
-              </div>
-            </div>
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              itemsPerPage={pagination.itemsPerPage}
+              hasPrevPage={pagination.hasPrevPage}
+              hasNextPage={pagination.hasNextPage}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       )}
@@ -752,39 +578,39 @@ export default function Clients() {
               </div>
 
               {/* Form Content */}
-              <div className="flex-1 p-6 overflow-y-auto">
-                <div className="space-y-6">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
                   {/* Basic Information */}
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     <div className="relative">
-                      <div className="flex items-center gap-3 pb-3">
+                      <div className="flex items-center gap-2 pb-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
                           <Icon icon="solar:user-bold-duotone" className="text-[#3c959d]" width={16} height={16} />
                         </div>
-                        <h4 className="text-base font-semibold text-gray-900">Basic Information</h4>
+                        <h4 className="text-sm font-semibold text-gray-900">Basic Information</h4>
                         <div className="flex-1 h-px bg-gradient-to-r from-[#3c959d]/30 via-gray-200 to-[#ef7335]/30"></div>
                       </div>
               </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="space-y-2"
+                        className="space-y-1 md:col-span-2"
                       >
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-medium text-gray-700">
                           Name <span className="text-red-500">*</span>
                         </label>
                         <div className="relative group">
                           <input 
                             value={form.name} 
                             onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
                             placeholder="Enter client name"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -794,16 +620,16 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-medium text-gray-700">
                           Type <span className="text-red-500">*</span>
                         </label>
                         <div className="relative group">
                           <select
                             value={form.type} 
                             onChange={(e) => setForm({ ...form, type: e.target.value })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
                           >
                             <option value="">Select a Type...</option>
                             <option value="Central">Central</option>
@@ -817,14 +643,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Category</label>
+                        <label className="block text-xs font-medium text-gray-700">Category</label>
                         <div className="relative group">
                           <select
                             value={form.category ?? ''} 
                             onChange={(e) => setForm({ ...form, category: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
                           >
                             <option value="">Select a Category...</option>
                             <option value="State">State</option>
@@ -838,16 +664,16 @@ export default function Clients() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="md:col-span-3 space-y-2"
+                        className="md:col-span-4 space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-medium text-gray-700">
                           Address <span className="text-red-500">*</span>
                         </label>
                         <div className="relative group">
                           <input 
                             value={form.address} 
                             onChange={(e) => setForm({ ...form, address: e.target.value })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
                             placeholder="Enter full address"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -861,30 +687,30 @@ export default function Clients() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     <div className="relative">
-                      <div className="flex items-center gap-3 pb-3">
+                      <div className="flex items-center gap-2 pb-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
                           <Icon icon="solar:map-point-bold-duotone" className="text-[#3c959d]" width={16} height={16} />
                         </div>
-                        <h4 className="text-base font-semibold text-gray-900">Location & Contact</h4>
+                        <h4 className="text-sm font-semibold text-gray-900">Location & Contact</h4>
                         <div className="flex-1 h-px bg-gradient-to-r from-[#3c959d]/30 via-gray-200 to-[#ef7335]/30"></div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.7 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Governorate</label>
+                        <label className="block text-xs font-medium text-gray-700">Governorate</label>
                         <div className="relative group">
                           <select
                             value={form.governorate ?? ''} 
                             onChange={(e) => setForm({ ...form, governorate: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50"
                           >
                             <option value="">Select Governorate...</option>
                             <option value="Ariana">Ariana</option>
@@ -920,14 +746,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.8 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">City</label>
+                        <label className="block text-xs font-medium text-gray-700">City</label>
                         <div className="relative group">
                           <input 
                             value={form.city ?? ''} 
                             onChange={(e) => setForm({ ...form, city: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:border-[#3c959d]/50 hover:bg-white/70" 
                             placeholder="City"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -937,12 +763,12 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.9 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Postal Code</label>
+                        <label className="block text-xs font-medium text-gray-700">Postal Code</label>
                         <div className="relative group">
                 <select
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
                   value={form.codesPostauxId ?? ''}
                   onChange={(e) => setForm({ ...form, codesPostauxId: e.target.value ? Number(e.target.value) : undefined })}
                 >
@@ -968,34 +794,34 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1.0 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <label className="block text-xs font-medium text-gray-700">Email</label>
                         <div className="relative">
                           <input 
                             type="email" 
                             value={form.email ?? ''} 
                             onChange={(e) => setForm({ ...form, email: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="client@example.com"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
                         </div>
                       </motion.div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.1 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Phone 1</label>
+                        <label className="block text-xs font-medium text-gray-700">Phone 1</label>
                         <div className="relative">
                           <input 
                             value={form.phone1 ?? ''} 
                             onChange={(e) => setForm({ ...form, phone1: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Primary phone"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1005,14 +831,14 @@ export default function Clients() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.2 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Phone 2</label>
+                        <label className="block text-xs font-medium text-gray-700">Phone 2</label>
                         <div className="relative">
                           <input 
                             value={form.phone2 ?? ''} 
                             onChange={(e) => setForm({ ...form, phone2: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Secondary phone"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1022,14 +848,14 @@ export default function Clients() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.3 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Phone 3</label>
+                        <label className="block text-xs font-medium text-gray-700">Phone 3</label>
                         <div className="relative">
                           <input 
                             value={form.phone3 ?? ''} 
                             onChange={(e) => setForm({ ...form, phone3: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Additional phone"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1039,14 +865,14 @@ export default function Clients() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.4 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Fax</label>
+                        <label className="block text-xs font-medium text-gray-700">Fax</label>
                         <div className="relative">
                           <input 
                             value={form.faxNumber ?? ''} 
                             onChange={(e) => setForm({ ...form, faxNumber: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Fax number"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1060,30 +886,30 @@ export default function Clients() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.5 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     <div className="relative">
-                      <div className="flex items-center gap-3 pb-3">
+                      <div className="flex items-center gap-2 pb-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
                           <Icon icon="solar:buildings-2-bold-duotone" className="text-[#3c959d]" width={16} height={16} />
                         </div>
-                        <h4 className="text-base font-semibold text-gray-900">Business Information</h4>
+                        <h4 className="text-sm font-semibold text-gray-900">Business Information</h4>
                         <div className="flex-1 h-px bg-gradient-to-r from-[#3c959d]/30 via-gray-200 to-[#ef7335]/30"></div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1.6 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Tax ID</label>
+                        <label className="block text-xs font-medium text-gray-700">Tax ID</label>
                         <div className="relative">
                           <input 
                             value={form.taxId ?? ''} 
                             onChange={(e) => setForm({ ...form, taxId: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Tax ID"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1093,14 +919,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1.7 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">VAT</label>
+                        <label className="block text-xs font-medium text-gray-700">VAT</label>
                         <div className="relative">
                           <input 
                             value={form.vat ?? ''} 
                             onChange={(e) => setForm({ ...form, vat: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="VAT number"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1110,14 +936,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1.8 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Registration</label>
+                        <label className="block text-xs font-medium text-gray-700">Registration</label>
                         <div className="relative">
                           <input 
                             value={form.registrationNumber ?? ''} 
                             onChange={(e) => setForm({ ...form, registrationNumber: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Registration number"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1127,14 +953,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1.9 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Exemption</label>
+                        <label className="block text-xs font-medium text-gray-700">Exemption</label>
                         <div className="relative">
                           <input 
                             value={form.ExemptionNumber ?? ''} 
                             onChange={(e) => setForm({ ...form, ExemptionNumber: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Exemption number"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1148,30 +974,30 @@ export default function Clients() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2.0 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     <div className="relative">
-                      <div className="flex items-center gap-3 pb-3">
+                      <div className="flex items-center gap-2 pb-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
                           <Icon icon="solar:dollar-minimalistic-bold-duotone" className="text-[#3c959d]" width={16} height={16} />
                         </div>
-                        <h4 className="text-base font-semibold text-gray-900">Financial Information</h4>
+                        <h4 className="text-sm font-semibold text-gray-900">Financial Information</h4>
                         <div className="flex-1 h-px bg-gradient-to-r from-[#3c959d]/30 via-gray-200 to-[#ef7335]/30"></div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 2.1 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Billing</label>
+                        <label className="block text-xs font-medium text-gray-700">Billing</label>
                         <div className="relative group">
                           <select
                             value={form.Billing ?? ''} 
                             onChange={(e) => setForm({ ...form, Billing: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
                           >
                             <option value="">Select Billing Type...</option>
                             <option value="Contract">Contract</option>
@@ -1186,14 +1012,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 2.2 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Price</label>
+                        <label className="block text-xs font-medium text-gray-700">Price</label>
                         <div className="relative group">
                           <select
                             value={form.Price ?? ''} 
                             onChange={(e) => setForm({ ...form, Price: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none hover:border-[#3c959d]/50 hover:bg-white/70"
                           >
                             <option value="">Select Price Type...</option>
                             <option value="Daily">Daily</option>
@@ -1208,14 +1034,14 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 2.3 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Affiliation</label>
+                        <label className="block text-xs font-medium text-gray-700">Affiliation</label>
                         <div className="relative">
                           <input 
                             value={form.affiliation ?? ''} 
                             onChange={(e) => setForm({ ...form, affiliation: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                             placeholder="Affiliation details"
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -1229,31 +1055,31 @@ export default function Clients() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2.4 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     <div className="relative">
-                      <div className="flex items-center gap-3 pb-3">
+                      <div className="flex items-center gap-2 pb-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center">
                           <Icon icon="solar:calendar-bold-duotone" className="text-[#3c959d]" width={16} height={16} />
                         </div>
-                        <h4 className="text-base font-semibold text-gray-900">Important Dates</h4>
+                        <h4 className="text-sm font-semibold text-gray-900">Important Dates</h4>
                         <div className="flex-1 h-px bg-gradient-to-r from-[#3c959d]/30 via-gray-200 to-[#ef7335]/30"></div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 2.5 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                        <label className="block text-xs font-medium text-gray-700">Start Date</label>
                         <div className="relative">
                           <input 
                             type="date" 
                             value={form.startDate ?? ''} 
                             onChange={(e) => setForm({ ...form, startDate: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
                         </div>
@@ -1262,15 +1088,15 @@ export default function Clients() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 2.6 }}
-                        className="space-y-2"
+                        className="space-y-1"
                       >
-                        <label className="block text-sm font-medium text-gray-700">End Date</label>
+                        <label className="block text-xs font-medium text-gray-700">End Date</label>
                         <div className="relative">
                           <input 
                             type="date" 
                             value={form.endDate ?? ''} 
                             onChange={(e) => setForm({ ...form, endDate: e.target.value || null })} 
-                            className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
+                            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-[#3c959d] focus:ring-2 focus:ring-[#3c959d]/20 transition-all duration-200 bg-white/50 backdrop-blur-sm" 
                           />
                           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#3c959d]/5 to-[#ef7335]/5 opacity-0 focus-within:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
                         </div>
@@ -1312,151 +1138,23 @@ export default function Clients() {
       )}
       </AnimatePresence>
 
-      {showPostalModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Add Postal Code</h3>
-              <button onClick={() => setShowPostalModal(false)} className="text-gray-400 hover:text-gray-600">
-                <Icon icon="solar:close-circle-bold" width={24} height={24} />
-              </button>
-            </div>
-            <form onSubmit={handleCreatePostal} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Governorate</label>
-                <input
-                  value={postalForm.governorate}
-                  onChange={(e) => setPostalForm({ ...postalForm, governorate: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d]/20"
-                />
-                {postalErrors.governorate && (
-                  <p className="mt-1 text-xs text-red-600">{postalErrors.governorate}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                <input
-                  value={postalForm.code}
-                  onChange={(e) => setPostalForm({ ...postalForm, code: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d]/20"
-                />
-                {postalErrors.code && (
-                  <p className="mt-1 text-xs text-red-600">{postalErrors.code}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <input
-                  value={postalForm.city}
-                  onChange={(e) => setPostalForm({ ...postalForm, city: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d]/20"
-                />
-                {postalErrors.city && (
-                  <p className="mt-1 text-xs text-red-600">{postalErrors.city}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                <input
-                  value={postalForm.location}
-                  onChange={(e) => setPostalForm({ ...postalForm, location: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-[#3c959d] focus:ring-1 focus:ring-[#3c959d]/20"
-                />
-                {postalErrors.location && (
-                  <p className="mt-1 text-xs text-red-600">{postalErrors.location}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowPostalModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmittingPostal}
-                  className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-[#3c959d] to-[#ef7335] text-white font-medium disabled:opacity-50"
-                >
-                  {isSubmittingPostal ? 'Adding...' : 'Add Postal Code'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <PostalCodeModal
+        isOpen={showPostalModal}
+        form={postalForm}
+        errors={postalErrors}
+        isSubmitting={isSubmittingPostal}
+        onChange={(patch) => setPostalForm({ ...postalForm, ...patch })}
+        onClose={() => setShowPostalModal(false)}
+        onSubmit={handleCreatePostal}
+      />
 
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {deleteConfirm.isOpen && deleteConfirm.client && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-200/50"
-            >
-              <div className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-xl bg-red-100 flex items-center justify-center">
-                    <Icon icon="solar:danger-triangle-bold-duotone" className="text-red-600" width={24} height={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Delete Client</h3>
-                    <p className="text-sm text-gray-600">This action cannot be undone</p>
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <p className="text-gray-700">
-                    Are you sure you want to delete <span className="font-semibold">{deleteConfirm.client.name}</span>?
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    All associated data will be permanently removed.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setDeleteConfirm({ isOpen: false, client: null })}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                  >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleDelete(deleteConfirm.client!)}
-                    disabled={deleteClient.isPending}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    {deleteClient.isPending ? (
-                      <>
-                        <Icon icon="solar:loading-bold-duotone" className="animate-spin" width={16} height={16} />
-                        Deleting...
-                      </>
-                    ) : (
-                      <>
-                        <Icon icon="solar:trash-bin-trash-bold-duotone" width={16} height={16} />
-                        Delete
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <DeleteConfirmModal
+        isOpen={deleteConfirm.isOpen && !!deleteConfirm.client}
+        clientName={deleteConfirm.client?.name || ''}
+        isPending={deleteClient.isPending}
+        onCancel={() => setDeleteConfirm({ isOpen: false, client: null })}
+        onConfirm={() => handleDelete(deleteConfirm.client!)}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
 import { Supplier, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { Op } from 'sequelize';
 
 export async function GET(req: Request) {
@@ -20,7 +21,9 @@ export async function GET(req: Request) {
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
-    const businessId = business.get('id') as number;
+    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'read');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     const where: any = { businessId };
     if (q) {

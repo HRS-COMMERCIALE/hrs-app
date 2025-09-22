@@ -1,21 +1,22 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { CodesPostaux, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { CodesPostaux } from '@/models/associationt.ts/association';
 
 export async function GET(req: Request) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
 
   try {
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    const { searchParams } = new URL(req.url);
+    const businessIdParam = searchParams.get('businessId');
+
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessIdParam, 'read');
+    if (!authz.ok) return authz.response;
 
     // Get all postal codes for this business
     const postalCodes = await CodesPostaux().findAll({
-      where: { businessId },
+      where: { businessId: authz.businessId },
       order: [['createdAt', 'DESC']], // Most recent first
       attributes: ['id', 'governorate', 'code', 'city', 'location', 'createdAt']
     });

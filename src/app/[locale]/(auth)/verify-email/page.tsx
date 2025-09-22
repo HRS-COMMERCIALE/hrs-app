@@ -20,8 +20,7 @@ import {
   RefreshCw,
   Sparkles,
   Lock,
-  Eye,
-  EyeOff
+  
 } from 'lucide-react';
 
 interface VerificationResponse {
@@ -48,7 +47,7 @@ export default function VerifyEmailPage() {
   const [attempts, setAttempts] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
-  const [showCode, setShowCode] = useState(false);
+  
 
   // Rate limiting state
   const [canSendCode, setCanSendCode] = useState(true);
@@ -313,7 +312,10 @@ export default function VerifyEmailPage() {
               <div className="relative">
                     <Input
                   id="verification-code"
-                      type={showCode ? "text" : "password"}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="\\d*"
                   placeholder="000000"
                   value={verificationCode}
                   onChange={handleCodeChange}
@@ -322,15 +324,6 @@ export default function VerifyEmailPage() {
                   disabled={isLoading}
                       className="text-center text-2xl tracking-widest font-mono h-14 border-2 focus:border-blue-500 focus:ring-blue-500/20"
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                      onClick={() => setShowCode(!showCode)}
-                    >
-                      {showCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
               </div>
             </div>
 

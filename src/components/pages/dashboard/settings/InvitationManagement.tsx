@@ -237,6 +237,14 @@ export default function InvitationManagement({ isOpen, onClose, businessId = 1 }
     fetchInvitations();
   };
 
+  // Ensure the invite dialog always starts in default state when opened
+  useEffect(() => {
+    if (isInviteDialogOpen) {
+      setInvitationCode('');
+      setInviteRole('member');
+    }
+  }, [isInviteDialogOpen]);
+
   // Load invitations on component mount and when filter changes
   useEffect(() => {
     if (isOpen) {

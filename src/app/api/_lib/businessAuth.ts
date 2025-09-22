@@ -8,7 +8,7 @@ interface AuthorizationSuccess {
   userId: number;
   businessId: number;
   role: 'member' | 'manager' | 'admin' ;
-  business: any;
+  business: { id: number };
   buinessUserId: number;
   operations: CrudOperation[];
 }
@@ -64,7 +64,15 @@ export async function authorizeBusinessAccess(userId: number, businessIdInput: u
     return { ok: false, response: NextResponse.json({ error: 'Forbidden: insufficient role' }, { status: 403 }) };
   }
 
-  return { ok: true, userId, businessId, role, business, buinessUserId: link.get('id') as number, operations: getAllowedOperations(role) };
+  return { 
+    ok: true, 
+    userId, 
+    businessId, 
+    role, 
+    business: { id: businessId }, 
+    buinessUserId: link.get('id') as number, 
+    operations: getAllowedOperations(role) 
+  };
 }
 
 

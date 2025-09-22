@@ -13,6 +13,7 @@ interface CreatePostalCodeData {
   code: string;
   city: string;
   location: string;
+  businessId: number;
 }
 
 interface UpdatePostalCodeData {
@@ -21,11 +22,12 @@ interface UpdatePostalCodeData {
   code: string;
   city: string;
   location: string;
+  businessId: number;
 }
 
 // API functions
-const fetchPostalCodes = async (): Promise<PostalCode[]> => {
-  const response = await fetch('/api/dashboard/settings/codesPostaux/getAll', {
+const fetchPostalCodes = async (businessId: number): Promise<PostalCode[]> => {
+  const response = await fetch(`/api/dashboard/settings/codesPostaux/getAll?businessId=${businessId}`, {
     method: 'GET',
     credentials: 'include',
     headers: { 'Accept': 'application/json' },
@@ -83,10 +85,11 @@ const deletePostalCodes = async (ids: number[]): Promise<void> => {
 };
 
 // Custom hooks
-export const usePostalCodes = () => {
+export const usePostalCodes = (businessId: number | null) => {
   return useQuery({
-    queryKey: ['postalCodes'],
-    queryFn: fetchPostalCodes,
+    queryKey: ['postalCodes', businessId],
+    enabled: typeof businessId === 'number' && !Number.isNaN(businessId),
+    queryFn: () => fetchPostalCodes(businessId as number),
   });
 };
 
@@ -95,9 +98,8 @@ export const useCreatePostalCode = () => {
 
   return useMutation({
     mutationFn: createPostalCode,
-    onSuccess: () => {
-      // Invalidate and refetch postal codes
-      queryClient.invalidateQueries({ queryKey: ['postalCodes'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['postalCodes', variables.businessId] });
     },
   });
 };
@@ -107,9 +109,8 @@ export const useUpdatePostalCode = () => {
 
   return useMutation({
     mutationFn: updatePostalCode,
-    onSuccess: () => {
-      // Invalidate and refetch postal codes
-      queryClient.invalidateQueries({ queryKey: ['postalCodes'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['postalCodes', variables.businessId] });
     },
   });
 };
@@ -118,10 +119,23 @@ export const useDeletePostalCodes = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deletePostalCodes,
-    onSuccess: () => {
-      // Invalidate and refetch postal codes
-      queryClient.invalidateQueries({ queryKey: ['postalCodes'] });
+    mutationFn: (input: { ids: number[]; businessId: number }) => deletePostalCodesWithBusiness(input),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['postalCodes', variables.businessId] });
     },
   });
+};
+
+const deletePostalCodesWithBusiness = async (input: { ids: number[]; businessId: number }): Promise<void> => {
+  const response = await fetch('/api/dashboard/settings/codesPostaux/delete', {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body?.error || `Request failed (${response.status})`);
+  }
 };

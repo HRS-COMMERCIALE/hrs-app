@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, Supplier } from '@/hooks/useSuppliers';
 import { usePostalCodes, useCreatePostalCode } from '@/hooks/usePostalCodes';
+import { useBusiness } from '@/store/businessProvider';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
@@ -36,8 +37,9 @@ const emptyForm: FormState = {
 };
 
 export default function Suppliers() {
+  const { selectedBusinessId } = useBusiness();
   const { data: suppliers = [], isLoading, error } = useSuppliers();
-  const { data: postalCodes = [], refetch: refetchPostalCodes } = usePostalCodes();
+  const { data: postalCodes = [], refetch: refetchPostalCodes } = usePostalCodes(selectedBusinessId);
   const createPostalCode = useCreatePostalCode();
   const createSupplier = useCreateSupplier();
   const updateSupplier = useUpdateSupplier();
@@ -336,6 +338,7 @@ export default function Suppliers() {
         code: postalForm.code.trim(),
         city: postalForm.city.trim(),
         location: postalForm.location.trim(),
+        businessId: selectedBusinessId as number,
       });
       await refetchPostalCodes();
       setShowPostalModal(false);

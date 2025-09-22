@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { Business, Clients, CodesPostaux } from '@/models/associationt.ts/association';
 import { getClientsQuerySchema } from '@/validations/dashboard/crm/clients/clients';
 import { Op } from 'sequelize';
@@ -29,13 +30,15 @@ export async function GET(req: Request) {
 
     const { page, limit, search, type, category, governorate } = parsed.data;
 
-    // Get user's business
+    // Resolve and authorize business access (read)
     const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
-    const businessId = business.get('id') as number;
-
+    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'read');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
+console.log("businessId",businessId);
     // Build where clause
     const whereClause: any = { businessId };
 
@@ -73,7 +76,7 @@ export async function GET(req: Request) {
       where: whereClause,
       include: [
         {
-          model: CodesPostaux,
+          model: CodesPostaux(),
           as: 'codesPostaux',
           required: false,
         },

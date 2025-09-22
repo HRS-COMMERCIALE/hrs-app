@@ -9,6 +9,8 @@ import UpgradePlanDialog from '../../ui/UpgradePlanDialog';
 import JoinBusinessDialog from '../../ui/JoinBusinessDialog';
 import { PAYMENT_PLANS } from '../../../app/api/stripe-config/PaymentPlanceConfig';
 import { useI18n } from '@/i18n/hooks';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const BusinessOption = () => {
   const router = useRouter();
@@ -17,6 +19,8 @@ const BusinessOption = () => {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
+  const [limitDialog, setLimitDialog] = useState<{ title: string; description: string }>({ title: '', description: '' });
 
   const { user, isPaidPlan, businessCount, businessLimit, canCreateBusiness } = useAuth();
   const { businesses, loading: businessesLoading, error: businessesError, refetch } = useUserBusinesses();
@@ -80,12 +84,20 @@ const BusinessOption = () => {
       
       // User has reached their business limit
       if (user?.plan === 'Diamond' && businessCount >= 3) {
-        alert(t('limits.reachedDiamond'));
+        setLimitDialog({
+          title: t('limits.limitReachedTitle') || 'Business limit reached',
+          description: t('limits.reachedDiamond')
+        });
+        setShowLimitDialog(true);
         return;
       }
       
       if ((user?.plan === 'Premium' || user?.plan === 'Platinum') && businessCount >= 1) {
-        alert(t('limits.reachedPremiumOrPlatinum'));
+        setLimitDialog({
+          title: t('limits.limitReachedTitle') || 'Business limit reached',
+          description: t('limits.reachedPremiumOrPlatinum')
+        });
+        setShowLimitDialog(true);
         return;
       }
       
@@ -419,7 +431,32 @@ const BusinessOption = () => {
       <JoinBusinessDialog 
         open={showJoinDialog} 
         onOpenChange={setShowJoinDialog} 
+        onJoinedSuccess={async () => { 
+          // Refetch only the businesses list to refresh Available Businesses
+          await refetch?.();
+        }}
       />
+      <Dialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-[#3c959d]" />
+              {limitDialog.title}
+            </DialogTitle>
+            <DialogDescription>
+              {limitDialog.description}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-between">
+            <Button variant="outline" onClick={() => setShowLimitDialog(false)}>
+              {t('buttons.close') || 'Close'}
+            </Button>
+            <Button onClick={() => { setShowLimitDialog(false); router.push('/businessPlans'); }} className="bg-gradient-to-r from-[#3c959d] via-[#4ba5ad] to-[#ef7335] text-white">
+              {t('buttons.viewPlans')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

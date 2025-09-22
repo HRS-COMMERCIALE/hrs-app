@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { usePostalCodes, useCreatePostalCode, useUpdatePostalCode, useDeletePostalCodes } from '../../../../hooks/usePostalCodes';
+import { useBusiness } from '@/store/businessProvider';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 import { MapPin } from 'lucide-react';
 
@@ -31,7 +32,8 @@ interface UpdatePostalCodeData {
 
 export default function PostalCodes() {
   // React Query hooks
-  const { data: postalCodes = [], isLoading, error, refetch } = usePostalCodes();
+  const { selectedBusinessId } = useBusiness();
+  const { data: postalCodes = [], isLoading, error, refetch } = usePostalCodes(selectedBusinessId ?? null);
   const createMutation = useCreatePostalCode();
   const updateMutation = useUpdatePostalCode();
   const deleteMutation = useDeletePostalCodes();
@@ -84,7 +86,8 @@ export default function PostalCodes() {
   // Optimized mutation handlers with useCallback
   const handleCreatePostalCode = useCallback(async (data: CreatePostalCodeData) => {
     try {
-      await createMutation.mutateAsync(data);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await createMutation.mutateAsync({ ...data, businessId: selectedBusinessId });
       setSuccessMessage('Postal code created successfully!');
       setShowCreateModal(false);
       resetForm();
@@ -92,11 +95,12 @@ export default function PostalCodes() {
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [createMutation]);
+  }, [createMutation, selectedBusinessId]);
 
   const handleUpdatePostalCode = useCallback(async (data: UpdatePostalCodeData) => {
     try {
-      await updateMutation.mutateAsync(data);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await updateMutation.mutateAsync({ ...data, businessId: selectedBusinessId });
       setSuccessMessage('Postal code updated successfully!');
       setShowEditModal(false);
       setEditingCode(null);
@@ -104,18 +108,19 @@ export default function PostalCodes() {
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [updateMutation]);
+  }, [updateMutation, selectedBusinessId]);
 
   const handleDeletePostalCodes = useCallback(async (ids: number[]) => {
     try {
-      await deleteMutation.mutateAsync(ids);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await deleteMutation.mutateAsync({ ids, businessId: selectedBusinessId });
       setSuccessMessage(`Successfully deleted ${ids.length} postal code(s)`);
       setDeletingCodes([]);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [deleteMutation]);
+  }, [deleteMutation, selectedBusinessId]);
 
   // Form validation
   const validateForm = (data: CreatePostalCodeData) => {

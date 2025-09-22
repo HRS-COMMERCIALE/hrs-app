@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
 import { Business, Clients, CodesPostaux } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { updateClientSchema } from '@/validations/dashboard/crm/clients/clients';
 
 export async function PUT(req: Request) {
@@ -27,12 +28,14 @@ export async function PUT(req: Request) {
 
     const { id, ...updateData } = parsed.data;
 
-    // Get user's business
+    // Get user's business and authorize update
     const business = await Business().findOne({ where: { userId: (auth as any).userId } });
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
-    const businessId = business.get('id') as number;
+    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'update');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Check if client exists and belongs to user's business
     const existingClient = await Clients().findOne({

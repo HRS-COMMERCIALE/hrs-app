@@ -116,6 +116,9 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
   const [isInvitationManagementOpen, setIsInvitationManagementOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{ action: 'approve' | 'reject' | 'delete'; userId: string; title: string; description: string; confirmLabel: string; tone: 'success' | 'danger' } | null>(null);
+  const [isConfirmProcessing, setIsConfirmProcessing] = useState(false);
   const [banReason, setBanReason] = useState('');
   const [banInterval, setBanInterval] = useState<'1h' | '1d' | '7d' | 'permanent'>('1d');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -324,21 +327,42 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
   };
 
   const handleApproveUser = async (userId: string) => {
-    if (confirm('Are you sure you want to approve this user?')) {
-      await updateUser(userId, 'approve');
-    }
+    const user = users.find(u => u.id === userId);
+    setConfirmConfig({
+      action: 'approve',
+      userId,
+      title: 'Approve User?',
+      description: `Are you sure you want to approve ${user?.name || 'this user'}?`,
+      confirmLabel: 'Approve',
+      tone: 'success'
+    });
+    setIsConfirmDialogOpen(true);
   };
 
   const handleRejectUser = async (userId: string) => {
-    if (confirm('Are you sure you want to reject this user? This will remove them from the business.')) {
-      await updateUser(userId, 'reject');
-    }
+    const user = users.find(u => u.id === userId);
+    setConfirmConfig({
+      action: 'reject',
+      userId,
+      title: 'Reject User?',
+      description: `Are you sure you want to reject ${user?.name || 'this user'}? This will remove them from the business.`,
+      confirmLabel: 'Reject',
+      tone: 'danger'
+    });
+    setIsConfirmDialogOpen(true);
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (confirm('Are you sure you want to remove this user from the business?')) {
-      await deleteUser(userId);
-    }
+    const user = users.find(u => u.id === userId);
+    setConfirmConfig({
+      action: 'delete',
+      userId,
+      title: 'Remove User?',
+      description: `Are you sure you want to remove ${user?.name || 'this user'} from the business?`,
+      confirmLabel: 'Remove',
+      tone: 'danger'
+    });
+    setIsConfirmDialogOpen(true);
   };
 
   const handleRefresh = async () => {
@@ -1030,6 +1054,91 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
               Ban User
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white border-0 shadow-2xl rounded-2xl overflow-hidden p-0">
+          {/* Gradient Header */}
+          <div className={`${confirmConfig?.tone === 'danger' ? 'bg-gradient-to-r from-red-600 via-rose-600 to-orange-500' : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600'} px-6 py-5 text-white relative overflow-hidden`}>
+            {/* Decorative orbs */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/3 -translate-x-1/3"></div>
+            <div className="relative z-10 flex items-start gap-3">
+              <div className="p-2.5 bg-white/25 rounded-xl backdrop-blur-sm shadow-sm">
+                {confirmConfig?.tone === 'danger' ? (
+                  <XCircle className="h-6 w-6 text-white" />
+                ) : (
+                  <CheckCircle className="h-6 w-6 text-white" />
+                )}
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">{confirmConfig?.title}</DialogTitle>
+                <DialogDescription className="text-emerald-100/90 text-sm">
+                  {confirmConfig?.description}
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-5 space-y-4 bg-white">
+            {confirmConfig?.tone === 'danger' ? (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {confirmConfig?.action === 'reject' 
+                  ? "Rejecting will remove this user's pending request. They won't have access to the business."
+                  : "Removing this user will revoke their access and delete their membership from this business."}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                The user will gain access according to their role.
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row-reverse gap-3 pt-2">
+              <Button 
+                onClick={async () => {
+                  if (!confirmConfig) return;
+                  try {
+                    setIsConfirmProcessing(true);
+                    if (confirmConfig.action === 'delete') {
+                      await deleteUser(confirmConfig.userId);
+                    } else {
+                      await updateUser(confirmConfig.userId, confirmConfig.action);
+                    }
+                    setIsConfirmDialogOpen(false);
+                    setConfirmConfig(null);
+                  } finally {
+                    setIsConfirmProcessing(false);
+                  }
+                }}
+                className={`h-11 rounded-xl px-5 text-white font-semibold shadow-md ${confirmConfig?.tone === 'danger' ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700' : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700'}`}
+                disabled={isConfirmProcessing}
+              >
+                {isConfirmProcessing ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-4 w-4 border-2 border-white/30 border-top-white rounded-full animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  confirmConfig?.confirmLabel
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  if (isConfirmProcessing) return;
+                  setIsConfirmDialogOpen(false);
+                }}
+                className="h-11 rounded-xl border-gray-200 hover:bg-gray-50"
+                disabled={isConfirmProcessing}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

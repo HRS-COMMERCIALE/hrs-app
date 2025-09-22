@@ -11,23 +11,28 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, Hash, ArrowRight, Copy, Check } from 'lucide-react';
+import { Users, Hash, ArrowRight, Copy, Check, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface JoinBusinessDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onJoinedSuccess?: () => void;
 }
 
-const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenChange }) => {
+const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenChange, onJoinedSuccess }) => {
   const [businessCode, setBusinessCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!businessCode.trim()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(null);
     
     try {
       const response = await fetch('/api/dashboard/settings/invitation/join', {
@@ -45,19 +50,15 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Success - show success message and close dialog
-        alert('Successfully joined the business! Your membership is pending approval.');
-        onOpenChange(false);
-        setBusinessCode('');
-        // Refresh the page to show updated business list
-        window.location.reload();
+        // Show success in-dialog instead of alert
+        setSubmitSuccess(data.message || 'Successfully joined the business! Your membership is pending approval.');
       } else {
-        // Error - show error message
-        alert(data.error || 'Failed to join business. Please try again.');
+        // Show error inline
+        setSubmitError(data.error || 'Failed to join business. Please try again.');
       }
     } catch (error) {
       console.error('Error joining business:', error);
-      alert('Network error. Please try again.');
+      setSubmitError('Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,18 +74,60 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-slate-900 border-slate-700">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-            <Users className="w-8 h-8 text-white" />
-          </div>
-          <DialogTitle className="text-2xl font-bold text-white">
-            Join Business
-          </DialogTitle>
-          <DialogDescription className="text-slate-300 text-base">
-            Enter the invitation code to join a business
-          </DialogDescription>
+          {submitSuccess ? (
+            <>
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-white">Request Sent</DialogTitle>
+              <DialogDescription className="text-slate-300 text-base">
+                {submitSuccess}
+              </DialogDescription>
+            </>
+          ) : (
+            <>
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-white">Join Business</DialogTitle>
+              <DialogDescription className="text-slate-300 text-base">
+                Enter the invitation code to join a business
+              </DialogDescription>
+            </>
+          )}
         </DialogHeader>
 
+        {submitSuccess ? (
+          <div className="space-y-6">
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 text-slate-200 text-sm">
+              Your membership is pending admin approval. You'll see the business once approved.
+            </div>
+            <div className="flex flex-col gap-3">
+              <Button 
+                type="button"
+                onClick={() => { setBusinessCode(''); setSubmitSuccess(null); onOpenChange(false); onJoinedSuccess && onJoinedSuccess(); }}
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105"
+              >
+                Done
+              </Button>
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => { setBusinessCode(''); setSubmitSuccess(null); onOpenChange(false); }}
+                className="w-full border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
+          {submitError && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-start gap-2 text-red-300">
+              <AlertTriangle className="w-4 h-4 mt-0.5" />
+              <span className="text-sm">{submitError}</span>
+            </div>
+          )}
           {/* Business Code Field */}
           <div className="space-y-2">
             <Label htmlFor="businessCode" className="text-white font-medium">
@@ -165,6 +208,7 @@ const JoinBusinessDialog: React.FC<JoinBusinessDialogProps> = ({ open, onOpenCha
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

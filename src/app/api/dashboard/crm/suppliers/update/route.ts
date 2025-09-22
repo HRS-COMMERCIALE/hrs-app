@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/_lib/auth';
 import { Supplier, Business, CodesPostaux } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 import { updateSupplierSchema } from '@/validations/dashboard/crm/suppliers/SuppliersValidation';
 
 export async function PUT(req: Request) {
@@ -29,7 +30,9 @@ export async function PUT(req: Request) {
     if (!business) {
       return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
     }
-    const businessId = business.get('id') as number;
+    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'update');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     const supplier = await Supplier().findOne({ where: { id, businessId } });
     if (!supplier) {

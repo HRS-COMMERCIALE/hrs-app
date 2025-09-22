@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import CompanyInformation from '../../../../../components/pages/dashboard/settings/CompanyInformation';
 import PostalCodes from '../../../../../components/pages/dashboard/settings/PostalCodes';
 import PointOfSale from '../../../../../components/pages/dashboard/settings/PointOfSale';
 import RoleManagement from '../../../../../components/pages/dashboard/settings/RoleManagement';
+import { ProgressBar } from '@/components/shared/ProgressBar/ProgressBar';
 
 type NavItem = {
   id: string;
@@ -159,35 +160,15 @@ const sectionsData: NavSection[] = [
       },
     ],
   },
-  {
-    name: 'Advanced',
-    icon: 'solar:settings-bold-duotone',
-    items: [
-      { 
-        id: 'audit-logs', 
-        name: 'Audit Logs', 
-        icon: 'solar:clipboard-check-bold-duotone',
-        description: 'View system activity and security logs'
-      },
-      { 
-        id: 'data-import-export', 
-        name: 'Data Import/Export', 
-        icon: 'solar:export-bold-duotone',
-        description: 'Transfer data in and out of the system'
-      },
-      { 
-        id: 'backup-restore', 
-        name: 'Backup & Restore', 
-        icon: 'solar:database-bold-duotone',
-        description: 'Create backups and restore system data'
-      },
-    ],
-  },
+  
 ];
 
 export default function SettingsPage() {
   const [activeId, setActiveId] = useState<string>('company-info');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const rafRef = useRef<number | null>(null);
   
   const flatItems = useMemo(() => sectionsData.flatMap((s) => s.items), []);
   const activeItem = useMemo(() => flatItems.find((i) => i.id === activeId), [flatItems, activeId]);
@@ -206,6 +187,44 @@ export default function SettingsPage() {
   }, [searchQuery]);
   
   const DEFAULT_ICON = 'solar:settings-bold-duotone';
+
+  // Step-based loading whenever the active panel changes
+  useEffect(() => {
+    setIsLoading(true);
+    setProgress(0);
+
+    const startTime = performance.now();
+    const durationMs = 1200; // total time for staged loading
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      // ease-out cubic for nice finish
+      const t = Math.min(elapsed / durationMs, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const next = Math.min(100, Math.round(eased * 100));
+      // cap at 95% until we are near finish to simulate steps
+      const capped = t < 0.9 ? Math.min(next, 95) : next;
+      setProgress(capped);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    };
+  }, [activeId]);
+
+  const loadingMessage = useMemo(() => {
+    if (progress < 30) return 'Initializing panel…';
+    if (progress < 70) return 'Loading settings…';
+    if (progress < 100) return 'Preparing interface…';
+    return 'Ready';
+  }, [progress]);
 
   return (
     <div className="bg-gradient-to-br from-gray-50/50 to-white overflow-hidden w-full min-h-screen -mt-6 -mx-6 rounded-none shadow-none border-0">
@@ -285,34 +304,42 @@ export default function SettingsPage() {
         </aside>
 
         {/* Enhanced Right Content */}
-        <section className="lg:col-span-8 xl:col-span-9 bg-white/40 backdrop-blur-sm">
+        <section className="lg:col-span-8 xl:col-span-9 bg-white/40 backdrop-blur-sm relative">
           <div className="p-8 h-full">
-            {activeId === 'company-info' ? (
-              <CompanyInformation />
-            ) : activeId === 'postal-codes' ? (
-              <PostalCodes />
-            ) : activeId === 'pos-settings' ? (
-              <PointOfSale />
-            ) : activeId === 'users' ? (
-              <RoleManagement />
-            ) : activeId === 'roles-permissions' ? (
-              <RoleManagement />
-            ) : activeId === 'counter-management' ? (
-              <RoleManagement />
-            ) : (
-              <div className="max-w-2xl">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
-                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center mx-auto mb-4">
-                    <Icon icon={activeItem?.icon || DEFAULT_ICON} className="text-[#3c959d]" width={32} height={32} />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{activeItem?.name}</h3>
-                  <p className="text-gray-600 mb-6">{activeItem?.description || 'This settings panel is coming soon.'}</p>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
-                    <Icon icon="solar:settings-linear" width={16} height={16} />
-                    Configuration panel coming soon
-                  </div>
-                </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center min-h-[420px]">
+                <ProgressBar progress={progress} message={loadingMessage} size="lg" />
               </div>
+            ) : (
+              <>
+                {activeId === 'company-info' ? (
+                  <CompanyInformation />
+                ) : activeId === 'postal-codes' ? (
+                  <PostalCodes />
+                ) : activeId === 'pos-settings' ? (
+                  <PointOfSale />
+                ) : activeId === 'users' ? (
+                  <RoleManagement />
+                ) : activeId === 'roles-permissions' ? (
+                  <RoleManagement />
+                ) : activeId === 'counter-management' ? (
+                  <RoleManagement />
+                ) : (
+                  <div className="max-w-2xl">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
+                      <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#3c959d]/20 to-[#ef7335]/20 flex items-center justify-center mx-auto mb-4">
+                        <Icon icon={activeItem?.icon || DEFAULT_ICON} className="text-[#3c959d]" width={32} height={32} />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{activeItem?.name}</h3>
+                      <p className="text-gray-600 mb-6">{activeItem?.description || 'This settings panel is coming soon.'}</p>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-50 text-orange-700 text-sm font-medium">
+                        <Icon icon="solar:settings-linear" width={16} height={16} />
+                        Configuration panel coming soon
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>

@@ -9,12 +9,6 @@ import { useAuth } from '@/store/authProvider';
 import { useBusiness } from '@/store/businessProvider';
 import { useSidebar } from '@/components/ui/sidebar';
 
-// ========================================
-// NEW SHADCN SIDEBAR IMPLEMENTATION
-// ========================================
-// Modern sidebar using shadcn/ui components
-// Following the app's theme and design system
-// ========================================
 
 import {
   Sidebar,
