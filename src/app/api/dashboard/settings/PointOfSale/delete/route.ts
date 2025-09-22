@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { PointOfSale, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { PointOfSale } from '@/models/associationt.ts/association';
 import { deletePointOfSaleSchema } from '@/validations/dashboard/settings/pointOfSale';
 
 export async function DELETE(req: Request) {
@@ -22,20 +23,17 @@ export async function DELETE(req: Request) {
       }, { status: 400 });
     }
 
-    const { ids } = validationResult.data;
+    const { ids, businessId } = validationResult.data as any;
 
-    // Get business information
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    // Authorize delete access for this business
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessId, 'delete');
+    if (!authz.ok) return authz.response;
 
     // Check if all points of sale belong to this business
     const existingPointsOfSale = await PointOfSale().findAll({
       where: { 
         id: ids,
-        businessId 
+        businessId: authz.businessId 
       }
     });
 
@@ -49,7 +47,7 @@ export async function DELETE(req: Request) {
     const deletedCount = await PointOfSale().destroy({
       where: { 
         id: ids,
-        businessId 
+        businessId: authz.businessId 
       }
     });
 

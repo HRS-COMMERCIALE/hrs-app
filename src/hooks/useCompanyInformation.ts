@@ -22,11 +22,12 @@ interface UpdateCompanyInfoData {
   size: string;
   industry: string;
   logo?: File;
+  businessId: number;
 }
 
 // API functions
-const fetchCompanyInformation = async (): Promise<CompanyInformation> => {
-  const response = await fetch('/api/dashboard/settings/CompanyInformation/getInformation', {
+const fetchCompanyInformation = async (businessId: number): Promise<CompanyInformation> => {
+  const response = await fetch(`/api/dashboard/settings/CompanyInformation/getInformation?businessId=${businessId}`, {
     method: 'GET',
     credentials: 'include',
     headers: { 'Accept': 'application/json' },
@@ -68,6 +69,7 @@ const updateCompanyInformation = async (data: UpdateCompanyInfoData): Promise<vo
     formData.append('size', data.size.trim());
     formData.append('industry', data.industry.trim());
     formData.append('logo', data.logo);
+    formData.append('businessId', String(data.businessId));
     
     response = await fetch('/api/dashboard/settings/CompanyInformation/updateCompanyInfo', {
       method: 'PUT',
@@ -91,6 +93,7 @@ const updateCompanyInformation = async (data: UpdateCompanyInfoData): Promise<vo
         currency: data.currency.trim(),
         size: data.size.trim(),
         industry: data.industry.trim(),
+        businessId: data.businessId,
       }),
     });
   }
@@ -102,24 +105,30 @@ const updateCompanyInformation = async (data: UpdateCompanyInfoData): Promise<vo
 };
 
 // Custom hooks
-export const useCompanyInformation = () => {
+export const useCompanyInformation = (businessId: number | null) => {
   return useQuery({
-    queryKey: ['companyInformation'],
-    queryFn: fetchCompanyInformation,
+    queryKey: ['companyInformation', businessId],
+    queryFn: () => fetchCompanyInformation(businessId as number),
+    enabled: typeof businessId === 'number' && !Number.isNaN(businessId),
     // Cache for 10 minutes since company info changes less frequently
     staleTime: 10 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
   });
 };
 
-export const useUpdateCompanyInformation = () => {
+export const useUpdateCompanyInformation = (businessId: number | null) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateCompanyInformation,
+    mutationFn: (data: Omit<UpdateCompanyInfoData, 'businessId'>) => {
+      if (typeof businessId !== 'number' || Number.isNaN(businessId)) {
+        return Promise.reject(new Error('No business selected'));
+      }
+      return updateCompanyInformation({ ...data, businessId });
+    },
     onSuccess: () => {
       // Invalidate and refetch company information
-      queryClient.invalidateQueries({ queryKey: ['companyInformation'] });
+      queryClient.invalidateQueries({ queryKey: ['companyInformation', businessId] });
     },
   });
 };

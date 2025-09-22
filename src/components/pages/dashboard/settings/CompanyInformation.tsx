@@ -5,7 +5,8 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useAuth } from '@/store/authProvider';
 import { useCompanyInformation, useUpdateCompanyInformation } from '../../../../hooks/useCompanyInformation';
-import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
+import { useBusiness } from '@/store/businessProvider';
+import { ProgressBar } from '@/components/shared/ProgressBar/ProgressBar';
 import { Building2, Upload, Save } from 'lucide-react';
 
 // Move options outside component for better performance
@@ -42,10 +43,11 @@ const industryOptions = [
 
 export default function CompanyInformation() {
   const { checkAuth } = useAuth();
+  const { selectedBusinessId } = useBusiness();
   
   // React Query hooks
-  const { data: companyData, isLoading, error, refetch } = useCompanyInformation();
-  const updateMutation = useUpdateCompanyInformation();
+  const { data: companyData, isLoading, error, refetch } = useCompanyInformation(selectedBusinessId);
+  const updateMutation = useUpdateCompanyInformation(selectedBusinessId);
 
   // Local state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -221,10 +223,8 @@ console.log("form",form);
     <form onSubmit={handleSubmit} className="max-w-4xl">
       {isLoading && (
         <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <LoadingSpinner 
-            icon={Building2}
+          <ProgressBar 
             message="Loading company information..."
-            variant="default"
             size="sm"
           />
         </div>
@@ -467,12 +467,7 @@ console.log("form",form);
                     `}>
                       {uploadingLogo ? (
                         <div className="flex items-center">
-                          <LoadingSpinner 
-                            icon={Upload}
-                            size="sm"
-                            variant="minimal"
-                          />
-                          <span className="ml-2">Uploading...</span>
+                          <ProgressBar size="sm" variant="inline" message="Uploading..." />
                         </div>
                       ) : (
                         <>

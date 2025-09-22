@@ -64,6 +64,7 @@ import { cn } from '@/lib/utils';
 import InvitationManagement from './InvitationManagement';
 import { useBusiness } from '@/store/businessProvider';
 import { useAuth } from '@/store/authProvider';
+import { useNotifications } from '@/store/notificationProvider';
 
 // Types
 interface User {
@@ -104,6 +105,7 @@ const statusConfig = {
 export default function RoleManagement({ businessId }: { businessId?: number }) {
   const { selectedBusinessId } = useBusiness();
   const { user: currentUser } = useAuth();
+  const { addNotification } = useNotifications();
   const actualBusinessId = businessId || selectedBusinessId || 1;
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -117,7 +119,6 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
   const [banReason, setBanReason] = useState('');
   const [banInterval, setBanInterval] = useState<'1h' | '1d' | '7d' | 'permanent'>('1d');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,7 +150,11 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
       } else {
         const errorData = await response.json();
         console.error('Error fetching users:', errorData);
-        // Show error in UI
+        addNotification({
+          type: 'error',
+          title: '😵 Team Not Found',
+          message: 'Couldn\'t load the team! They might be hiding somewhere.',
+        });
         setUsers([]);
       }
     } catch (error) {
@@ -182,16 +187,60 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
         
         // Show success message
         if (data.success) {
-          showNotification('success', `User ${action} successful!`);
+          const user = users.find(u => u.id === userId);
+          const userName = user?.name || 'User';
+          
+          let notificationTitle = '';
+          let notificationMessage = '';
+          
+          switch (action) {
+            case 'changeRole':
+              notificationTitle = '🎭 Role Changed!';
+              notificationMessage = `${userName} is now a ${newRole}! They've got new powers!`;
+              break;
+            case 'approve':
+              notificationTitle = '✅ Welcome Aboard!';
+              notificationMessage = `${userName} has been approved! Time to get to work!`;
+              break;
+            case 'reject':
+              notificationTitle = '❌ Access Denied';
+              notificationMessage = `${userName} has been rejected. Better luck next time!`;
+              break;
+            case 'ban':
+              notificationTitle = '🚫 User Banned';
+              notificationMessage = `${userName} has been banned${banInterval === 'permanent' ? ' permanently' : ` for ${banInterval}`}. They're in timeout!`;
+              break;
+            case 'unban':
+              notificationTitle = '🎉 Welcome Back!';
+              notificationMessage = `${userName} has been unbanned! They're back in the game!`;
+              break;
+            default:
+              notificationTitle = '✨ Action Complete';
+              notificationMessage = `${userName} has been updated successfully!`;
+          }
+          
+          addNotification({
+            type: 'success',
+            title: notificationTitle,
+            message: notificationMessage,
+          });
         }
       } else {
         const errorData = await response.json();
         console.error('Error updating user:', errorData.error);
-        showNotification('error', `Error: ${errorData.error}`);
+        addNotification({
+          type: 'error',
+          title: '😤 Oops! Something went wrong',
+          message: `Couldn't update user: ${errorData.error}. Try again!`,
+        });
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      showNotification('error', 'Network error occurred');
+      addNotification({
+        type: 'error',
+        title: '🌐 Connection Lost',
+        message: 'Looks like the internet took a coffee break! Check your connection.',
+      });
     }
   };
 
@@ -203,12 +252,29 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
 
       if (response.ok) {
         await fetchUsers(); // Refresh the list
+        const user = users.find(u => u.id === userId);
+        const userName = user?.name || 'User';
+        addNotification({
+          type: 'success',
+          title: '👋 See You Later!',
+          message: `${userName} has been removed from the team. They'll be missed!`,
+        });
       } else {
         const errorData = await response.json();
         console.error('Error deleting user:', errorData.error);
+        addNotification({
+          type: 'error',
+          title: '🚫 Can\'t Remove User',
+          message: `Failed to remove user: ${errorData.error}. They're staying for now!`,
+        });
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+      addNotification({
+        type: 'error',
+        title: '🌐 Connection Issues',
+        message: 'Couldn\'t remove user due to network problems. Try again later!',
+      });
     }
   };
 
@@ -284,10 +350,6 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
     }
   };
 
-  const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
-  };
 
 
   const getRoleIcon = (role: string) => {
@@ -971,39 +1033,6 @@ export default function RoleManagement({ businessId }: { businessId?: number }) 
         </DialogContent>
       </Dialog>
 
-      {/* Custom Notification */}
-      {notification && (
-        <div className={`fixed top-0 left-0 right-0 z-50 transform transition-all duration-300 ${
-          notification.type === 'success' ? 'bg-green-50 border-b border-green-200 text-green-800' :
-          notification.type === 'error' ? 'bg-red-50 border-b border-red-200 text-red-800' :
-          'bg-blue-50 border-b border-blue-200 text-blue-800'
-        } shadow-lg p-4`}>
-          <div className="flex items-center justify-center gap-3 max-w-4xl mx-auto">
-            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-              notification.type === 'success' ? 'bg-green-100' :
-              notification.type === 'error' ? 'bg-red-100' :
-              'bg-blue-100'
-            }`}>
-              {notification.type === 'success' ? (
-                <CheckCircle className="w-4 h-4 text-green-600" />
-              ) : notification.type === 'error' ? (
-                <XCircle className="w-4 h-4 text-red-600" />
-              ) : (
-                <Clock className="w-4 h-4 text-blue-600" />
-              )}
-            </div>
-            <div className="flex-1 text-center">
-              <p className="text-sm font-medium">{notification.message}</p>
-            </div>
-            <button
-              onClick={() => setNotification(null)}
-              className="flex-shrink-0 p-1 hover:bg-black/5 rounded-full transition-colors"
-            >
-              <XCircle className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

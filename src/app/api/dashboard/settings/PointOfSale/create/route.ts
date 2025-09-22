@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { PointOfSale, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { PointOfSale } from '@/models/associationt.ts/association';
 import { createPointOfSaleSchema } from '@/validations/dashboard/settings/pointOfSale';
 
 export async function POST(req: Request) {
@@ -22,14 +23,11 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const { pointOfSale, location } = validationResult.data;
+    const { pointOfSale, location, businessId } = validationResult.data as any;
 
-    // Get business information
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    // Authorize create access for this business
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessId, 'create');
+    if (!authz.ok) return authz.response;
 
     // Check if point of sale already exists for this business
     const existingPointOfSale = await PointOfSale().findOne({
@@ -48,7 +46,7 @@ export async function POST(req: Request) {
 
     // Create the point of sale
     const created = await PointOfSale().create({ 
-      businessId, 
+      businessId: authz.businessId, 
       pointOfSale, 
       location 
     });

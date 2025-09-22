@@ -1,23 +1,24 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { PointOfSale, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { PointOfSale } from '@/models/associationt.ts/association';
 
 export async function GET(req: Request) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
 
   try {
-    // Get business information
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    const { searchParams } = new URL(req.url);
+    const businessIdParam = searchParams.get('businessId');
+
+    // Authorize read access for this business
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessIdParam, 'read');
+    if (!authz.ok) return authz.response;
 
     // Get all points of sale for this business
     const pointsOfSale = await PointOfSale().findAll({
-      where: { businessId },
-      order: [['createdAt', 'DESC']], // Most recent first
+      where: { businessId: authz.businessId },
+      order: [['createdAt', 'DESC']],
       attributes: ['id', 'pointOfSale', 'location', 'createdAt', 'updatedAt']
     });
 

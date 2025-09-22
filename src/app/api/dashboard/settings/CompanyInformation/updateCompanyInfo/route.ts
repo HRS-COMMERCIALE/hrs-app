@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload } from '@/app/api/_lib/auth';
 import { Business } from '@/models/associationt.ts/association';
 import { uploadToCloudinary, deleteFromCloudinary, isCloudinaryConfigured } from '@/utils/cloudinary';
+import { authorizeBusinessAccess } from '@/app/api/_lib/businessAuth';
 
 // Attempt to derive Cloudinary public_id from a secure URL
 function deriveCloudinaryPublicId(url: string): string | null {
@@ -124,7 +125,8 @@ export async function PUT(req: NextRequest) {
         website: ((formData.get('website') as string) ?? ''),
         currency: (formData.get('currency') as string) ?? '',
         size: (formData.get('size') as string) ?? '',
-        industry: (formData.get('industry') as string) ?? ''
+        industry: (formData.get('industry') as string) ?? '',
+        businessId: Number(formData.get('businessId')),
       };
 
       const logo = formData.get('logo');
@@ -170,20 +172,24 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Business-level auth (update)
+    const authz = await authorizeBusinessAccess(userId, body.businessId, 'update');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
+
     // Sanitize input
     const sanitizedData = sanitizeInput(body as UpdateCompanyInfoRequest);
 
-    // Find the business associated with this user
-    const business = await Business().findOne({
-      where: { userId: userId }
-    });
-
+    // Reuse authorized business instance when available to avoid redundant query
+    const business = authz.business || await Business().findOne({ where: { id: businessId } });
     if (!business) {
       return NextResponse.json(
-        { error: 'Business not found for this user' },
+        { error: 'Business not found' },
         { status: 404 }
       );
     }
+
+    // Authorization already enforced by authorizeBusinessAccess
 
     // If a new logo was uploaded, best-effort delete old one and set new URL
     if (hasNewLogo && uploadedLogoUrl) {
@@ -249,9 +255,14 @@ export async function GET(req: NextRequest) {
     const { payload: userPayload } = authResult;
     const userId = userPayload.userId;
 
-    // Find the business associated with this user
+    // Require businessId from query and authorize read access
+    const { searchParams } = new URL(req.url);
+    const businessIdParam = searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess(userId, businessIdParam, 'read');
+    if (!authz.ok) return authz.response;
+
     const business = await Business().findOne({
-      where: { userId: userId },
+      where: { id: authz.businessId },
       attributes: ['businessName', 'taxId', 'cnssCode', 'website', 'currency', 'size', 'industry', 'logoFile']
     });
 

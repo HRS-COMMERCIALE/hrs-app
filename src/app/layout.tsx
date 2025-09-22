@@ -5,6 +5,7 @@ import { AuthProvider } from '@/store/authProvider';
 import { ToastProvider } from '@/components/ui/alerts';
 import { VerificationBanner } from '@/components/shared';
 import QueryProvider from '@/components/providers/QueryProvider';
+import { NotificationProvider } from '@/store/notificationProvider';
  
 
 
@@ -35,10 +36,12 @@ export default async function RootLayout({
       >
         <AuthProvider>
           <QueryProvider>
-            <ToastProvider>
-              {children}
-              <VerificationBanner />
-            </ToastProvider>
+            <NotificationProvider>
+              <ToastProvider>
+                {children}
+                <VerificationBanner />
+              </ToastProvider>
+            </NotificationProvider>
           </QueryProvider>
         </AuthProvider>
       </body>

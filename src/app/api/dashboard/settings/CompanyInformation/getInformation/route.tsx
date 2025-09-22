@@ -1,18 +1,23 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '../../../../_lib/auth';
 import { Business } from '../../../../../../models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { requireAuth } from '../../../../_lib/auth';
 
 export async function GET(req: Request) {
-  // Authenticate request and get payload
-  const auth = await requireAuth(req);
-  if (auth instanceof NextResponse) return auth;
-
   try {
-    const userId = auth.userId;
+    const auth = await requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+    const userId = (auth as any).userId as number;
+    const { searchParams } = new URL(req.url);
+    const businessIdParam = searchParams.get('businessId');
 
-    // Find the business tied to the authenticated user
-    const business = await (Business as any).findOne({
-      where: { userId },
+    // Business-level auth (read)
+    const authz = await authorizeBusinessAccess(userId, businessIdParam, 'read');
+    if (!authz.ok) return authz.response;
+
+    // Load the targeted business (subset fields)
+    const business = await Business().findOne({
+      where: { id: authz.businessId },
       attributes: [ 
         'userId',
         'currency',

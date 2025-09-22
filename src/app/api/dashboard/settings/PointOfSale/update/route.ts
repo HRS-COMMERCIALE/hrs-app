@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '../../../../_lib/auth';
-import { PointOfSale, Business } from '@/models/associationt.ts/association';
+import { authorizeBusinessAccess } from '../../../../_lib/businessAuth';
+import { PointOfSale } from '@/models/associationt.ts/association';
 import { updatePointOfSaleSchema } from '@/validations/dashboard/settings/pointOfSale';
 
 export async function PUT(req: Request) {
@@ -22,18 +23,15 @@ export async function PUT(req: Request) {
       }, { status: 400 });
     }
 
-    const { id, pointOfSale, location } = validationResult.data;
+    const { id, pointOfSale, location, businessId } = validationResult.data as any;
 
-    // Get business information
-    const business = await Business().findByPk(auth.userId);
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-    }
-    const businessId = business.get('id');
+    // Authorize update access for this business
+    const authz = await authorizeBusinessAccess((auth as any).userId as number, businessId, 'update');
+    if (!authz.ok) return authz.response;
 
     // Check if the point of sale belongs to this business
     const existingPointOfSale = await PointOfSale().findOne({
-      where: { id, businessId }
+      where: { id, businessId: authz.businessId }
     });
 
     if (!existingPointOfSale) {
@@ -44,7 +42,7 @@ export async function PUT(req: Request) {
     if (pointOfSale !== undefined || location !== undefined) {
       const duplicateCheck = await PointOfSale().findOne({
         where: {
-          businessId,
+          businessId: authz.businessId,
           pointOfSale: pointOfSale || existingPointOfSale.get('pointOfSale'),
           location: location || existingPointOfSale.get('location'),
           id: { [require('sequelize').Op.ne]: id } // Exclude current record

@@ -11,20 +11,23 @@ interface PointOfSale {
 interface CreatePointOfSaleData {
   pointOfSale: string;
   location: string;
+  businessId: number;
 }
 
 interface UpdatePointOfSaleData {
   id: number;
   pointOfSale?: string;
   location?: string;
+  businessId: number;
 }
 
 // Fetch all points of sale
-export function usePointOfSale() {
+export function usePointOfSale(businessId: number | null) {
   return useQuery<PointOfSale[]>({
-    queryKey: ['pointsOfSale'],
+    queryKey: ['pointsOfSale', businessId],
+    enabled: typeof businessId === 'number' && !Number.isNaN(businessId),
     queryFn: async () => {
-      const response = await fetch('/api/dashboard/settings/PointOfSale/getAll');
+      const response = await fetch(`/api/dashboard/settings/PointOfSale/getAll?businessId=${businessId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch points of sale');
       }
@@ -55,8 +58,8 @@ export function useCreatePointOfSale() {
       
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pointsOfSale'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['pointsOfSale', variables.businessId] });
     },
   });
 }
@@ -82,8 +85,8 @@ export function useUpdatePointOfSale() {
       
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pointsOfSale'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['pointsOfSale', variables.businessId] });
     },
   });
 }
@@ -93,13 +96,13 @@ export function useDeletePointOfSale() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (ids: number[]) => {
+    mutationFn: async (input: { ids: number[]; businessId: number }) => {
       const response = await fetch('/api/dashboard/settings/PointOfSale/delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify(input),
       });
       
       if (!response.ok) {
@@ -109,8 +112,8 @@ export function useDeletePointOfSale() {
       
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pointsOfSale'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['pointsOfSale', variables.businessId] });
     },
   });
 }

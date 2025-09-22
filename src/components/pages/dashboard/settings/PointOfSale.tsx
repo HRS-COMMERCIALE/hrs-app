@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { usePointOfSale, useCreatePointOfSale, useUpdatePointOfSale, useDeletePointOfSale } from '../../../../hooks/usePointOfSale';
+import { useBusiness } from '@/store/businessProvider';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner/LoadingSpinner';
 import { Store } from 'lucide-react';
 
@@ -27,7 +28,8 @@ interface UpdatePointOfSaleData {
 
 export default function PointOfSale() {
   // React Query hooks
-  const { data: pointsOfSale = [], isLoading, error, refetch } = usePointOfSale();
+  const { selectedBusinessId } = useBusiness();
+  const { data: pointsOfSale = [], isLoading, error, refetch } = usePointOfSale(selectedBusinessId ?? null);
   const createMutation = useCreatePointOfSale();
   const updateMutation = useUpdatePointOfSale();
   const deleteMutation = useDeletePointOfSale();
@@ -76,7 +78,8 @@ export default function PointOfSale() {
   // Optimized mutation handlers with useCallback
   const handleCreatePointOfSale = useCallback(async (data: CreatePointOfSaleData) => {
     try {
-      await createMutation.mutateAsync(data);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await createMutation.mutateAsync({ ...data, businessId: selectedBusinessId });
       setSuccessMessage('Point of sale created successfully!');
       setShowCreateModal(false);
       resetForm();
@@ -84,11 +87,12 @@ export default function PointOfSale() {
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [createMutation]);
+  }, [createMutation, selectedBusinessId]);
 
   const handleUpdatePointOfSale = useCallback(async (data: UpdatePointOfSaleData) => {
     try {
-      await updateMutation.mutateAsync(data);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await updateMutation.mutateAsync({ ...data, businessId: selectedBusinessId });
       setSuccessMessage('Point of sale updated successfully!');
       setShowEditModal(false);
       setEditingPoint(null);
@@ -96,18 +100,19 @@ export default function PointOfSale() {
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [updateMutation]);
+  }, [updateMutation, selectedBusinessId]);
 
   const handleDeletePointOfSale = useCallback(async (ids: number[]) => {
     try {
-      await deleteMutation.mutateAsync(ids);
+      if (!selectedBusinessId) throw new Error('No business selected');
+      await deleteMutation.mutateAsync({ ids, businessId: selectedBusinessId });
       setSuccessMessage(`Successfully deleted ${ids.length} point(s) of sale`);
       setDeletingPoints([]);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       // Error is handled by React Query
     }
-  }, [deleteMutation]);
+  }, [deleteMutation, selectedBusinessId]);
 
   // Form validation
   const validateForm = (data: CreatePointOfSaleData) => {
