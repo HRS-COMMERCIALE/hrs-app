@@ -180,8 +180,8 @@ export async function PUT(req: NextRequest) {
     // Sanitize input
     const sanitizedData = sanitizeInput(body as UpdateCompanyInfoRequest);
 
-    // Reuse authorized business instance when available to avoid redundant query
-    const business = authz.business || await Business().findOne({ where: { id: businessId } });
+    // Ensure we have a Sequelize instance (with get/update). Always fetch to avoid union type issues.
+    const business = await Business().findOne({ where: { id: businessId } });
     if (!business) {
       return NextResponse.json(
         { error: 'Business not found' },

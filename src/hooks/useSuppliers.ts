@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
 export interface Supplier {
   id: number;
@@ -34,8 +35,11 @@ export interface UpdateSupplierData extends Partial<CreateSupplierData> {
 }
 
 // API functions
-const fetchSuppliers = async (): Promise<Supplier[]> => {
-  const response = await fetch('/api/dashboard/crm/suppliers/getAll', {
+const fetchSuppliers = async (businessId?: number): Promise<Supplier[]> => {
+  const searchParams = new URLSearchParams();
+  if (businessId) searchParams.set('businessId', String(businessId));
+  
+  const response = await fetch(`/api/dashboard/crm/suppliers/getAll?${searchParams.toString()}`, {
     method: 'GET',
     credentials: 'include',
     headers: { Accept: 'application/json' },
@@ -50,8 +54,8 @@ const fetchSuppliers = async (): Promise<Supplier[]> => {
   return body?.data || [];
 };
 
-const createSupplier = async (data: CreateSupplierData): Promise<void> => {
-  const response = await fetch('/api/dashboard/crm/suppliers/create', {
+const createSupplier = async (data: CreateSupplierData & { businessId: number }): Promise<void> => {
+  const response = await fetch(`/api/dashboard/crm/suppliers/create?businessId=${data.businessId}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -64,8 +68,8 @@ const createSupplier = async (data: CreateSupplierData): Promise<void> => {
   }
 };
 
-const updateSupplier = async (data: UpdateSupplierData): Promise<void> => {
-  const response = await fetch('/api/dashboard/crm/suppliers/update', {
+const updateSupplier = async (data: UpdateSupplierData & { businessId: number }): Promise<void> => {
+  const response = await fetch(`/api/dashboard/crm/suppliers/update?businessId=${data.businessId}`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -78,8 +82,8 @@ const updateSupplier = async (data: UpdateSupplierData): Promise<void> => {
   }
 };
 
-const deleteSupplier = async (id: number): Promise<void> => {
-  const response = await fetch('/api/dashboard/crm/suppliers/delete', {
+const deleteSupplier = async (id: number, businessId: number): Promise<void> => {
+  const response = await fetch(`/api/dashboard/crm/suppliers/delete?businessId=${businessId}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -94,16 +98,27 @@ const deleteSupplier = async (id: number): Promise<void> => {
 
 // Hooks
 export const useSuppliers = () => {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
+  
   return useQuery({
-    queryKey: ['suppliers'],
-    queryFn: fetchSuppliers,
+    queryKey: ['suppliers', { businessId }],
+    queryFn: () => fetchSuppliers(businessId),
   });
 };
 
 export const useCreateSupplier = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
+  
   return useMutation({
-    mutationFn: createSupplier,
+    mutationFn: (payload: CreateSupplierData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return createSupplier({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     },
@@ -112,8 +127,15 @@ export const useCreateSupplier = () => {
 
 export const useUpdateSupplier = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
+  
   return useMutation({
-    mutationFn: updateSupplier,
+    mutationFn: (payload: UpdateSupplierData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return updateSupplier({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     },
@@ -122,8 +144,15 @@ export const useUpdateSupplier = () => {
 
 export const useDeleteSupplier = () => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
+  
   return useMutation({
-    mutationFn: deleteSupplier,
+    mutationFn: (id: number) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return deleteSupplier(id, businessId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     },

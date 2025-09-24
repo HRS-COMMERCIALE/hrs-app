@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 
 export type OrderItem = {
   id: number;
@@ -55,12 +56,13 @@ export type CreateOrderData = {
 
 export type UpdateOrderData = Partial<CreateOrderData> & { id: number };
 
-async function fetchOrders(params: GetOrdersParams) {
+async function fetchOrders(params: GetOrdersParams & { businessId?: number }) {
   const searchParams = new URLSearchParams();
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
   if (params.search) searchParams.set('search', params.search);
   if (params.articleId) searchParams.set('articleId', String(params.articleId));
+  if (params.businessId) searchParams.set('businessId', String(params.businessId));
 
   const res = await fetch(`/api/dashboard/operations/sales/orders/getAll?${searchParams.toString()}`,
     { credentials: 'include' }
@@ -73,18 +75,21 @@ async function fetchOrders(params: GetOrdersParams) {
 }
 
 export function useOrders(params: GetOrdersParams) {
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   const { page = 1, limit = 10, search, articleId } = params;
   return useQuery({
-    queryKey: ['orders', { page, limit, search: search || '', articleId: articleId || null }],
-    queryFn: () => fetchOrders({ page, limit, search, articleId }),
+    queryKey: ['orders', { page, limit, search: search || '', articleId: articleId || null, businessId }],
+    queryFn: () => fetchOrders({ page, limit, search, articleId, businessId }),
     staleTime: 30_000,
     gcTime: 5 * 60_000,
     retry: 1,
   });
 }
 
-async function postCreateOrder(data: CreateOrderData) {
-  const res = await fetch('/api/dashboard/operations/sales/orders/create', {
+async function postCreateOrder(data: CreateOrderData & { businessId: number }) {
+  const res = await fetch(`/api/dashboard/operations/sales/orders/create?businessId=${data.businessId}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -97,8 +102,8 @@ async function postCreateOrder(data: CreateOrderData) {
   return res.json();
 }
 
-async function putUpdateOrder(data: UpdateOrderData) {
-  const res = await fetch('/api/dashboard/operations/sales/orders/update', {
+async function putUpdateOrder(data: UpdateOrderData & { businessId: number }) {
+  const res = await fetch(`/api/dashboard/operations/sales/orders/update?businessId=${data.businessId}`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -111,8 +116,8 @@ async function putUpdateOrder(data: UpdateOrderData) {
   return res.json();
 }
 
-async function deleteOrderById(id: number) {
-  const res = await fetch('/api/dashboard/operations/sales/orders/delete', {
+async function deleteOrderById(id: number, businessId: number) {
+  const res = await fetch(`/api/dashboard/operations/sales/orders/delete?businessId=${businessId}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -127,8 +132,14 @@ async function deleteOrderById(id: number) {
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: postCreateOrder,
+    mutationFn: (payload: CreateOrderData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return postCreateOrder({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
@@ -137,8 +148,14 @@ export function useCreateOrder() {
 
 export function useUpdateOrder() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: putUpdateOrder,
+    mutationFn: (payload: UpdateOrderData) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return putUpdateOrder({ ...payload, businessId });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
@@ -147,8 +164,14 @@ export function useUpdateOrder() {
 
 export function useDeleteOrder() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const businessIdParam = searchParams.get('businessId');
+  const businessId = businessIdParam ? parseInt(businessIdParam) : undefined;
   return useMutation({
-    mutationFn: deleteOrderById,
+    mutationFn: (id: number) => {
+      if (!businessId) throw new Error('Missing businessId');
+      return deleteOrderById(id, businessId);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },

@@ -681,5 +681,12 @@
     "export": "Export",
     "import": "Import",
     "appName": "HRS App"
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundMessage": "The page you are looking for doesn’t exist."
+  },
+  "actions": {
+    "goHome": "Go back home"
   }
 }

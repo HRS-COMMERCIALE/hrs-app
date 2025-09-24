@@ -1,24 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthPayload } from '../../../../../_lib/auth';
+import { requireAuth } from '../../../../../_lib/auth';
+import { authorizeBusinessAccess } from '../../../../../_lib/businessAuth';
 import { createOrderSchema, CreateOrderData } from '@/validations/dashboard/operations/sales/orders/orderValidation';
-import { Order, Article, Business } from '@/models/associationt.ts/association';
+import { Order, Article } from '@/models/associationt.ts/association';
 
 export async function POST(req: NextRequest) {
   try {
     // Authenticate user
-    const authResult = await getAuthPayload(req);
-    if (!authResult.ok) {
-      return authResult.response;
-    }
-    const userId = authResult.payload.userId;
-    const business = await Business().findOne({ where: { userId } });
-    if (!business) {
-      return NextResponse.json(
-        { error: 'Business not found for this user' },
-        { status: 404 }
-      );
-    }
-    const businessId = (business as any).get('id') as number;
+    const auth = await requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+
+    // Business authorization
+    const { searchParams } = new URL(req.url);
+    const businessIdInput = searchParams.get('businessId') || (await req.json().then(body => body.businessId).catch(() => null));
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'create');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Parse and validate request body
     const body = await req.json();
@@ -71,7 +68,7 @@ export async function POST(req: NextRequest) {
     const createdOrder = await Order().findByPk((order as any).get('id'), {
       include: [
         {
-          model: Article,
+          model: Article(),
           as: 'article',
           attributes: ['id', 'article', 'marque', 'prixVenteTTC'],
         },

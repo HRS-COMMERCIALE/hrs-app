@@ -1,29 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthPayload } from '../../../../../_lib/auth';
+import { requireAuth } from '../../../../../_lib/auth';
+import { authorizeBusinessAccess } from '../../../../../_lib/businessAuth';
 import { getOrdersSchema, GetOrdersData } from '@/validations/dashboard/operations/sales/orders/orderValidation';
-import { Order, Article ,Business } from '@/models/associationt.ts/association';
+import { Order, Article } from '@/models/associationt.ts/association';
 import { Op } from 'sequelize';
 
 export async function GET(req: NextRequest) {
   try {
     // Authenticate user
-    const authResult = await getAuthPayload(req);
-    if (!authResult.ok) {
-      return authResult.response;
-    }
-    const userId = authResult.payload.userId;
-    // derive businessId from user
-    const business = await  Business().findOne({ where: { userId } });
-    if (!business) {
-      return NextResponse.json(
-        { error: 'Business not found for this user' },
-        { status: 404 }
-      );
-    }
-    const businessId = (business as any).get('id') as number;
+    const auth = await requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+
+    // Business authorization
+    const { searchParams } = new URL(req.url);
+    const businessIdInput = searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'read');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Parse and validate query parameters
-    const { searchParams } = new URL(req.url);
     const queryData = {
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '10'),
@@ -60,7 +55,7 @@ export async function GET(req: NextRequest) {
       where: whereClause,
       include: [
         {
-          model: Article,
+          model: Article(),
           as: 'article',
           attributes: ['id', 'article', 'marque', 'prixVenteTTC', 'qteEnStock'],
         },

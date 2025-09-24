@@ -675,5 +675,12 @@
     "export": "تصدير",
     "import": "استيراد",
     "appName": "تطبيق HRS"
+  },
+  "errors": {
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundMessage": "الصفحة التي تبحث عنها غير موجودة."
+  },
+  "actions": {
+    "goHome": "العودة إلى الرئيسية"
   }
 }

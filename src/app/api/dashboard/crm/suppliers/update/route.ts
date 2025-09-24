@@ -26,11 +26,10 @@ export async function PUT(req: Request) {
 
     const { id, codesPostauxId, ...updates } = parsed.data as any;
 
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'update');
+    // Business authorization
+    const { searchParams } = new URL(req.url);
+    const businessIdInput = searchParams.get('businessId') || body.businessId;
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'update');
     if (!authz.ok) return authz.response;
     const businessId = authz.businessId;
 

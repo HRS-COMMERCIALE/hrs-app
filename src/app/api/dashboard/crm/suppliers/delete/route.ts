@@ -26,11 +26,10 @@ export async function DELETE(req: Request) {
 
     const { id } = parsed.data;
 
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'delete');
+    // Business authorization
+    const { searchParams } = new URL(req.url);
+    const businessIdInput = searchParams.get('businessId') || body.businessId;
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'delete');
     if (!authz.ok) return authz.response;
     const businessId = authz.businessId;
 

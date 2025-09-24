@@ -1,24 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthPayload } from '../../../../../_lib/auth';
+import { requireAuth } from '../../../../../_lib/auth';
+import { authorizeBusinessAccess } from '../../../../../_lib/businessAuth';
 import { deleteOrderSchema, DeleteOrderData } from '@/validations/dashboard/operations/sales/orders/orderValidation';
-import { Order, Business } from '@/models/associationt.ts/association';
+import { Order } from '@/models/associationt.ts/association';
 
 export async function DELETE(req: NextRequest) {
   try {
     // Authenticate user
-    const authResult = await getAuthPayload(req);
-    if (!authResult.ok) {
-      return authResult.response;
-    }
-    const userId = authResult.payload.userId;
-    const business = await Business().findOne({ where: { userId } });
-    if (!business) {
-      return NextResponse.json(
-        { error: 'Business not found for this user' },
-        { status: 404 }
-      );
-    }
-    const businessId = (business as any).get('id') as number;
+    const auth = await requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+
+    // Business authorization
+    const { searchParams } = new URL(req.url);
+    const businessIdInput = searchParams.get('businessId') || (await req.json().then(body => body.businessId).catch(() => null));
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'delete');
+    if (!authz.ok) return authz.response;
+    const businessId = authz.businessId;
 
     // Parse and validate request body
     const body = await req.json();

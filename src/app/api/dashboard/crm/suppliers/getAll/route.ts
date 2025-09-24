@@ -17,11 +17,8 @@ export async function GET(req: Request) {
     const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 0, 1), 100) : 50;
     const offset = offsetParam ? Math.max(parseInt(offsetParam, 10) || 0, 0) : 0;
 
-    const business = await Business().findOne({ where: { userId: (auth as any).userId } });
-    if (!business) {
-      return NextResponse.json({ error: 'Business not found for user' }, { status: 404 });
-    }
-    const authz = await authorizeBusinessAccess((auth as any).userId, business.get('id'), 'read');
+    const businessIdInput = searchParams.get('businessId');
+    const authz = await authorizeBusinessAccess((auth as any).userId, businessIdInput, 'read');
     if (!authz.ok) return authz.response;
     const businessId = authz.businessId;
 

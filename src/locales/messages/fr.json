@@ -675,5 +675,12 @@
     "export": "Exporter",
     "import": "Importer",
     "appName": "Application HRS"
+  },
+  "errors": {
+    "notFoundTitle": "Page introuvable",
+    "notFoundMessage": "La page que vous recherchez n’existe pas."
+  },
+  "actions": {
+    "goHome": "Retour à l’accueil"
   }
 }
